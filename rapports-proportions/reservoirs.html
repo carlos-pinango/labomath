@@ -3,22 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Les pourcentages</title>
+    <title>Deux réservoirs – LaboMath</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../commun/style.css">
+    <script src="../commun/langue.js"></script>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            color: #2c3e50;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px 16px;
-            margin: 0;
-        }
-
+        /* Styles propres à cette activité (le reste vient de commun/style.css) */
         .container {
+            color: #2c3e50;
             width: 100%;
             max-width: 760px;
+            margin: 0 auto;
             background: white;
             padding: 30px;
             border-radius: 15px;
@@ -26,33 +23,13 @@
             box-sizing: border-box;
         }
 
-        .title-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
+        h1 {
+            color: #e67e22;
+            font-weight: 900;
+            line-height: 1.2;
             border-bottom: 2px solid #fcf3cf;
             padding-bottom: 10px;
         }
-
-        h1 {
-            color: #e67e22;
-            margin: 0;
-        }
-
-        .lang-btn {
-            border: 2px solid #f0a868;
-            background: white;
-            color: #e67e22;
-            font-family: inherit;
-            font-weight: 800;
-            font-size: 0.85em;
-            border-radius: 8px;
-            padding: 6px 12px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .lang-btn:hover { background: #fdf2e9; }
 
         .concept-box {
             background: #fdf2e9;
@@ -397,16 +374,6 @@
         }
         .hint-btn:hover, .hint-btn.active { background: #fdf2e9; }
 
-        .back-link {
-            margin-top: 28px;
-            text-decoration: none;
-            color: #95a5a6;
-            font-weight: bold;
-            display: inline-block;
-            transition: 0.2s;
-        }
-        .back-link:hover { color: #2c3e50; padding-left: 5px; }
-
         /* ── Mobile ── */
         @media (max-width: 560px) {
             .container { padding: 20px 16px; }
@@ -420,11 +387,20 @@
 </head>
 <body>
 
-<div class="container">
-    <div class="title-row">
-        <h1 data-i18n="title">💧 Les pourcentages</h1>
+<header class="app-header">
+    <div class="header-inner">
+        <a class="back-btn" href="index.html">← <span data-en="Ratios and proportions">Rapports et proportions</span></a>
+        <a class="logo" href="../index.html">
+            <div class="logo-icon">∑</div>
+            <span class="logo-text">Labo<span class="logo-accent">Math</span></span>
+        </a>
         <button class="lang-btn" id="langBtn">EN</button>
     </div>
+</header>
+
+<main class="page">
+<div class="container">
+    <h1 data-i18n="title">💧 Deux réservoirs</h1>
 
     <div class="concept-box" data-i18n-html="concept"></div>
 
@@ -499,9 +475,12 @@
     <div class="result-box" id="result"></div>
 
     <button class="hint-btn" id="hintBtn" data-i18n="hintShow">💡 Montrer le niveau de A dans B</button>
-
-    <a href="../index.html" class="back-link" data-i18n="back">← Retour à LaboMath</a>
 </div>
+</main>
+
+<footer class="app-footer">
+    <span data-en="Designed by Carlos Pinango, engineer and high school math teacher">Conçu par Carlos Pinango, ingénieur et enseignant de mathématiques au secondaire</span>
+</footer>
 
 <script>
     const CAP_A = 100;
@@ -510,7 +489,7 @@
 
     const STR = {
         fr: {
-            title: '💧 Les pourcentages',
+            title: '💧 Deux réservoirs',
             concept: 'Deux réservoirs rectangulaires de <strong>même hauteur</strong>. Le réservoir A a toujours une <strong>capacité de 100 L</strong> : ' +
                      'le nombre de litres qu\'il contient, c\'est directement le <strong>pourcentage</strong>. ' +
                      'Choisis la capacité du réservoir B, puis remplis chaque réservoir. ' +
@@ -547,11 +526,9 @@
             whyOnly: cap =>
                 `Avec une capacité de ${cap} L, seuls A = 0 L et A = 100 L donnent une équivalence exacte au centième.`,
             tryA: v => `Essayer A = ${v} L`,
-            back: '← Retour à LaboMath',
-            switchTo: 'EN',
         },
         en: {
-            title: '💧 Percentages',
+            title: '💧 Two water tanks',
             concept: 'Two rectangular tanks of the <strong>same height</strong>. Tank A always has a <strong>capacity of 100 L</strong>: ' +
                      'the number of liters in it is directly the <strong>percentage</strong>. ' +
                      'Choose the capacity of tank B, then fill each tank. ' +
@@ -588,13 +565,11 @@
             whyOnly: cap =>
                 `With a capacity of ${cap} L, only A = 0 L and A = 100 L give an exact equivalence to the hundredth.`,
             tryA: v => `Try A = ${v} L`,
-            back: '← Back to LaboMath',
-            switchTo: 'FR',
         }
     };
 
     const state = {
-        lang: readLang(),
+        lang: Langue.lang, // shared language, see commun/langue.js
         capB: 20,
         vA: 35,
         vB: 5,
@@ -602,11 +577,6 @@
         why: false,  // "Why?" explanation open
         active: 'A', // tank controlled by the arrow keys
     };
-
-    function readLang() {
-        try { return localStorage.getItem('labomath-lang') === 'en' ? 'en' : 'fr'; }
-        catch (e) { return 'fr'; }
-    }
 
     const $ = id => document.getElementById(id);
     const s = () => STR[state.lang];
@@ -668,7 +638,6 @@
 
     // ── Static text ──
     function applyLang() {
-        document.documentElement.lang = state.lang;
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const v = s()[el.dataset.i18n];
             if (typeof v === 'string') el.textContent = v;
@@ -676,8 +645,7 @@
         document.querySelectorAll('[data-i18n-html]').forEach(el => {
             el.innerHTML = s()[el.dataset.i18nHtml];
         });
-        document.title = s().title.replace(/^\S+\s/, '');
-        $('langBtn').textContent = s().switchTo;
+        document.title = s().title.replace(/^\S+\s/, '') + ' – LaboMath';
         renderScales();
         render();
     }
@@ -934,11 +902,8 @@
 
     $('hintBtn').addEventListener('click', () => { state.hint = !state.hint; render(); });
 
-    $('langBtn').addEventListener('click', () => {
-        state.lang = state.lang === 'fr' ? 'en' : 'fr';
-        try { localStorage.setItem('labomath-lang', state.lang); } catch (e) {}
-        applyLang();
-    });
+    // The header's FR/EN button is handled by commun/langue.js
+    Langue.onChange(lang => { state.lang = lang; applyLang(); });
 
     setCapacity(state.capB);
     setActive(state.active);

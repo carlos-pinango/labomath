@@ -4,7 +4,7 @@
 
 👉 **https://carlos-pinango.github.io/labomath/**
 
-Pour chaque thème, l'élève peut **explorer** la notion avec une leçon interactive, puis **pratiquer** avec des questions, des indices et des explications.
+Les activités sont regroupées par sujet. Chaque activité est une page interactive avec sa propre adresse, à partager directement avec les élèves.
 
 ## Auteur
 
