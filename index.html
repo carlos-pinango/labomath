@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Labo Math – Ton laboratoire de mathématiques pour le secondaire au Québec">
+  <title>LaboMath</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="app-header" id="appHeader">
+    <div class="header-inner">
+      <button class="back-btn hidden" id="backBtn" aria-label="Retour">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/>
+        </svg>
+        <span data-i18n="back">Retour</span>
+      </button>
+      <div class="logo" id="logoBtn" role="button" tabindex="0" aria-label="Accueil">
+        <div class="logo-icon">∑</div>
+        <span class="logo-text">Labo<span class="logo-accent">Math</span></span>
+      </div>
+      <button class="lang-btn" id="langBtn" aria-label="Switch language">
+        <span id="langLabel">EN</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="app" role="main">
+    <!-- Views rendered by JS -->
+  </main>
+
+  <footer class="app-footer">
+    <span data-i18n="footerText">Curriculum québécois · Secondaire 1–5 · Progression des apprentissages</span>
+  </footer>
+
+  <script src="js/translations.js"></script>
+  <script src="js/curriculum.js"></script>
+  <script src="js/explore.js"></script>
+  <script src="js/practice.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

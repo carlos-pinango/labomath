@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Les pourcentages</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 720px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: #e67e22;
+            border-bottom: 2px solid #fcf3cf;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        .concept-box {
+            background: #fdf2e9;
+            padding: 15px;
+            border-left: 5px solid #e67e22;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        /* ── Mode tabs ── */
+        .mode-tabs {
+            display: flex;
+            gap: 6px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+
+        .mode-tab {
+            flex: 1;
+            padding: 9px 6px;
+            border: none;
+            border-radius: 7px;
+            font-family: inherit;
+            font-size: 0.82em;
+            font-weight: bold;
+            cursor: pointer;
+            background: transparent;
+            color: #95a5a6;
+            transition: 0.2s;
+        }
+
+        .mode-tab.active {
+            background: white;
+            color: #e67e22;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .mode-tab:hover:not(.active) { color: #e67e22; }
+
+        /* ── Question ── */
+        .question-wrap {
+            background: #fdf2e9;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+        }
+
+        .question {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            font-size: 1.05em;
+            font-weight: 600;
+        }
+
+        .question input[type="number"] {
+            width: 75px;
+            padding: 6px 8px;
+            border: 2px solid #f0a868;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1.1em;
+            font-weight: 800;
+            color: #e67e22;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.2s;
+            -moz-appearance: textfield;
+        }
+
+        .question input[type="number"]::-webkit-outer-spin-button,
+        .question input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+        .question input[type="number"]:focus { border-color: #e67e22; }
+        .question input.narrow { width: 58px; }
+
+        .pct-sign {
+            font-size: 1.2em;
+            font-weight: 900;
+            color: #e67e22;
+            margin-left: -6px;
+        }
+
+        /* ── Two-grid layout ── */
+        .grids-section {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .grid-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-label {
+            font-size: 0.75em;
+            font-weight: 700;
+            color: #95a5a6;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        /* Fraction display */
+        .fraction {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1;
+        }
+
+        .frac-num, .frac-den {
+            font-size: 1.4em;
+            font-weight: 900;
+            color: #e67e22;
+            padding: 2px 6px;
+        }
+
+        .frac-den { color: #2c3e50; }
+
+        .frac-bar {
+            width: 100%;
+            height: 2.5px;
+            background: #2c3e50;
+            border-radius: 2px;
+        }
+
+        /* Grid container — fixed height so both grids are same size */
+        .grid-wrap {
+            width: 100%;
+            height: 260px;
+            position: relative;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 3px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .cell {
+            border-radius: 3px;
+            background: #fde8cc;
+            transition: background-color 0.2s ease;
+        }
+
+        .cell.on  { background: #e67e22; }
+        .cell.ghost { background: #f0f0f0; opacity: 0.4; }
+
+        .grid-info {
+            font-size: 0.75em;
+            color: #95a5a6;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* Warning when whole > 200 */
+        .grid-warning {
+            display: none;
+            width: 100%;
+            height: 260px;
+            background: #fdf2e9;
+            border-radius: 8px;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.85em;
+            color: #e67e22;
+            font-weight: 600;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        /* Equals column */
+        .equals-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 60px;
+        }
+
+        .big-equals {
+            font-size: 2em;
+            font-weight: 900;
+            color: #2c3e50;
+            line-height: 1;
+        }
+
+        /* ── Result annotation ── */
+        .annotation-box {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px 16px;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+
+        /* ── Back link ── */
+        .back-link {
+            margin-top: 28px;
+            text-decoration: none;
+            color: #95a5a6;
+            font-weight: bold;
+            display: inline-block;
+            transition: 0.2s;
+        }
+        .back-link:hover { color: #2c3e50; padding-left: 5px; }
+
+        /* ── Mobile ── */
+        @media (max-width: 520px) {
+            .grids-section {
+                grid-template-columns: 1fr;
+            }
+            .equals-col {
+                padding-top: 0;
+                flex-direction: row;
+                justify-content: center;
+            }
+            .big-equals { font-size: 1.6em; }
+            .grid-wrap { height: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>💯 Les pourcentages</h1>
+
+    <div class="concept-box">
+        Un <strong>pourcentage</strong>, c'est une <strong>proportion exprimée sur 100</strong>.
+        Les deux grilles montrent la même proportion : la grille de gauche utilise le nombre réel,
+        la grille de droite la <strong>ramène toujours à 100</strong>.
+        Les deux fractions sont <strong>équivalentes</strong> — c'est ça, un pourcentage !
+    </div>
+
+    <div class="mode-tabs">
+        <button class="mode-tab active" data-mode="A">🔍 Trouver le %</button>
+        <button class="mode-tab" data-mode="B">🔢 Trouver la partie</button>
+        <button class="mode-tab" data-mode="C">🧩 Trouver le tout</button>
+    </div>
+
+    <div class="question-wrap">
+        <div class="question" id="question"></div>
+    </div>
+
+    <!-- Two grids -->
+    <div class="grids-section">
+
+        <!-- Left: real proportion -->
+        <div class="grid-panel">
+            <div class="panel-label">La proportion réelle</div>
+            <div class="fraction">
+                <span class="frac-num" id="leftNum">30</span>
+                <div class="frac-bar"></div>
+                <span class="frac-den" id="leftDen">80</span>
+            </div>
+            <div class="grid-wrap">
+                <div class="grid" id="gridWhole"></div>
+                <div class="grid-warning" id="wholeWarning">
+                    ⚠️ Utilise un nombre ≤ 200<br>pour voir la grille
+                </div>
+            </div>
+            <div class="grid-info" id="infoWhole"></div>
+        </div>
+
+        <!-- Equals -->
+        <div class="equals-col">
+            <span class="big-equals">=</span>
+        </div>
+
+        <!-- Right: /100 -->
+        <div class="grid-panel">
+            <div class="panel-label">Sur 100 (le pourcentage)</div>
+            <div class="fraction">
+                <span class="frac-num" id="rightNum">37.5</span>
+                <div class="frac-bar"></div>
+                <span class="frac-den">100</span>
+            </div>
+            <div class="grid-wrap">
+                <div class="grid" id="gridHundred"></div>
+            </div>
+            <div class="grid-info" id="infoHundred"></div>
+        </div>
+
+    </div>
+
+    <div class="annotation-box" id="annotation"></div>
+
+    <a href="../proportionnalite.html" class="back-link">← Retour à la proportionnalité</a>
+</div>
+
+<script>
+    const MAX_WHOLE = 200;
+    const COLS = 10;
+
+    const state = {
+        mode: 'A',
+        A: { part: 30, whole: 80 },
+        B: { whole: 80, pct: 25 },
+        C: { part: 15, pct: 25 }
+    };
+
+    // Build the fixed /100 grid once
+    const gridHundred = document.getElementById('gridHundred');
+    const hundredCells = [];
+    gridHundred.style.gridTemplateRows = 'repeat(10, 1fr)';
+    for (let i = 0; i < 100; i++) {
+        const c = document.createElement('div');
+        c.className = 'cell';
+        gridHundred.appendChild(c);
+        hundredCells.push(c);
+    }
+
+    function fmt(n) {
+        return Number.isInteger(n) ? String(n) : parseFloat(n.toFixed(1)).toString();
+    }
+
+    function updateHundredGrid(pct) {
+        const count = Math.min(100, Math.max(0, Math.round(pct)));
+        hundredCells.forEach((c, i) => {
+            c.className = 'cell' + (i < count ? ' on' : '');
+        });
+        document.getElementById('infoHundred').textContent =
+            `100 cases · ${count} colorée${count !== 1 ? 's' : ''}`;
+        document.getElementById('rightNum').textContent = fmt(pct);
+    }
+
+    function updateWholeGrid(whole, part) {
+        const gridEl   = document.getElementById('gridWhole');
+        const warnEl   = document.getElementById('wholeWarning');
+        const infoEl   = document.getElementById('infoWhole');
+        const wholeInt = Math.round(whole);
+        const partInt  = Math.round(part);
+
+        if (wholeInt > MAX_WHOLE || wholeInt < 1) {
+            gridEl.style.display  = 'none';
+            warnEl.style.display  = 'flex';
+            infoEl.textContent    = '';
+            return;
+        }
+
+        warnEl.style.display = 'none';
+        gridEl.style.display = 'grid';
+        gridEl.innerHTML     = '';
+
+        const rows      = Math.ceil(wholeInt / COLS);
+        const totalCells = rows * COLS;
+        gridEl.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+        for (let i = 0; i < totalCells; i++) {
+            const c = document.createElement('div');
+            if (i >= wholeInt) {
+                c.className = 'cell ghost';
+            } else {
+                c.className = 'cell' + (i < partInt ? ' on' : '');
+            }
+            gridEl.appendChild(c);
+        }
+
+        infoEl.textContent =
+            `${wholeInt} cases · ${partInt} colorée${partInt !== 1 ? 's' : ''}`;
+    }
+
+    function updateFractions(leftNum, leftDen) {
+        document.getElementById('leftNum').textContent = fmt(leftNum);
+        document.getElementById('leftDen').textContent = fmt(leftDen);
+    }
+
+    function compute() {
+        const { mode } = state;
+
+        if (mode === 'A') {
+            const { part, whole } = state.A;
+            if (whole <= 0) return;
+            const pct = (part / whole) * 100;
+            const safePct = Math.min(pct, 100);
+            updateFractions(part, whole);
+            updateWholeGrid(whole, part > whole ? whole : part);
+            updateHundredGrid(safePct);
+            document.getElementById('annotation').textContent =
+                part > whole
+                    ? 'La partie dépasse le tout !'
+                    : `${part} ÷ ${whole} × 100 = ${fmt(pct)} %`;
+
+        } else if (mode === 'B') {
+            const { whole, pct } = state.B;
+            const part = (pct / 100) * whole;
+            updateFractions(part, whole);
+            updateWholeGrid(whole, part);
+            updateHundredGrid(pct);
+            document.getElementById('annotation').textContent =
+                `${whole} × ${pct} ÷ 100 = ${fmt(part)}`;
+
+        } else {
+            const { part, pct } = state.C;
+            if (pct <= 0) return;
+            const whole = part / (pct / 100);
+            updateFractions(part, whole);
+            updateWholeGrid(whole, part);
+            updateHundredGrid(pct);
+            document.getElementById('annotation').textContent =
+                `${part} ÷ (${pct} ÷ 100) = ${part} ÷ ${(pct / 100).toFixed(2)} = ${fmt(whole)}`;
+        }
+    }
+
+    function renderQuestion() {
+        const q    = document.getElementById('question');
+        const { mode } = state;
+
+        if (mode === 'A') {
+            const { part, whole } = state.A;
+            q.innerHTML = `
+                <input type="number" min="0" max="1000" value="${part}" id="iPart">
+                <span>est quel pourcentage de</span>
+                <input type="number" min="1" max="${MAX_WHOLE}" value="${whole}" id="iWhole">
+                <span>?</span>`;
+            q.querySelector('#iPart').addEventListener('input', e => {
+                const v = parseFloat(e.target.value);
+                if (!isNaN(v) && v >= 0) { state.A.part = v; compute(); }
+            });
+            q.querySelector('#iWhole').addEventListener('input', e => {
+                const v = parseFloat(e.target.value);
+                if (!isNaN(v) && v >= 1) { state.A.whole = v; compute(); }
+            });
+
+        } else if (mode === 'B') {
+            const { whole, pct } = state.B;
+            q.innerHTML = `
+                <span>Quel est</span>
+                <input type="number" class="narrow" min="0" max="100" value="${pct}" id="iPct">
+                <span class="pct-sign">%</span>
+                <span>de</span>
+                <input type="number" min="1" max="${MAX_WHOLE}" value="${whole}" id="iWhole">
+                <span>?</span>`;
+            q.querySelector('#iPct').addEventListener('input', e => {
+                const v = parseFloat(e.target.value);
+                if (!isNaN(v) && v >= 0 && v <= 100) { state.B.pct = v; compute(); }
+            });
+            q.querySelector('#iWhole').addEventListener('input', e => {
+                const v = parseFloat(e.target.value);
+                if (!isNaN(v) && v >= 1) { state.B.whole = v; compute(); }
+            });
+
+        } else {
+            const { part, pct } = state.C;
+            q.innerHTML = `
+                <input type="number" min="0" max="1000" value="${part}" id="iPart">
+                <span>représente</span>
+                <input type="number" class="narrow" min="1" max="100" value="${pct}" id="iPct">
+                <span class="pct-sign">%</span>
+                <span>de quel nombre ?</span>`;
+            q.querySelector('#iPart').addEventListener('input', e => {
+                const v = parseFloat(e.target.value);
+                if (!isNaN(v) && v >= 0) { state.C.part = v; compute(); }
+            });
+            q.querySelector('#iPct').addEventListener('input', e => {
+                const v = parseFloat(e.target.value);
+                if (!isNaN(v) && v >= 1 && v <= 100) { state.C.pct = v; compute(); }
+            });
+        }
+
+        compute();
+    }
+
+    document.querySelectorAll('.mode-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            state.mode = tab.dataset.mode;
+            document.querySelectorAll('.mode-tab').forEach(t =>
+                t.classList.toggle('active', t === tab));
+            renderQuestion();
+        });
+    });
+
+    renderQuestion();
+</script>
+
+</body>
+</html>
