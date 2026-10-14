@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Situation proportionnelle – LaboMath</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../commun/style.css">
+    <script src="../commun/langue.js"></script>
+    <style>
+        /* Styles propres à cette activité (le reste vient de commun/style.css) */
+        [hidden] { display: none !important; }
+        :root {
+            --ok: #27ae60;
+            --bad: #e74c3c;
+            --base: #e67e22;
+        }
+
+        .container {
+            color: #2c3e50;
+            width: 100%;
+            max-width: 860px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: #e67e22;
+            font-weight: 900;
+            line-height: 1.2;
+            border-bottom: 2px solid #fcf3cf;
+            padding-bottom: 10px;
+        }
+
+        h2.step {
+            font-size: 1.05em;
+            font-weight: 900;
+            margin: 26px 0 10px;
+            color: #2c3e50;
+        }
+        h2.step .num {
+            display: inline-flex;
+            width: 26px; height: 26px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #e67e22;
+            color: white;
+            font-size: 0.85em;
+            margin-right: 8px;
+        }
+
+        .concept-box {
+            background: #fdf2e9;
+            padding: 15px;
+            border-left: 5px solid #e67e22;
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .panel {
+            background: #fdf2e9;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 10px 16px;
+            font-weight: 700;
+        }
+
+        .toggle {
+            display: inline-flex;
+            background: white;
+            border-radius: 20px;
+            padding: 3px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .toggle button {
+            border: none;
+            background: transparent;
+            color: #7f8c8d;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.85em;
+            border-radius: 18px;
+            padding: 5px 12px;
+            cursor: pointer;
+        }
+        .toggle button.active { background: #e67e22; color: white; }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+        .chip {
+            border: none;
+            background: white;
+            color: #7f8c8d;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.85em;
+            border-radius: 20px;
+            padding: 5px 12px;
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .chip:hover { color: #e67e22; }
+        .chip.active { background: #e67e22; color: white; }
+
+        .field { display: flex; align-items: center; gap: 6px; font-size: 0.9em; }
+
+        .num-input, .text-input {
+            padding: 5px 6px;
+            border: 2px solid #f0a868;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1em;
+            font-weight: 800;
+            color: #e67e22;
+            text-align: center;
+            outline: none;
+            background: white;
+            transition: border-color 0.2s;
+        }
+        .num-input { width: 70px; }
+        .text-input { width: 110px; }
+        .num-input:focus, .text-input:focus { border-color: #e67e22; }
+        .num-input.invalid { border-color: var(--bad); color: var(--bad); }
+        .num-input.ok  { border-color: var(--ok); color: #1e8449; background: #e9f7ef; }
+        .num-input.bad { border-color: var(--bad); color: #c0392b; background: #fdedec; }
+
+        .situation {
+            text-align: center;
+            font-size: 1.15em;
+            font-weight: 800;
+            margin: 6px 0 4px;
+        }
+
+        /* ── Fractions ── */
+        .fractions {
+            --cell-h: 38px;                          /* height of a numerator or denominator */
+            --frac-h: calc(2 * var(--cell-h) + 11px); /* + bar and gaps */
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 8px;
+        }
+        .frac {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        /* numerator + bar + denominator: same height everywhere, so the bar is always at mid-height */
+        .frac-body {
+            height: var(--frac-h);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .frac .bar { width: 100%; height: 3px; background: #2c3e50; border-radius: 2px; }
+        .frac .num-input { width: 66px; height: var(--cell-h); padding: 0 6px; }
+        .frac.base .val {
+            height: var(--cell-h);
+            line-height: var(--cell-h);
+            font-size: 1.3em;
+            font-weight: 900;
+            color: var(--base);
+            min-width: 50px;
+            text-align: center;
+        }
+        .frac .tag {
+            font-size: 0.7em;
+            font-weight: 800;
+            color: #95a5a6;
+            text-transform: uppercase;
+        }
+        .eq {
+            height: var(--frac-h);
+            display: flex;
+            align-items: center;
+            font-size: 1.6em;
+            font-weight: 900;
+            line-height: 1;
+        }
+        .mark { font-weight: 900; min-height: 1.2em; font-size: 0.95em; }
+        .mark.ok { color: var(--ok); }
+        .mark.bad { color: var(--bad); }
+        .frac-legend {
+            text-align: center;
+            font-size: 0.8em;
+            color: #7f8c8d;
+            margin-top: 6px;
+        }
+
+        /* ── Table ── */
+        .table-wrap { overflow-x: auto; }
+        table { border-collapse: collapse; margin: 0 auto; }
+        th, td {
+            padding: 6px 6px;
+            text-align: center;
+            border: 1px solid #f0e0d0;
+            white-space: nowrap;
+        }
+        th { background: #fdf2e9; font-size: 0.85em; text-align: left; }
+        th small { font-weight: 600; color: #7f8c8d; }
+        td.col-head { font-size: 0.75em; font-weight: 800; color: #95a5a6; border: none; }
+        td.ratio { font-weight: 800; color: #5d6d7e; font-size: 0.9em; }
+        td.ratio.ok { color: var(--ok); }
+        td.ratio.bad { color: var(--bad); }
+
+        /* ── Graph ── */
+        .graph-wrap { max-width: 640px; margin: 0 auto; }
+        svg.graph { width: 100%; height: auto; display: block; }
+        .graph .grid { stroke: #ecf0f1; stroke-width: 1; }
+        .graph .axis { stroke: #2c3e50; stroke-width: 2; }
+        .graph .tick { font-size: 12px; fill: #7f8c8d; font-family: Nunito, sans-serif; }
+        .graph .axis-label { font-size: 13px; font-weight: 800; fill: #2c3e50; font-family: Nunito, sans-serif; }
+        .graph .pt-label { font-size: 11px; font-weight: 800; font-family: Nunito, sans-serif; }
+        .graph .line { stroke: #2980b9; stroke-width: 2.5; stroke-dasharray: 8 5; }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 16px;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: 700;
+            color: #5d6d7e;
+            margin-top: 6px;
+        }
+        .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
+
+        .center { text-align: center; margin-top: 10px; }
+        .btn {
+            border: none;
+            background: #fdf2e9;
+            color: #e67e22;
+            font-family: inherit;
+            font-weight: 800;
+            border-radius: 20px;
+            padding: 7px 14px;
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .btn:hover, .btn.active { background: #fcf3cf; }
+
+        .summary, .insight {
+            border-radius: 10px;
+            padding: 12px 16px;
+            line-height: 1.6;
+            margin-top: 12px;
+            text-align: center;
+        }
+        .summary { background: #f8f9fa; color: #5d6d7e; }
+        .summary.good { background: #e9f7ef; color: #1e8449; }
+        .insight { background: #eaf2f8; color: #1f618d; }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px 14px; }
+            h1 { font-size: 1.4em; }
+            .num-input { width: 58px; }
+            .frac .num-input { width: 54px; }
+            .panel { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="app-header">
+    <div class="header-inner">
+        <a class="back-btn" href="index.html">← <span data-en="Ratios and proportions">Rapports et proportions</span></a>
+        <a class="logo" href="../index.html">
+            <div class="logo-icon">∑</div>
+            <span class="logo-text">Labo<span class="logo-accent">Math</span></span>
+        </a>
+        <button class="lang-btn" id="langBtn">EN</button>
+    </div>
+</header>
+
+<main class="page">
+<div class="container">
+    <h1 data-i18n="title">📈 Situation proportionnelle</h1>
+
+    <div class="concept-box" id="concept"></div>
+
+    <!-- Type of situation and context -->
+    <div class="panel">
+        <div class="toggle" id="modeToggle">
+            <button data-mode="prop" data-i18n="modeProp">Proportionnelle</button>
+            <button data-mode="nonprop" data-i18n="modeNonprop">Non proportionnelle</button>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="chips" id="presetChips"></div>
+    </div>
+    <div class="panel" id="customPanel" hidden></div>
+
+    <div class="situation" id="situation"></div>
+
+    <!-- Step 1: equivalent fractions (proportional mode only) -->
+    <div id="fracSection">
+        <h2 class="step"><span class="num">1</span><span data-i18n="step1">Écris 5 fractions équivalentes</span></h2>
+        <div class="fractions" id="fractions"></div>
+        <div class="frac-legend" id="fracLegend"></div>
+    </div>
+
+    <!-- Step 2: table of values -->
+    <h2 class="step"><span class="num" id="tableNum">2</span><span id="step2Title"></span></h2>
+    <div class="table-wrap"><table id="table"></table></div>
+
+    <!-- Step 3: graph -->
+    <h2 class="step"><span class="num" id="graphNum">3</span><span data-i18n="step3">Observe le graphique</span></h2>
+    <div class="graph-wrap">
+        <svg class="graph" id="graph" viewBox="0 0 560 400" role="img"></svg>
+        <div class="legend" id="legend"></div>
+    </div>
+    <div class="center">
+        <button class="btn" id="lineBtn"></button>
+    </div>
+
+    <div class="summary" id="summary"></div>
+    <div class="insight" id="insight" hidden></div>
+</div>
+</main>
+
+<footer class="app-footer">
+    <span data-en="Designed by Carlos Pinango, engineer and high school math teacher">Conçu par Carlos Pinango, ingénieur et enseignant de mathématiques au secondaire</span>
+</footer>
+
+<script>
+    const N = 5; // number of fractions / table columns
+
+    // Situations. Proportional: y = k·x, given as a starting pair (x0, y0).
+    // Non-proportional: y = b + k·x (b = fixed part).
+    const PRESETS = {
+        prop: [
+            { id: 'pommes',
+              name: { fr: '🍎 Pommes', en: '🍎 Apples' },
+              text: { fr: '2 kg de pommes coûtent 5 $.', en: '2 kg of apples cost $5.' },
+              x: { fr: 'Masse', en: 'Mass', unit: 'kg' }, y: { fr: 'Prix', en: 'Price', unit: '$' },
+              x0: 2, y0: 5 },
+            { id: 'voiture',
+              name: { fr: '🚗 Voiture', en: '🚗 Car' },
+              text: { fr: 'Une voiture parcourt 150 km en 2 h.', en: 'A car travels 150 km in 2 h.' },
+              x: { fr: 'Temps', en: 'Time', unit: 'h' }, y: { fr: 'Distance', en: 'Distance', unit: 'km' },
+              x0: 2, y0: 150 },
+            { id: 'recette',
+              name: { fr: '🧁 Recette', en: '🧁 Recipe' },
+              text: { fr: 'Pour 4 personnes, il faut 300 g de farine.', en: 'For 4 people, you need 300 g of flour.' },
+              x: { fr: 'Personnes', en: 'People', unit: '' }, y: { fr: 'Farine', en: 'Flour', unit: 'g' },
+              x0: 4, y0: 300 },
+            { id: 'salaire',
+              name: { fr: '💼 Salaire', en: '💼 Wages' },
+              text: { fr: 'En 3 h de travail, Léa gagne 54 $.', en: 'In 3 hours of work, Léa earns $54.' },
+              x: { fr: 'Temps', en: 'Time', unit: 'h' }, y: { fr: 'Salaire', en: 'Pay', unit: '$' },
+              x0: 3, y0: 54 },
+        ],
+        nonprop: [
+            { id: 'taxi',
+              name: { fr: '🚕 Taxi', en: '🚕 Taxi' },
+              text: { fr: 'Un taxi coûte 3 $ au départ, puis 2 $ par km.', en: 'A taxi costs $3 to start, then $2 per km.' },
+              x: { fr: 'Distance', en: 'Distance', unit: 'km' }, y: { fr: 'Prix', en: 'Price', unit: '$' },
+              b: 3, k: 2 },
+            { id: 'velo',
+              name: { fr: '🚲 Location de vélo', en: '🚲 Bike rental' },
+              text: { fr: 'Louer un vélo coûte 5 $ de frais, plus 4 $ par heure.', en: 'Renting a bike costs a $5 fee, plus $4 per hour.' },
+              x: { fr: 'Temps', en: 'Time', unit: 'h' }, y: { fr: 'Coût', en: 'Cost', unit: '$' },
+              b: 5, k: 4 },
+            { id: 'piscine',
+              name: { fr: '🏊 Piscine', en: '🏊 Pool' },
+              text: { fr: "L'abonnement coûte 20 $, plus 3 $ par visite.", en: 'The membership costs $20, plus $3 per visit.' },
+              x: { fr: 'Visites', en: 'Visits', unit: '' }, y: { fr: 'Coût', en: 'Cost', unit: '$' },
+              b: 20, k: 3 },
+        ],
+    };
+
+    const STR = {
+        fr: {
+            title: '📈 Situation proportionnelle',
+            conceptProp: 'Une situation est <strong>directement proportionnelle</strong> quand y ÷ x est <strong>constant</strong> : ' +
+                'si x est multiplié par un nombre, y est multiplié par le même nombre. ' +
+                'Quand x et y ont des unités différentes (ex. $ et kg), y ÷ x est un <strong>taux</strong> (2,5 $/kg) ; ' +
+                'quand ils ont la même unité (ex. cm et cm), c\'est un <strong>rapport</strong>. ' +
+                'On peut représenter la situation de trois façons : des <strong>fractions équivalentes</strong>, une <strong>table de valeurs</strong> ' +
+                'et un <strong>graphique</strong>. Écris 5 fractions équivalentes à la fraction de départ, recopie-les dans la table, puis observe les points.',
+            conceptNonprop: w => 'Une situation est <strong>non proportionnelle</strong> quand il y a une <strong>valeur de départ</strong> (des frais fixes, par exemple). ' +
+                `Remplis la table en calculant y pour 5 valeurs de x de ton choix, puis observe les ${w.many} y ÷ x et le graphique.`,
+            // y ÷ x is a rate (taux) when the units differ, a ratio (rapport) when they are the same
+            word: same => same ? { one: 'rapport', many: 'rapports', Many: 'Les rapports' } : { one: 'taux', many: 'taux', Many: 'Les taux' },
+            modeProp: 'Proportionnelle',
+            modeNonprop: 'Non proportionnelle',
+            custom: '✏️ Personnalisée',
+            customText: 'Situation personnalisée',
+            xName: 'Nom de x', yName: 'Nom de y', unit: 'unité',
+            startPair: 'Départ :', fixed: 'Valeur de départ (b) :', rate: 'Par unité de x (k) :',
+            step1: 'Écris 5 fractions équivalentes',
+            step2Prop: 'Recopie tes fractions dans la table de valeurs',
+            step2Nonprop: 'Remplis la table de valeurs',
+            step3: 'Observe le graphique',
+            start: 'départ',
+            fracLegend: (y, x) => `Numérateur : ${y} · Dénominateur : ${x}`,
+            ratioRow: 'y ÷ x',
+            col: n => `Colonne ${n}`,
+            lineShow: '📈 Tracer la droite',
+            lineHide: '🙈 Cacher la droite',
+            legendStart: 'Fraction de départ',
+            legendOk: 'Point correct',
+            legendBad: 'Point à vérifier',
+            legendFixed: 'Valeur de départ',
+            // Comma between coordinates, unless one of them has a decimal comma: then a semicolon
+            coord: (x, y) => /,/.test(`${x}${y}`) ? `(${x} ; ${y})` : `(${x}, ${y})`,
+            sumProp: (f, t) => `Fractions équivalentes : <strong>${f} sur ${N}</strong> · Table : <strong>${t} sur ${N}</strong>`,
+            sumPropHint: 'Dans la table, le <strong>dénominateur</strong> de chaque fraction devient x et le <strong>numérateur</strong> devient y.',
+            sumPropDone: '✅ Bravo ! Tes fractions, ta table et ton graphique représentent la même situation proportionnelle.',
+            sumNonprop: t => `Table : <strong>${t} sur ${N}</strong> valeurs correctes`,
+            sumNonpropHint: rule => `Calcule ${rule}.`,
+            sumNonpropDone: '✅ Bravo ! Ta table est correcte.',
+            insightProp: (k, unit, w) => `Les points sont <strong>alignés sur une droite qui passe par l'origine (0, 0)</strong> : quand x = 0, y = 0. ` +
+                `Le <strong>${w.one}</strong> y ÷ x est toujours le même : <strong>${k}${unit}</strong>. C'est le <strong>coefficient de proportionnalité</strong>.`,
+            insightNonprop: (pt, w) => `Les points sont alignés, mais la droite <strong>ne passe pas par l'origine</strong> : elle coupe l'axe des y à <strong>${pt}</strong>, la valeur de départ. ` +
+                `${w.Many} y ÷ x ne sont pas égaux : la situation <strong>n'est pas proportionnelle</strong>.`,
+        },
+        en: {
+            title: '📈 Proportional situation',
+            conceptProp: 'A situation is <strong>directly proportional</strong> when y ÷ x is <strong>constant</strong>: ' +
+                'if x is multiplied by a number, y is multiplied by the same number. ' +
+                'When x and y have different units (e.g. $ and kg), y ÷ x is a <strong>rate</strong> ($2.50/kg); ' +
+                'when they have the same unit (e.g. cm and cm), it is a <strong>ratio</strong>. ' +
+                'The situation can be shown in three ways: <strong>equivalent fractions</strong>, a <strong>table of values</strong> ' +
+                'and a <strong>graph</strong>. Write 5 fractions equivalent to the starting fraction, copy them into the table, then look at the points.',
+            conceptNonprop: w => 'A situation is <strong>not proportional</strong> when there is a <strong>starting value</strong> (a fixed fee, for example). ' +
+                `Fill in the table by computing y for 5 values of x of your choice, then look at the ${w.many} y ÷ x and the graph.`,
+            word: same => same ? { one: 'ratio', many: 'ratios', Many: 'The ratios' } : { one: 'rate', many: 'rates', Many: 'The rates' },
+            modeProp: 'Proportional',
+            modeNonprop: 'Not proportional',
+            custom: '✏️ Custom',
+            customText: 'Custom situation',
+            xName: 'Name of x', yName: 'Name of y', unit: 'unit',
+            startPair: 'Start:', fixed: 'Starting value (b):', rate: 'Per unit of x (k):',
+            step1: 'Write 5 equivalent fractions',
+            step2Prop: 'Copy your fractions into the table of values',
+            step2Nonprop: 'Fill in the table of values',
+            step3: 'Look at the graph',
+            start: 'start',
+            fracLegend: (y, x) => `Numerator: ${y} · Denominator: ${x}`,
+            ratioRow: 'y ÷ x',
+            col: n => `Column ${n}`,
+            lineShow: '📈 Draw the line',
+            lineHide: '🙈 Hide the line',
+            legendStart: 'Starting fraction',
+            legendOk: 'Correct point',
+            legendBad: 'Point to check',
+            legendFixed: 'Starting value',
+            coord: (x, y) => `(${x}, ${y})`,
+            sumProp: (f, t) => `Equivalent fractions: <strong>${f} of ${N}</strong> · Table: <strong>${t} of ${N}</strong>`,
+            sumPropHint: 'In the table, each fraction\'s <strong>denominator</strong> becomes x and its <strong>numerator</strong> becomes y.',
+            sumPropDone: '✅ Well done! Your fractions, table and graph show the same proportional situation.',
+            sumNonprop: t => `Table: <strong>${t} of ${N}</strong> correct values`,
+            sumNonpropHint: rule => `Compute ${rule}.`,
+            sumNonpropDone: '✅ Well done! Your table is correct.',
+            insightProp: (k, unit, w) => `The points are <strong>on a line that goes through the origin (0, 0)</strong>: when x = 0, y = 0. ` +
+                `The <strong>${w.one}</strong> y ÷ x is always the same: <strong>${k}${unit}</strong>. It is the <strong>constant of proportionality</strong>.`,
+            insightNonprop: (pt, w) => `The points are on a line, but it <strong>does not go through the origin</strong>: it crosses the y-axis at <strong>${pt}</strong>, the starting value. ` +
+                `${w.Many} y ÷ x are not equal: the situation is <strong>not proportional</strong>.`,
+        }
+    };
+
+    const state = {
+        lang: Langue.lang,          // shared language, see commun/langue.js
+        mode: 'prop',               // 'prop' | 'nonprop'
+        preset: 'pommes',           // preset id, or 'custom'
+        custom: {
+            prop:    { xName: 'x', xUnit: '', yName: 'y', yUnit: '', x0: 2, y0: 3 },
+            nonprop: { xName: 'x', xUnit: '', yName: 'y', yUnit: '', b: 2, k: 3 },
+        },
+        fracs: [],                  // [{ n, d }] as typed (strings)
+        table: [],                  // [{ x, y }] as typed (strings)
+        line: false,
+    };
+
+    const $ = id => document.getElementById(id);
+    const s = () => STR[state.lang];
+    const L = obj => obj[state.lang];
+    const round2 = n => Math.round(n * 100) / 100;
+    const hund = n => Math.round(n * 100);
+
+    function fmt(n, maxDec = 2) {
+        return n.toLocaleString(state.lang === 'fr' ? 'fr-CA' : 'en-CA', { maximumFractionDigits: maxDec });
+    }
+    function inputVal(n) {
+        const str = String(round2(n));
+        return state.lang === 'fr' ? str.replace('.', ',') : str;
+    }
+    // Accepts "12,5" and "12.5" with at most 2 decimals; NaN otherwise
+    function parseNum(str) {
+        const t = String(str).trim().replace(',', '.');
+        return /^(\d+\.?\d{0,2}|\.\d{1,2})$/.test(t) ? Number(t) : NaN;
+    }
+    function limitDecimals(input) {
+        const cut = input.value.replace(/([.,]\d{2})\d+/, '$1');
+        if (cut !== input.value) input.value = cut;
+    }
+    function escapeHtml(t) {
+        return String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    }
+
+    // ── Current situation ──
+    function situation() {
+        if (state.preset === 'custom') {
+            const c = state.custom[state.mode];
+            return {
+                custom: true,
+                text: s().customText,
+                x: { name: c.xName || 'x', unit: c.xUnit }, y: { name: c.yName || 'y', unit: c.yUnit },
+                x0: c.x0, y0: c.y0, b: c.b, k: c.k,
+            };
+        }
+        const p = PRESETS[state.mode].find(p => p.id === state.preset);
+        return {
+            text: L(p.text),
+            x: { name: L(p.x), unit: p.x.unit }, y: { name: L(p.y), unit: p.y.unit },
+            x0: p.x0, y0: p.y0, b: p.b, k: p.k,
+        };
+    }
+    const withUnit = v => v.unit ? `${v.name} (${v.unit})` : v.name;
+    // Same unit for x and y → y ÷ x is a ratio (rapport); otherwise a rate (taux)
+    const sameUnit = sit => !!sit.x.unit && sit.x.unit.trim().toLowerCase() === sit.y.unit.trim().toLowerCase();
+    // Table/axis label after "x" or "y": skip it when it would only repeat the letter
+    const axisName = (letter, v) => (v.name === letter && !v.unit) ? '' : withUnit(v);
+
+    // Exact tests in hundredths (all values have at most 2 decimals)
+    function onRelation(sit, x, y) {
+        if (state.mode === 'prop') return hund(y) * hund(sit.x0) === hund(x) * hund(sit.y0);  // y/x = y0/x0
+        return hund(y) * 100 === hund(sit.b) * 100 + hund(sit.k) * hund(x);                     // y = b + kx
+    }
+
+    // Rule written as in algebra: y = 3 + 2x (no × sign that could be read as the variable x)
+    function ruleHtml(sit) {
+        const kx = sit.k === 1 ? '<em>x</em>' : `${fmt(sit.k)}<em>x</em>`;
+        return `<em>y</em> = ${fmt(sit.b)} + ${kx}`;
+    }
+
+    // Something typed that is not a number (letters, negative, too many commas…): show it in red
+    function flagInvalid(inputs) {
+        inputs.forEach(el => {
+            if (el.value.trim() !== '' && isNaN(parseNum(el.value))) el.classList.add('bad');
+        });
+    }
+
+    function resetAnswers() {
+        state.fracs = Array.from({ length: N }, () => ({ n: '', d: '' }));
+        state.table = Array.from({ length: N }, () => ({ x: '', y: '' }));
+    }
+
+    // ── Build the inputs (only when the situation, mode or language changes) ──
+    function build() {
+        const sit = situation();
+        const prop = state.mode === 'prop';
+
+        document.querySelectorAll('#modeToggle button').forEach(b => b.classList.toggle('active', b.dataset.mode === state.mode));
+
+        // Preset chips
+        $('presetChips').innerHTML = PRESETS[state.mode].map(p =>
+            `<button class="chip${p.id === state.preset ? ' active' : ''}" data-preset="${p.id}">${L(p.name)}</button>`
+        ).join('') + `<button class="chip${state.preset === 'custom' ? ' active' : ''}" data-preset="custom">${s().custom}</button>`;
+
+        buildCustomPanel();
+
+        // Step 1: fractions (proportional only)
+        $('fracSection').hidden = !prop;
+        $('tableNum').textContent = prop ? '2' : '1';
+        $('graphNum').textContent = prop ? '3' : '2';
+        $('step2Title').textContent = prop ? s().step2Prop : s().step2Nonprop;
+        if (prop) {
+            let html = `<div class="frac base"><div class="frac-body"><span class="val">${fmt(sit.y0)}</span><div class="bar"></div><span class="val">${fmt(sit.x0)}</span></div><span class="tag">${s().start}</span></div>`;
+            state.fracs.forEach((f, i) => {
+                html += `<span class="eq">=</span>
+                    <div class="frac">
+                        <div class="frac-body">
+                            <input type="text" inputmode="decimal" class="num-input" data-frac="${i}" data-part="n" value="${escapeHtml(f.n)}" aria-label="numérateur ${i + 1}">
+                            <div class="bar"></div>
+                            <input type="text" inputmode="decimal" class="num-input" data-frac="${i}" data-part="d" value="${escapeHtml(f.d)}" aria-label="dénominateur ${i + 1}">
+                        </div>
+                        <span class="tag">${i + 1}</span>
+                        <span class="mark" id="fracMark${i}"></span>
+                    </div>`;
+            });
+            $('fractions').innerHTML = html;
+            $('fracLegend').textContent = s().fracLegend(withUnit(sit.y), withUnit(sit.x));
+        }
+
+        // Step 2: table
+        let t = `<tr><td class="col-head"></td>${state.table.map((_, i) => `<td class="col-head">${prop ? s().col(i + 1) : ''}</td>`).join('')}</tr>`;
+        t += `<tr><th>x <small>${escapeHtml(axisName('x', sit.x))}</small></th>${state.table.map((c, i) =>
+            `<td><input type="text" inputmode="decimal" class="num-input" data-col="${i}" data-axis="x" value="${escapeHtml(c.x)}"></td>`).join('')}</tr>`;
+        t += `<tr><th>y <small>${escapeHtml(axisName('y', sit.y))}</small></th>${state.table.map((c, i) =>
+            `<td><input type="text" inputmode="decimal" class="num-input" data-col="${i}" data-axis="y" value="${escapeHtml(c.y)}"></td>`).join('')}</tr>`;
+        t += `<tr><th>${s().ratioRow}</th>${state.table.map((_, i) => `<td class="ratio" id="ratio${i}"></td>`).join('')}</tr>`;
+        $('table').innerHTML = t;
+
+        $('situation').textContent = sit.text;
+        update();
+    }
+
+    function buildCustomPanel() {
+        const panel = $('customPanel');
+        panel.hidden = state.preset !== 'custom';
+        if (panel.hidden) { panel.innerHTML = ''; return; }
+        const c = state.custom[state.mode];
+        const text = (key, w) => `<input type="text" class="text-input" data-custom="${key}" value="${escapeHtml(c[key])}"${w ? ` style="width:${w}px"` : ''}>`;
+        const num = key => `<input type="text" inputmode="decimal" class="num-input" data-custom="${key}" data-numeric="1" value="${inputVal(c[key])}">`;
+        let html = `<label class="field">${s().xName} ${text('xName')} ${text('xUnit', 60)}</label>
+                    <label class="field">${s().yName} ${text('yName')} ${text('yUnit', 60)}</label>`;
+        html += state.mode === 'prop'
+            ? `<span class="field">${s().startPair} x = ${num('x0')} y = ${num('y0')}</span>`
+            : `<label class="field">${s().fixed} ${num('b')}</label><label class="field">${s().rate} ${num('k')}</label>`;
+        panel.innerHTML = html;
+        panel.querySelectorAll('[data-custom$="Unit"]').forEach(el => el.placeholder = s().unit);
+    }
+
+    // ── Update marks, ratios, graph and summary (on every keystroke) ──
+    function update() {
+        const sit = situation();
+        const prop = state.mode === 'prop';
+        const w = s().word(sameUnit(sit));
+        $('concept').innerHTML = prop ? s().conceptProp : s().conceptNonprop(w);
+
+        // Fractions
+        let fracOk = 0;
+        const fracVals = state.fracs.map((f, i) => {
+            const n = parseNum(f.n), d = parseNum(f.d);
+            const mark = $(`fracMark${i}`);
+            const inputs = document.querySelectorAll(`[data-frac="${i}"]`);
+            inputs.forEach(el => el.classList.remove('ok', 'bad'));
+            if (!prop) return null;
+            flagInvalid(inputs);
+            if (isNaN(n) || isNaN(d)) { mark.textContent = ''; mark.className = 'mark'; return null; }
+            // A denominator of 0 is never an equivalent fraction (division by 0)
+            const ok = d !== 0 && onRelation(sit, d, n);
+            if (ok) fracOk++;
+            inputs.forEach(el => el.classList.add(ok ? 'ok' : 'bad'));
+            mark.textContent = ok ? '✓' : '✗';
+            mark.className = 'mark ' + (ok ? 'ok' : 'bad');
+            return { n, d, ok };
+        });
+
+        // Table: a column is correct when it is on the relation (equivalent to the starting fraction),
+        // in any order — it does not have to repeat the fraction with the same number
+        let colOk = 0;
+        const points = [];
+        state.table.forEach((c, i) => {
+            const x = parseNum(c.x), y = parseNum(c.y);
+            const inputs = document.querySelectorAll(`[data-col="${i}"]`);
+            const ratio = $(`ratio${i}`);
+            inputs.forEach(el => el.classList.remove('ok', 'bad'));
+            ratio.className = 'ratio';
+            flagInvalid(inputs);
+            if (isNaN(x) || isNaN(y)) { ratio.textContent = ''; return; }
+            // x = 0 is a real pair to check (e.g. the taxi at 0 km costs 3 $), only y ÷ x is undefined
+            const ok = onRelation(sit, x, y);
+            if (ok) colOk++;
+            inputs.forEach(el => el.classList.add(ok ? 'ok' : 'bad'));
+            if (x === 0) {
+                ratio.textContent = '—';
+            } else {
+                const r = y / x;
+                ratio.textContent = (round2(r) === r ? '' : '≈ ') + fmt(r);
+                if (prop) ratio.classList.add(ok ? 'ok' : 'bad');
+            }
+            points.push({ x, y, ok, col: i + 1 });
+        });
+
+        drawGraph(sit, points);
+
+        // Summary
+        const sum = $('summary');
+        sum.className = 'summary';
+        if (prop) {
+            const done = fracOk === N && colOk === N;
+            sum.innerHTML = done ? s().sumPropDone : s().sumProp(fracOk, colOk) + '<br><small>' + s().sumPropHint + '</small>';
+            sum.classList.toggle('good', done);
+        } else {
+            const done = colOk === N;
+            sum.innerHTML = done ? s().sumNonpropDone : s().sumNonprop(colOk) + '<br><small>' + s().sumNonpropHint(ruleHtml(sit)) + '</small>';
+            sum.classList.toggle('good', done);
+        }
+
+        // Line + what it shows
+        $('lineBtn').textContent = state.line ? s().lineHide : s().lineShow;
+        $('lineBtn').classList.toggle('active', state.line);
+        const ins = $('insight');
+        ins.hidden = !state.line;
+        if (state.line) {
+            if (prop) {
+                const k = sit.y0 / sit.x0;
+                // a rate has a unit ($/kg); a ratio (same units) has none
+                const unit = sit.y.unit && sit.x.unit && !sameUnit(sit) ? ` ${sit.y.unit}/${sit.x.unit}` : '';
+                ins.innerHTML = s().insightProp((round2(k) === k ? '' : '≈ ') + fmt(k), unit, w);
+            } else {
+                ins.innerHTML = s().insightNonprop(s().coord(0, fmt(sit.b)), w);
+            }
+        }
+    }
+
+    // ── Graph (quadrant I) ──
+    const G = { w: 560, h: 400, l: 58, r: 22, t: 18, b: 52 };
+
+    function niceStep(max) {
+        const raw = max / 6;
+        const mag = 10 ** Math.floor(Math.log10(raw));
+        for (const m of [1, 2, 2.5, 5, 10]) if (m * mag >= raw) return m * mag;
+        return 10 * mag;
+    }
+
+    function drawGraph(sit, points) {
+        const prop = state.mode === 'prop';
+        const k = prop ? sit.y0 / sit.x0 : sit.k;
+        const b = prop ? 0 : sit.b;
+
+        // Scale: fit every point, the starting point and the line
+        // Never narrower than a useful minimum (e.g. when only x = 0 has been entered)
+        const xMin = prop ? sit.x0 * 2 : 5;
+        let xMax = points.length ? Math.max(xMin, ...points.map(p => p.x)) * 1.1 : (prop ? sit.x0 * 4 : 5);
+        const xStep = niceStep(xMax);
+        xMax = Math.ceil(xMax / xStep) * xStep;
+        let yMax = Math.max(b + k * xMax, ...points.map(p => p.y), prop ? sit.y0 : b) * 1.05;
+        const yStep = niceStep(yMax);
+        yMax = Math.ceil(yMax / yStep) * yStep;
+
+        const W = G.w - G.l - G.r, H = G.h - G.t - G.b;
+        const X = v => G.l + v / xMax * W;
+        const Y = v => G.t + H - v / yMax * H;
+
+        let svg = '';
+        for (let v = 0; v <= xMax + 1e-9; v += xStep) {
+            svg += `<line class="grid" x1="${X(v)}" y1="${Y(0)}" x2="${X(v)}" y2="${Y(yMax)}"/>`;
+            svg += `<text class="tick" x="${X(v)}" y="${Y(0) + 18}" text-anchor="middle">${fmt(v)}</text>`;
+        }
+        for (let v = 0; v <= yMax + 1e-9; v += yStep) {
+            svg += `<line class="grid" x1="${X(0)}" y1="${Y(v)}" x2="${X(xMax)}" y2="${Y(v)}"/>`;
+            if (v > 0) svg += `<text class="tick" x="${X(0) - 8}" y="${Y(v) + 4}" text-anchor="end">${fmt(v)}</text>`;
+        }
+        svg += `<line class="axis" x1="${X(0)}" y1="${Y(0)}" x2="${X(xMax) + 6}" y2="${Y(0)}"/>`;
+        svg += `<line class="axis" x1="${X(0)}" y1="${Y(0)}" x2="${X(0)}" y2="${Y(yMax) - 6}"/>`;
+        svg += `<text class="axis-label" x="${X(xMax)}" y="${G.h - 8}" text-anchor="end">x${axisName('x', sit.x) ? ' : ' + escapeHtml(axisName('x', sit.x)) : ''}</text>`;
+        svg += `<text class="axis-label" x="${X(0) + 8}" y="${G.t + 4}">y${axisName('y', sit.y) ? ' : ' + escapeHtml(axisName('y', sit.y)) : ''}</text>`;
+
+        if (state.line) {
+            // y = b + kx, clipped to the visible box
+            const xEnd = k > 0 ? Math.min(xMax, (yMax - b) / k) : xMax;
+            svg += `<line class="line" x1="${X(0)}" y1="${Y(b)}" x2="${X(xEnd)}" y2="${Y(b + k * xEnd)}"/>`;
+        }
+        // Starting value on the y-axis (its label is skipped if the student already plotted that point)
+        if (!prop && !points.some(p => p.x === 0 && hund(p.y) === hund(b))) {
+            svg += `<circle cx="${X(0)}" cy="${Y(b)}" r="6" fill="#2980b9" stroke="white" stroke-width="2"/>`;
+            svg += `<text class="pt-label" x="${X(0) + 10}" y="${Y(b) - 8}" fill="#2980b9">${s().coord(0, fmt(b))}</text>`;
+        }
+
+        // Points first, then labels placed where they don't cover another point or label
+        const marks = (prop ? [{ x: sit.x0, y: sit.y0, color: '#e67e22' }] : [])
+            .concat(points.map(p => ({ x: p.x, y: p.y, color: p.ok ? '#27ae60' : '#e74c3c' })));
+        marks.forEach(m => {
+            svg += `<circle cx="${X(m.x)}" cy="${Y(m.y)}" r="6.5" fill="${m.color}" stroke="white" stroke-width="2">` +
+                   `<title>${s().coord(fmt(m.x), fmt(m.y))}</title></circle>`;   // coordinates on hover
+        });
+        const taken = marks.map(m => ({ x1: X(m.x) - 7, x2: X(m.x) + 7, y1: Y(m.y) - 7, y2: Y(m.y) + 7 }));
+        if (state.line) {
+            // Small boxes along the drawn line, so labels avoid it too
+            const xEnd = k > 0 ? Math.min(xMax, (yMax - b) / k) : xMax;
+            for (let i = 0; i <= 60; i++) {
+                const vx = xEnd * i / 60, px = X(vx), py = Y(b + k * vx);
+                taken.push({ x1: px - 3, x2: px + 3, y1: py - 3, y2: py + 3 });
+            }
+        }
+        const overlaps = b => taken.some(t => b.x1 < t.x2 && b.x2 > t.x1 && b.y1 < t.y2 && b.y2 > t.y1);
+        const seen = new Set();
+        marks.forEach(m => {
+            const key = `${m.x};${m.y}`;
+            if (seen.has(key)) return;          // same point entered twice: one label
+            seen.add(key);
+            const label = s().coord(fmt(m.x), fmt(m.y));
+            const w = label.length * 7, h = 13, cx = X(m.x), cy = Y(m.y);
+            // up-left (away from a rising line), up-right, down-right, down-left
+            const spots = [
+                { x1: cx - 9 - w, y1: cy - 9 - h }, { x1: cx + 9, y1: cy - 9 - h },
+                { x1: cx + 9, y1: cy + 9 },         { x1: cx - 9 - w, y1: cy + 9 },
+            ].map(b => ({ ...b, x2: b.x1 + w, y2: b.y1 + h }))
+             .filter(b => b.x1 >= G.l + 2 && b.x2 <= G.w - 2 && b.y1 >= 0 && b.y2 <= Y(0) - 2);
+            // No free spot (points packed together): no label rather than an unreadable one
+            const b = spots.find(b => !overlaps(b));
+            if (!b) return;
+            taken.push(b);
+            svg += `<text class="pt-label" x="${b.x1}" y="${b.y2 - 2}" fill="${m.color}">${label}</text>`;
+        });
+        $('graph').innerHTML = svg;
+
+        $('legend').innerHTML =
+            (prop ? `<span><span class="dot" style="background:#e67e22"></span>${s().legendStart}</span>`
+                  : `<span><span class="dot" style="background:#2980b9"></span>${s().legendFixed}</span>`) +
+            `<span><span class="dot" style="background:#27ae60"></span>${s().legendOk}</span>` +
+            `<span><span class="dot" style="background:#e74c3c"></span>${s().legendBad}</span>`;
+    }
+
+    // ── Events ──
+    $('modeToggle').addEventListener('click', e => {
+        const btn = e.target.closest('button');
+        if (!btn || btn.dataset.mode === state.mode) return;
+        state.mode = btn.dataset.mode;
+        state.preset = PRESETS[state.mode][0].id;
+        state.line = false;
+        resetAnswers(); build();
+    });
+
+    $('presetChips').addEventListener('click', e => {
+        const btn = e.target.closest('.chip');
+        if (!btn) return;
+        state.preset = btn.dataset.preset;
+        state.line = false;
+        resetAnswers(); build();
+    });
+
+    $('customPanel').addEventListener('input', e => {
+        const key = e.target.dataset.custom;
+        if (!key) return;
+        const c = state.custom[state.mode];
+        if (e.target.dataset.numeric) {
+            limitDecimals(e.target);
+            const v = parseNum(e.target.value);
+            const ok = !isNaN(v) && (key === 'b' || v > 0) && v <= 100000;
+            e.target.classList.toggle('invalid', !ok);
+            if (!ok) return;
+            c[key] = v;
+            // The starting fraction changed: rebuild the fraction row, keep what was typed
+            const active = document.activeElement;
+            build();
+            const again = $('customPanel').querySelector(`[data-custom="${key}"]`);
+            if (again && active === e.target) { again.focus(); again.setSelectionRange(again.value.length, again.value.length); }
+        } else {
+            c[key] = e.target.value.slice(0, 20);
+            // Names and units only change labels
+            const sit = situation();
+            document.querySelectorAll('#table th small')[0].textContent = axisName('x', sit.x);
+            document.querySelectorAll('#table th small')[1].textContent = axisName('y', sit.y);
+            if (state.mode === 'prop') $('fracLegend').textContent = s().fracLegend(withUnit(sit.y), withUnit(sit.x));
+            update();
+        }
+    });
+
+    $('fractions').addEventListener('input', e => {
+        const i = e.target.dataset.frac;
+        if (i === undefined) return;
+        limitDecimals(e.target);
+        state.fracs[i][e.target.dataset.part] = e.target.value;
+        update();
+    });
+
+    $('table').addEventListener('input', e => {
+        const i = e.target.dataset.col;
+        if (i === undefined) return;
+        limitDecimals(e.target);
+        state.table[i][e.target.dataset.axis] = e.target.value;
+        update();
+    });
+
+    $('lineBtn').addEventListener('click', () => { state.line = !state.line; update(); });
+
+    function applyLang() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const v = s()[el.dataset.i18n];
+            if (typeof v === 'string') el.textContent = v;
+        });
+        document.title = s().title.replace(/^\S+\s/, '') + ' – LaboMath';
+        build();
+    }
+
+    // The header's FR/EN button is handled by commun/langue.js
+    Langue.onChange(lang => { state.lang = lang; applyLang(); });
+    resetAnswers();
+    applyLang();
+</script>
+
+</body>
+</html>
