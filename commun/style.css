@@ -1,6 +1,11 @@
 /* ============================================
    LABOMATH – Styles partagés par toutes les pages
    (en-tête, pied de page, cartes de sujets et d'activités)
+
+   Version : les pages chargent les fichiers de commun/ avec « ?v=AAAA-MM-JJ »
+   (ex. commun/style.css?v=2026-11-21). Quand un fichier de commun/ change,
+   mettre à jour cette date dans toutes les pages : les navigateurs chargent
+   alors la nouvelle version tout de suite au lieu de garder l'ancienne en cache.
    ============================================ */
 
 :root {
