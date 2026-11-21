@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La lettre comme inconnue – LaboMath</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../commun/style.css">
+    <script src="../commun/langue.js"></script>
+    <style>
+        /* Styles propres à cette activité (le reste vient de commun/style.css) */
+        [hidden] { display: none !important; }
+        :root {
+            --navy: #1f2d4d;
+            --blue: #1f5fa8;
+            --orange: #c84a16;
+            --pale: #eef3fa;
+            --line: #c9d4e5;
+            --ok: #1e7d45;
+            --muted: #4a5878;
+        }
+
+        .container {
+            color: var(--navy);
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h1 {
+            color: var(--navy);
+            font-weight: 900;
+            line-height: 1.2;
+            border-bottom: 2px solid var(--pale);
+            padding-bottom: 10px;
+        }
+        h2.step {
+            font-size: 1.15em;
+            font-weight: 900;
+            margin: 30px 0 10px;
+            padding-top: 14px;
+            border-top: 2px solid var(--pale);
+            color: var(--navy);
+        }
+        h2.step .num {
+            display: inline-flex;
+            width: 28px; height: 28px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--blue);
+            color: white;
+            font-size: 0.85em;
+            margin-right: 8px;
+        }
+        h3 { font-size: 1em; font-weight: 900; margin: 16px 0 8px; }
+        em { font-family: Georgia, 'Times New Roman', serif; font-style: italic; }
+        p { line-height: 1.6; }
+        .intro { margin: 6px 0 10px; }
+
+        .concept-box {
+            background: var(--pale);
+            padding: 15px;
+            border-left: 5px solid var(--blue);
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        .problem {
+            background: white;
+            border: 2px solid var(--blue);
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-size: 1.1em;
+            font-weight: 700;
+            line-height: 1.6;
+        }
+
+        .panel {
+            background: var(--pale);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8px 14px;
+            font-weight: 700;
+        }
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+        .chip {
+            border: none;
+            background: white;
+            color: var(--muted);
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.9em;
+            border-radius: 18px;
+            padding: 6px 14px;
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .chip:hover { color: var(--blue); }
+        .chip.active { background: var(--blue); color: white; }
+        .chip .done { color: var(--ok); }
+        .chip.active .done { color: white; }
+
+        /* Champs et boutons */
+        .row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; font-weight: 700; margin: 8px 0; }
+        .text-input, .num-input, select {
+            padding: 6px 10px;
+            border: 2px solid var(--line);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1.05em;
+            font-weight: 800;
+            color: var(--navy);
+            background: white;
+            outline: none;
+        }
+        .text-input { width: 210px; }
+        .num-input { width: 110px; text-align: center; }
+        select { font-size: 0.95em; max-width: 100%; }
+        .text-input:focus, .num-input:focus, select:focus { border-color: var(--blue); }
+        .ok-field { border-color: var(--ok) !important; background: #e7f4ec; }
+        textarea {
+            width: 100%;
+            min-height: 70px;
+            border: 2px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-family: inherit;
+            font-size: 1em;
+            color: var(--navy);
+            resize: vertical;
+        }
+        textarea:focus { outline: none; border-color: var(--blue); }
+        .note { font-size: 0.85em; color: var(--muted); }
+        .btn {
+            border: none;
+            background: var(--blue);
+            color: white;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95em;
+            border-radius: 20px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        .btn:hover { background: #184d8a; }
+        .btn.light { background: var(--pale); color: var(--blue); }
+        .btn.light:hover { background: #dde7f5; }
+        .center { text-align: center; margin-top: 10px; }
+
+        .feedback {
+            border-radius: 10px;
+            padding: 10px 14px;
+            line-height: 1.6;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .feedback.hint { background: #fbeee7; color: #84300d; }
+        .feedback.ok { background: #e7f4ec; color: var(--ok); }
+        .feedback.info { background: var(--pale); color: var(--navy); }
+
+        /* Tableau d'essais */
+        .table-wrap { overflow-x: auto; }
+        table { border-collapse: collapse; margin: 0 auto; }
+        th, td { padding: 6px 10px; text-align: center; border: 1px solid var(--line); white-space: nowrap; }
+        th { background: var(--pale); font-size: 0.95em; }
+        th.expr { background: white; font-size: 1em; color: var(--blue); }
+        th.expr.unknown { color: #9fb0c8; }
+        td.small { color: var(--orange); font-weight: 800; }
+        td.big { color: var(--orange); font-weight: 800; }
+        td.right { color: var(--ok); font-weight: 900; background: #f1f9f4; }
+        td.base { font-weight: 900; color: var(--blue); }
+
+        /* Relations et schéma en barres */
+        .rel-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 10px; margin: 6px 0; font-weight: 800; }
+        .rel-row .who { min-width: 90px; text-align: right; }
+        svg.bars { width: 100%; max-width: 680px; height: auto; display: block; margin: 10px auto 0; }
+        svg.bars text { font-family: Nunito, sans-serif; font-weight: 800; }
+
+        .exprs .rel-row .who { min-width: 160px; }
+        .link-note { font-size: 0.9em; color: var(--muted); text-align: center; margin-top: 6px; line-height: 1.7; }
+
+        .strategies { margin-top: 10px; }
+        .strategies table { width: 100%; }
+        .strategies td, .strategies th { white-space: normal; text-align: left; }
+        .strategies td.n { text-align: center; font-weight: 900; white-space: nowrap; }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px 14px; }
+            h1 { font-size: 1.4em; }
+            .problem { font-size: 1em; padding: 12px; }
+            .text-input { width: 180px; }
+            .rel-row .who, .exprs .rel-row .who { min-width: 0; width: 100%; text-align: center; }
+            th, td { padding: 5px 7px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="app-header">
+    <div class="header-inner">
+        <a class="back-btn" href="index.html">← <span data-en="Introduction to algebra">Introduction à l'algèbre</span></a>
+        <a class="logo" href="../index.html">
+            <div class="logo-icon">∑</div>
+            <span class="logo-text">Labo<span class="logo-accent">Math</span></span>
+        </a>
+        <button class="lang-btn" id="langBtn">EN</button>
+    </div>
+</header>
+
+<main class="page">
+<div class="container">
+    <h1 data-i18n="title">🔍 La lettre comme inconnue</h1>
+    <div class="concept-box" id="concept"></div>
+
+    <div class="panel">
+        <div class="chips" id="probChips"></div>
+    </div>
+    <div class="problem" id="problemText"></div>
+
+    <!-- ── Étape 1 ── -->
+    <h2 class="step"><span class="num">1</span><span data-i18n="s1Title"></span></h2>
+    <div id="s1"></div>
+
+    <!-- ── Étape 2 ── -->
+    <h2 class="step"><span class="num">2</span><span data-i18n="s2Title"></span></h2>
+    <div id="s2"></div>
+
+    <!-- ── Étape 3 ── -->
+    <h2 class="step"><span class="num">3</span><span data-i18n="s3Title"></span></h2>
+    <div id="s3"></div>
+
+    <!-- ── Étape 4 ── -->
+    <h2 class="step"><span class="num">4</span><span data-i18n="s4Title"></span></h2>
+    <div id="s4"></div>
+
+    <div class="center"><button type="button" class="btn light" id="revealBtn" data-i18n="reveal"></button></div>
+    <div class="feedback info" id="revealBox" hidden></div>
+</div>
+</main>
+
+<footer class="app-footer">
+    <span data-en="Designed by Carlos Pinango, engineer and high school math teacher">Conçu par Carlos Pinango, ingénieur et enseignant de mathématiques au secondaire</span>
+</footer>
+
+<script>
+    const M = '−';                     // true minus sign
+    // The letter of the current problem is written § and replaced when the page is drawn (see put)
+    const XV = '<em>§</em>';
+
+    // ── Problèmes ──
+    // Each quantity is described from the starting quantity (the base):
+    //   { base: true } | { add: k, of: id } | { mul: k, of: id }
+    // P2 can start from Ben or from Ana: one description per possible base.
+    const PROBLEMS = [
+        {
+            target: 112, money: false, letter: 'a',
+            def: { max: { fr: `Soit <em>a</em>, le nombre de canettes de Max.`, en: `Let <em>a</em> be the number of cans Max has.` } },
+            unit: { fr: 'canettes', en: 'cans' },
+            text: {
+                fr: `Léa a 3 fois plus de canettes que Max. Zoé a 12 canettes de plus que Max. Ensemble, ils en ont 112. Combien chacun en a-t-il ?`,
+                en: `Léa has 3 times as many cans as Max. Zoé has 12 more cans than Max. Together, they have 112. How many does each one have?`,
+            },
+            people: {
+                max: { fr: { nom: 'Max', que: 'que Max', de: 'de Max' }, en: { nom: 'Max', of: 'Max' } },
+                lea: { fr: { nom: 'Léa', que: 'que Léa', de: 'de Léa' }, en: { nom: 'Léa', of: 'Léa' } },
+                zoe: { fr: { nom: 'Zoé', que: 'que Zoé', de: 'de Zoé' }, en: { nom: 'Zoé', of: 'Zoé' } },
+            },
+            order: ['max', 'lea', 'zoe'],
+            bases: {
+                max: {
+                    tree: { max: { base: true }, lea: { mul: 3, of: 'max' }, zoe: { add: 12, of: 'max' } },
+                    options: [{ mul: 3, of: 'max' }, { add: 3, of: 'max' }, { add: 12, of: 'max' }, { mul: 12, of: 'max' }],
+                },
+            },
+            base: 'max',
+        },
+        {
+            target: 172, money: false, letter: 't',
+            def: { ben: { fr: `Soit <em>t</em>, le nombre d'autocollants de Ben.`, en: `Let <em>t</em> be the number of stickers Ben has.` },
+                   ana: { fr: `Soit <em>t</em>, le nombre d'autocollants d'Ana.`, en: `Let <em>t</em> be the number of stickers Ana has.` } },
+            unit: { fr: 'autocollants', en: 'stickers' },
+            text: {
+                fr: `Ana a 8 autocollants de moins que Ben. Cléo en a le double de Ben. Ensemble, ils en ont 172. Combien chacun en a-t-il ?`,
+                en: `Ana has 8 fewer stickers than Ben. Cléo has double what Ben has. Together, they have 172. How many does each one have?`,
+            },
+            people: {
+                ana: { fr: { nom: 'Ana', que: "qu'Ana", de: "d'Ana" }, en: { nom: 'Ana', of: 'Ana' } },
+                ben: { fr: { nom: 'Ben', que: 'que Ben', de: 'de Ben' }, en: { nom: 'Ben', of: 'Ben' } },
+                cleo: { fr: { nom: 'Cléo', que: 'que Cléo', de: 'de Cléo' }, en: { nom: 'Cléo', of: 'Cléo' } },
+            },
+            order: ['ana', 'ben', 'cleo'],
+            bases: {
+                ben: {
+                    tree: { ben: { base: true }, ana: { add: -8, of: 'ben' }, cleo: { mul: 2, of: 'ben' } },
+                    options: [{ add: -8, of: 'ben' }, { add: 8, of: 'ben' }, { mul: 2, of: 'ben' }, { add: 2, of: 'ben' }],
+                },
+                ana: {
+                    tree: { ana: { base: true }, ben: { add: 8, of: 'ana' }, cleo: { mul: 2, of: 'ben' } },
+                    options: [{ add: 8, of: 'ana' }, { add: -8, of: 'ana' }, { mul: 2, of: 'ana' }, { mul: 2, of: 'ben' }],
+                },
+            },
+            base: null,          // chosen by the student
+            choose: ['ben', 'ana', 'cleo'],
+        },
+        {
+            target: 47, money: true, letter: 'p',
+            def: { casq: { fr: `Soit <em>p</em>, le prix de la casquette, en dollars.`, en: `Let <em>p</em> be the price of the cap, in dollars.` } },
+            unit: { fr: '$', en: '$' },
+            text: {
+                fr: `Un chandail coûte 5 $ de plus qu'une casquette. Un manteau coûte le double de la casquette. Le tout coûte 47 $. Combien coûte chaque article ?`,
+                en: `A sweater costs $5 more than a cap. A coat costs double the price of the cap. Everything costs $47. How much does each item cost?`,
+            },
+            people: {
+                casq: { fr: { nom: 'Casquette', que: 'que la casquette', de: 'de la casquette' }, en: { nom: 'Cap', of: 'the cap' } },
+                chan: { fr: { nom: 'Chandail', que: 'que le chandail', de: 'du chandail' }, en: { nom: 'Sweater', of: 'the sweater' } },
+                mant: { fr: { nom: 'Manteau', que: 'que le manteau', de: 'du manteau' }, en: { nom: 'Coat', of: 'the coat' } },
+            },
+            order: ['casq', 'chan', 'mant'],
+            bases: {
+                casq: {
+                    tree: { casq: { base: true }, chan: { add: 5, of: 'casq' }, mant: { mul: 2, of: 'casq' } },
+                    options: [{ add: 5, of: 'casq' }, { add: -5, of: 'casq' }, { mul: 2, of: 'casq' }, { mul: 5, of: 'casq' }],
+                },
+            },
+            base: 'casq',
+        },
+        {
+            target: 98, money: false, letter: 'k',
+            def: { eli: { fr: `Soit <em>k</em>, le nombre de billes d'Éli.`, en: `Let <em>k</em> be the number of marbles Éli has.` } },
+            unit: { fr: 'billes', en: 'marbles' },
+            text: {
+                fr: `Noé a 6 billes de plus qu'Éli. Jade a le double de Noé. Ensemble, ils en ont 98. Combien chacun en a-t-il ?`,
+                en: `Noé has 6 more marbles than Éli. Jade has double what Noé has. Together, they have 98. How many does each one have?`,
+            },
+            people: {
+                eli: { fr: { nom: 'Éli', que: "qu'Éli", de: "d'Éli" }, en: { nom: 'Éli', of: 'Éli' } },
+                noe: { fr: { nom: 'Noé', que: 'que Noé', de: 'de Noé' }, en: { nom: 'Noé', of: 'Noé' } },
+                jade: { fr: { nom: 'Jade', que: 'que Jade', de: 'de Jade' }, en: { nom: 'Jade', of: 'Jade' } },
+            },
+            order: ['eli', 'noe', 'jade'],
+            bases: {
+                eli: {
+                    tree: { eli: { base: true }, noe: { add: 6, of: 'eli' }, jade: { mul: 2, of: 'noe' } },
+                    options: [{ add: 6, of: 'eli' }, { mul: 2, of: 'eli' }, { mul: 2, of: 'noe' }, { add: 6, of: 'noe' }],
+                },
+            },
+            base: 'eli',
+        },
+    ];
+
+    const STR = {
+        fr: {
+            title: `🔍 La lettre comme inconnue`,
+            concept: `Dans chaque problème, une quantité est inconnue. Commence par chercher par <strong>essais</strong>, comme tu le ferais sans algèbre. ` +
+                `Ensuite, une <strong>lettre</strong> va représenter le nombre de départ : elle résume les calculs que tu faisais déjà à chaque essai. Chaque problème a sa lettre, définie au début de l'étape 3.`,
+            prob: i => `Problème ${i}`,
+            s1Title: `Je cherche par essais`,
+            s2Title: `Je repère les grandeurs`,
+            s3Title: `Je remplace par une lettre`,
+            s4Title: `Je vérifie`,
+            reveal: `Voir la réponse`,
+            check: `Vérifier`,
+            // Step 1
+            chooseBase: `De quelle quantité pars-tu ? `,
+            choosePh: `Choisis…`,
+            baseCleo: `C'est possible, mais Ben serait alors la moitié de Cléo, et Ana la moitié de Cléo moins 8 : les calculs deviennent plus longs. Choisis plutôt Ben ou Ana.`,
+            needBase: `Choisis d'abord la quantité de départ.`,
+            s1Intro: (b) => `Choisis une valeur pour <strong>${b}</strong>. Le tableau calcule les autres quantités et le total.`,
+            tryLabel: b => `Essai pour ${b} :`,
+            tryBtn: `Essayer`,
+            badNum: `Écris un nombre positif (au plus deux décimales).`,
+            colTrial: `Essai`, colTotal: `Total`, colVerdict: `Résultat`,
+            small: `trop petit`, big: `trop grand`, right: `juste !`,
+            whyQ: `Comment choisis-tu ton prochain essai ?`,
+            whyNote: `Ta réponse reste sur cet écran : elle n'est ni enregistrée ni envoyée.`,
+            found: k => `✅ Tu as trouvé en ${k} essai${k > 1 ? 's' : ''} !`,
+            integerGap: (a, b) => `Avec ${a}, c'est trop petit ; avec ${b}, c'est trop grand. Aucun nombre entier ne fonctionne : la réponse est entre les deux. ` +
+                `Les essais deviennent longs… Continue avec des nombres décimaux, ou passe aux étapes suivantes : la lettre va t'aider.`,
+            longTrials: `Les essais deviennent longs ? Les étapes suivantes vont t'aider.`,
+            stratTitle: `Comparer des stratégies d'essais`,
+            stratIntro: `Toutes ces stratégies mènent à la réponse ; elles ne demandent pas le même nombre d'essais.`,
+            stratYou: `Ta démarche`,
+            stratOne: b => `Essayer 1, 2, 3, … pour ${b}`,
+            stratHalf: `Se rapprocher : couper en deux l'intervalle qui reste`,
+            stratGap: (b, a) => `Utiliser l'écart : deux essais montrent que chaque unité de plus pour ${b} ajoute ${a} au total`,
+            stratNever: `n'aboutit pas`,
+            trialsCount: k => `${k} essai${k > 1 ? 's' : ''}`,
+            // Step 2
+            s2Intro: b => `Pour chaque quantité, choisis sa relation avec <strong>${b}</strong>, la quantité de départ. Un schéma en barres se dessine.`,
+            startQty: `quantité de départ`,
+            relWrong: (who, b, sv, tv) => `Relis la phrase sur ${who}. Si la valeur pour ${b} était ${sv}, quelle serait celle pour ${who} selon le texte ? Avec ton choix, ce serait ${tv}.`,
+            relOk: `✅ Toutes les relations sont justes.`,
+            together: `Ensemble`,
+            // Step 3
+            s3Intro: (b, u) => `Remplace la quantité de <strong>${b}</strong> par la lettre ${XV}. Écris l'expression de chaque quantité, puis celle du total.`,
+            xIs: (b) => `${XV} = quantité de ${b}`,
+            totalLbl: `Total`,
+            exprWrong: (who, v, a, b) => `Vérifie avec ton tableau d'essais : quand ${XV} = ${v}, la colonne ${who} indiquait ${a}. Ton expression donne ${b}.`,
+            exprWrongNoTrial: (who) => `Relis la relation de ${who} à l'étape 2, et écris-la avec ${XV}.`,
+            exprOk: `✅`,
+            totalUnreduced: `✅ C'est juste ! Tu peux aussi l'écrire sous forme réduite.`,
+            totalOrder: `✅ C'est juste ! On écrit habituellement le terme en ${XV} avant le nombre.`,
+            linkTitle: `Ton tableau d'essais, avec la lettre`,
+            linkNote: `Chaque expression résume le calcul que tu faisais à chaque essai :`,
+            fbTimes: `Pour multiplier, écris seulement des parenthèses, comme dans 2(${XV} + 6) : pas de ×, d'astérisque ni de point.`,
+            fbParse: `Je ne reconnais pas cette écriture. Utilise des nombres, ${XV}, +, ${M} et des parenthèses.`,
+            fbSecond: `Ici, on reste au premier degré : ${XV} n'est jamais multiplié par ${XV}.`,
+            fbLetter: `Dans ce problème, la lettre utilisée est ${XV}. Que représente-t-elle ?`,
+            // Step 4
+            s4Intro: `Écris l'égalité : l'expression du total = le total donné. Ensuite, vérifie une solution en remplaçant ${XV} par sa valeur.`,
+            eqLabel: `Égalité :`,
+            eqNoEq: `Une égalité a un signe = : l'expression du total d'un côté, le total donné de l'autre.`,
+            eqLeft: `Un côté doit être l'expression du total de l'étape 3.`,
+            eqRight: `Quel est le total donné dans le problème ?`,
+            eqOk: `✅ C'est l'égalité qui traduit le problème.`,
+            xLabel: `Valeur de ${XV} :`,
+            calcLabel: `Remplace ${XV} dans l'expression du total :`,
+            calcWrong: v => `Remplace chaque ${XV} par ${v} dans l'expression du total, puis calcule.`,
+            calcNotTotal: (v, r, t) => `Avec ${XV} = ${v}, le total est ${r}, et non ${t} : ${XV} = ${v} n'est pas la solution. ` + (r < t ? `C'est trop petit.` : `C'est trop grand.`),
+            calcOk: (v, t) => `✅ Avec ${XV} = ${v}, le total est bien ${t} : ${XV} = ${v} vérifie l'égalité.`,
+            needEq: `Écris d'abord l'égalité.`,
+            amountsTitle: `Combien chacun en a-t-il ?`,
+            amountsTitleMoney: `Combien coûte chaque article ?`,
+            amountWrong: who => `Pour ${who}, utilise ton expression de l'étape 3 avec la valeur de ${XV}.`,
+            solved: `✅ Bravo ! Le problème est résolu, et ta solution est vérifiée.`,
+            gapBtn: `💡 Un indice`,
+            gapHint: `Indice : regarde le schéma en barres. Si on enlève les 5 $, que reste-t-il ? Combien de barres égales à la casquette ?`,
+            p3Lesson: `Avec des nombres entiers, les essais n'aboutissaient pas. L'expression 4${XV} + 5 montre 4 parts égales et 5 $ : c'est la lettre qui organise la recherche.`,
+            p2Compare: (exA, xA, exB, xB) => `Les deux choix de départ mènent à la même réponse. En partant de Ben : ${exA} = 172, et ${XV} = ${xB} (Ben). ` +
+                `En partant d'Ana : ${exB} = 172, et ${XV} = ${xA} (Ana). La lettre ne représente pas la même quantité, mais les quantités trouvées sont les mêmes.`,
+            answerIs: (list, ex, eq) => `Réponse : ${list}. Total : ${ex}. Égalité : ${eq}.`,
+            needAll: `Remplis chaque case.`,
+        },
+        en: {
+            title: `🔍 The letter as an unknown`,
+            concept: `In each problem, a quantity is unknown. Start by searching by <strong>trial and error</strong>, as you would without algebra. ` +
+                `Then a <strong>letter</strong> will stand for the starting number: it sums up the calculations you were already doing at each trial. Each problem has its own letter, defined at the start of step 3.`,
+            prob: i => `Problem ${i}`,
+            s1Title: `I search by trial and error`,
+            s2Title: `I identify the quantities`,
+            s3Title: `I replace with a letter`,
+            s4Title: `I check`,
+            reveal: `Show the answer`,
+            check: `Check`,
+            chooseBase: `Which quantity do you start from? `,
+            choosePh: `Choose…`,
+            baseCleo: `That is possible, but then Ben would be half of Cléo, and Ana half of Cléo minus 8: the calculations get longer. Choose Ben or Ana instead.`,
+            needBase: `First choose the starting quantity.`,
+            s1Intro: (b) => `Choose a value for <strong>${b}</strong>. The table calculates the other quantities and the total.`,
+            tryLabel: b => `Trial for ${b}:`,
+            tryBtn: `Try`,
+            badNum: `Write a positive number (at most two decimals).`,
+            colTrial: `Trial`, colTotal: `Total`, colVerdict: `Result`,
+            small: `too small`, big: `too big`, right: `right!`,
+            whyQ: `How do you choose your next trial?`,
+            whyNote: `Your answer stays on this screen: it is not saved or sent.`,
+            found: k => `✅ You found it in ${k} trial${k > 1 ? 's' : ''}!`,
+            integerGap: (a, b) => `With ${a}, it is too small; with ${b}, it is too big. No whole number works: the answer is in between. ` +
+                `The trials are getting long… Continue with decimal numbers, or go on to the next steps: the letter will help.`,
+            longTrials: `Are the trials getting long? The next steps will help.`,
+            stratTitle: `Compare trial strategies`,
+            stratIntro: `All these strategies lead to the answer; they do not need the same number of trials.`,
+            stratYou: `Your work`,
+            stratOne: b => `Try 1, 2, 3, … for ${b}`,
+            stratHalf: `Close in: cut the remaining interval in half`,
+            stratGap: (b, a) => `Use the gap: two trials show that each extra unit for ${b} adds ${a} to the total`,
+            stratNever: `never gets there`,
+            trialsCount: k => `${k} trial${k > 1 ? 's' : ''}`,
+            s2Intro: b => `For each quantity, choose how it relates to <strong>${b}</strong>, the starting quantity. A bar model is drawn.`,
+            startQty: `starting quantity`,
+            relWrong: (who, b, sv, tv) => `Read the sentence about ${who} again. If the value for ${b} were ${sv}, what would it be for ${who} according to the text? With your choice, it would be ${tv}.`,
+            relOk: `✅ All the relations are right.`,
+            together: `Together`,
+            s3Intro: (b, u) => `Replace the quantity of <strong>${b}</strong> with the letter ${XV}. Write the expression of each quantity, then of the total.`,
+            xIs: (b) => `${XV} = quantity of ${b}`,
+            totalLbl: `Total`,
+            exprWrong: (who, v, a, b) => `Check with your trial table: when ${XV} = ${v}, the ${who} column showed ${a}. Your expression gives ${b}.`,
+            exprWrongNoTrial: (who) => `Read the relation for ${who} in step 2 again, and write it with ${XV}.`,
+            exprOk: `✅`,
+            totalUnreduced: `✅ That's right! You can also write it in simplified form.`,
+            totalOrder: `✅ That's right! We usually write the ${XV} term before the number.`,
+            linkTitle: `Your trial table, with the letter`,
+            linkNote: `Each expression sums up the calculation you were doing at each trial:`,
+            fbTimes: `To multiply, only write parentheses, as in 2(${XV} + 6): no ×, asterisk or dot.`,
+            fbParse: `I don't recognize this. Use numbers, ${XV}, +, ${M} and parentheses.`,
+            fbSecond: `Here we stay in the first degree: ${XV} is never multiplied by ${XV}.`,
+            fbLetter: `In this problem, the letter used is ${XV}. What does it stand for?`,
+            s4Intro: `Write the equality: the expression of the total = the given total. Then check a solution by replacing ${XV} with its value.`,
+            eqLabel: `Equality:`,
+            eqNoEq: `An equality has an = sign: the expression of the total on one side, the given total on the other.`,
+            eqLeft: `One side must be the expression of the total from step 3.`,
+            eqRight: `What total is given in the problem?`,
+            eqOk: `✅ This is the equality that translates the problem.`,
+            xLabel: `Value of ${XV}:`,
+            calcLabel: `Replace ${XV} in the expression of the total:`,
+            calcWrong: v => `Replace each ${XV} with ${v} in the expression of the total, then calculate.`,
+            calcNotTotal: (v, r, t) => `With ${XV} = ${v}, the total is ${r}, not ${t}: ${XV} = ${v} is not the solution. ` + (r < t ? `It is too small.` : `It is too big.`),
+            calcOk: (v, t) => `✅ With ${XV} = ${v}, the total is indeed ${t}: ${XV} = ${v} satisfies the equality.`,
+            needEq: `First write the equality.`,
+            amountsTitle: `How many does each one have?`,
+            amountsTitleMoney: `How much does each item cost?`,
+            amountWrong: who => `For ${who}, use your expression from step 3 with the value of ${XV}.`,
+            solved: `✅ Well done! The problem is solved, and your solution is checked.`,
+            gapBtn: `💡 A hint`,
+            gapHint: `Hint: look at the bar model. If you take away the $5, what is left? How many bars equal to the cap?`,
+            p3Lesson: `With whole numbers, the trials never got there. The expression 4${XV} + 5 shows 4 equal parts and $5: the letter organizes the search.`,
+            p2Compare: (exA, xA, exB, xB) => `Both starting choices lead to the same answer. Starting from Ben: ${exA} = 172, and ${XV} = ${xB} (Ben). ` +
+                `Starting from Ana: ${exB} = 172, and ${XV} = ${xA} (Ana). The letter does not stand for the same quantity, but the quantities found are the same.`,
+            answerIs: (list, ex, eq) => `Answer: ${list}. Total: ${ex}. Equality: ${eq}.`,
+            needAll: `Fill in every box.`,
+        },
+    };
+
+    const state = {
+        lang: Langue.lang,          // shared language, see commun/langue.js
+        p: 0,
+        probs: PROBLEMS.map(pb => newProbState(pb)),
+    };
+    function newProbState(pb) {
+        return { base: pb.base, trials: [], why: '', rels: {}, exprs: {}, exprOk: {}, eq: '', eqOk: false, xv: '', calc: '', calcOk: false,
+                 amounts: {}, solved: false, revealed: false, fb: {} };
+    }
+
+    const $ = id => document.getElementById(id);
+    const s = () => STR[state.lang];
+    const PB = () => PROBLEMS[state.p];
+    const ST = () => state.probs[state.p];
+    const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    // ── Nombres ──
+    const round2 = v => Math.round(v * 100) / 100;
+    function fmtNum(v) {
+        return round2(v).toLocaleString(state.lang === 'fr' ? 'fr-CA' : 'en-CA', { maximumFractionDigits: 2 });
+    }
+    function fmtVal(v, money) {
+        if (!money) return fmtNum(v);
+        const n = round2(v).toLocaleString(state.lang === 'fr' ? 'fr-CA' : 'en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return state.lang === 'fr' ? `${n} $` : `$${n}`;
+    }
+    // "10,50", "10.5", "10,50 $" → 10.5 ; NaN otherwise
+    function parseNum(str) {
+        const t = String(str).replace(/[\s  $]/g, '').replace(',', '.');
+        return /^\d+(\.\d{1,2})?$/.test(t) ? Number(t) : NaN;
+    }
+    const same = (a, b) => Math.abs(a - b) < 0.005;
+
+    // ── Polynômes en x (1er degré) : [c0, c1, c2] ──
+    const coef = (p, d) => p[d] || 0;
+    function padd(p, q) { const r = []; for (let d = 0; d < Math.max(p.length, q.length); d++) r[d] = coef(p, d) + coef(q, d); return r; }
+    function pmul(p, q) { const r = []; p.forEach((a, i) => q.forEach((b, j) => { r[i + j] = (r[i + j] || 0) + a * b; })); return r; }
+    const pscale = (p, k) => p.map(c => c * k);
+    function peq(p, q) { for (let d = 0; d < Math.max(p.length, q.length, 3); d++) if (!same(coef(p, d), coef(q, d))) return false; return true; }
+    const pval = (p, x) => p.reduce((acc, c, d) => acc + c * Math.pow(x, d), 0);
+
+    // Reads 5x + 12, x + (x + 6) + 2(x + 6), 5(20) + 12, 4(10,5) + 5…
+    function parse(raw) {
+        const str = raw.replace(/\s+/g, '').replace(/[−–—]/g, '-').replace(/[A-Z]/g, c => c.toLowerCase());
+        const L = PB().letter;
+        if (!str) return { err: 'empty' };
+        if (/[*×·•∙]/.test(str)) return { err: 'times' };
+        let i = 0, paren = false, hasX = false;
+        function expr() {
+            const terms = [];
+            while (i < str.length && str[i] !== ')') {
+                let sign = 1;
+                if (str[i] === '+' || str[i] === '-') { sign = str[i] === '-' ? -1 : 1; i++; }
+                else if (terms.length) throw 0;
+                terms.push(pscale(product(), sign));
+            }
+            if (!terms.length) throw 0;
+            return terms;
+        }
+        function product() {
+            let p = [1], k = 0;
+            while (i < str.length) {
+                const ch = str[i];
+                if (/\d/.test(ch)) {
+                    if (k > 0) throw 0;
+                    const m = str.slice(i).match(/^\d+([.,]\d+)?/);
+                    i += m[0].length;
+                    p = pmul(p, [Number(m[0].replace(',', '.'))]);
+                } else if (/[a-z]/.test(ch)) {
+                    if (ch !== L) throw 'letter';
+                    i++; hasX = true;
+                    p = pmul(p, [0, 1]);
+                } else if (ch === '(') {
+                    i++; paren = true;
+                    const inner = expr();
+                    if (str[i] !== ')') throw 0;
+                    i++;
+                    p = pmul(p, inner.reduce(padd, [0]));
+                } else break;
+                k++;
+            }
+            if (!k) throw 0;
+            return p;
+        }
+        try {
+            const terms = expr();
+            if (i !== str.length) throw 0;
+            const poly = terms.reduce(padd, [0]);
+            if (poly.slice(2).some(c => c)) return { err: 'second' };
+            const degs = terms.map(t => {
+                const nz = t.map((c, d) => c ? d : -1).filter(d => d >= 0);
+                return nz.length === 1 ? nz[0] : (nz.length === 0 ? 0 : -1);
+            });
+            const reduced = !paren && degs.every(d => d >= 0) && new Set(degs).size === degs.length;
+            const ordered = degs.every((d, k) => k === 0 || d < degs[k - 1]);
+            return { poly, paren, hasX, reduced, ordered };
+        } catch (e) {
+            return { err: e === 'letter' ? 'letter' : 'parse' };
+        }
+    }
+    const parseErr = r => r.err === 'times' ? s().fbTimes : r.err === 'second' ? s().fbSecond : r.err === 'letter' ? s().fbLetter : s().fbParse;
+
+    // ── Quantités à partir de l'arbre ──
+    const tree = () => PB().bases[ST().base].tree;
+    const nom = id => PB().people[id][state.lang].nom;
+    function polyOf(id, t = tree()) {
+        const q = t[id];
+        if (q.base) return [0, 1];
+        if (q.add !== undefined) return padd(polyOf(q.of, t), [q.add]);
+        return pscale(polyOf(q.of, t), q.mul);
+    }
+    const totalPoly = (t = tree()) => PB().order.reduce((acc, id) => padd(acc, polyOf(id, t)), [0]);
+    const solutionX = (t = tree()) => { const p = totalPoly(t); return (PB().target - coef(p, 0)) / coef(p, 1); };
+    // Expression written as in algebra: 3x, x + 12, x − 8, 2(x + 6)
+    function exprOf(id, t = tree()) {
+        const q = t[id];
+        if (q.base) return XV;
+        if (q.add !== undefined) return `${exprOf(q.of, t)} ${q.add < 0 ? M : '+'} ${fmtNum(Math.abs(q.add))}`;
+        return t[q.of].base ? `${q.mul}${XV}` : `${q.mul}(${exprOf(q.of, t)})`;
+    }
+    // Same expression with x replaced by a value: 3(20), 20 + 12, 2(20 + 6)
+    function subOf(id, v, t = tree()) {
+        const q = t[id];
+        if (q.base) return fmtNum(v);
+        if (q.add !== undefined) return `${subOf(q.of, v, t)} ${q.add < 0 ? M : '+'} ${fmtNum(Math.abs(q.add))}`;
+        return `${q.mul}(${subOf(q.of, v, t)})`;
+    }
+    function fmtPoly(p) {
+        const a = round2(coef(p, 1)), b = round2(coef(p, 0));
+        let out = a ? (a === 1 ? XV : a === -1 ? M + XV : (a < 0 ? M : '') + fmtNum(Math.abs(a)) + XV) : '';
+        if (b) out += out ? ` ${b < 0 ? M : '+'} ${fmtNum(Math.abs(b))}` : (b < 0 ? M : '') + fmtNum(Math.abs(b));
+        return out || '0';
+    }
+    // Relation label: « 3 fois plus que Max », « le double de Ben », « 5 $ de plus que la casquette »
+    function relLabel(rel) {
+        const pb = PB(), of = pb.people[rel.of][state.lang];
+        const k = Math.abs(rel.add ?? rel.mul);
+        if (state.lang === 'fr') {
+            const amt = pb.money ? `${k} $` : `${k}`;
+            if (rel.add !== undefined) return `${amt} de ${rel.add > 0 ? 'plus' : 'moins'} ${of.que}`;
+            return rel.mul === 2 ? `le double ${of.de}` : `${k} fois plus ${of.que}`;
+        }
+        const amt = pb.money ? `$${k}` : `${k}`;
+        if (rel.add !== undefined) return `${amt} ${rel.add > 0 ? 'more' : (pb.money ? 'less' : 'fewer')} than ${of.of}`;
+        return rel.mul === 2 ? `double ${of.of}` : `${k} times as ${pb.money ? 'much' : 'many'} as ${of.of}`;
+    }
+    const sameRel = (a, b) => a.of === b.of && a.add === b.add && a.mul === b.mul;
+    const others = () => PB().order.filter(id => !tree()[id].base);
+
+    // ── Rendu ──
+    const letter = () => PB().letter;
+    const put = (id, html) => { $(id).innerHTML = html.replace(/§/g, letter()); };
+    function render() {
+        const t = s(), pb = PB(), st = ST();
+        $('concept').innerHTML = t.concept;
+        $('probChips').innerHTML = PROBLEMS.map((_, i) =>
+            `<button type="button" class="chip${i === state.p ? ' active' : ''}" data-p="${i}" aria-pressed="${i === state.p}">${t.prob(i + 1)}${state.probs[i].solved ? ' <span class="done">✓</span>' : ''}</button>`).join('');
+        $('problemText').textContent = pb.text[state.lang];
+        renderS1(); renderS2(); renderS3(); renderS4();
+        const rb = $('revealBox');
+        rb.hidden = !st.revealed;
+        if (st.revealed) rb.innerHTML = revealText().replace(/§/g, letter());
+    }
+
+    function fbHtml(key) {
+        const f = ST().fb[key];
+        return f ? `<div class="feedback ${f.cls}" data-fb="${key}">${f.html}</div>` : `<div class="feedback" data-fb="${key}" hidden></div>`;
+    }
+    function setFb(key, cls, html) { ST().fb[key] = cls ? { cls, html } : null; }
+
+    function baseChooser() {
+        const pb = PB(), st = ST(), t = s();
+        if (!pb.choose) return '';
+        const opts = pb.choose.map(id => `<option value="${id}"${st.base === id ? ' selected' : ''}>${nom(id)}</option>`).join('');
+        return `<div class="row"><label for="baseSel">${t.chooseBase}</label><select id="baseSel" data-act="base"><option value="">${t.choosePh}</option>${opts}</select></div>`;
+    }
+
+    function trialTable(withExpr) {
+        const pb = PB(), st = ST(), t = s();
+        const ids = [pb.order.find(id => tree()[id].base), ...others()];
+        const head = `<tr><th>${t.colTrial}</th>${ids.map(id => `<th>${nom(id)}</th>`).join('')}<th>${t.colTotal}</th>${withExpr ? '' : `<th>${t.colVerdict}</th>`}</tr>`;
+        const exprRow = withExpr
+            ? `<tr><th></th>${ids.map(id => st.exprOk[id] || tree()[id].base
+                ? `<th class="expr">${exprOf(id)}</th>` : `<th class="expr unknown">?</th>`).join('')}` +
+              `<th class="expr${st.exprOk.total ? '' : ' unknown'}">${st.exprOk.total ? fmtPoly(totalPoly()) : '?'}</th></tr>`
+            : '';
+        const rows = st.trials.map((v, k) => {
+            const tot = pval(totalPoly(), v);
+            const verdict = same(tot, pb.target) ? 'right' : tot < pb.target ? 'small' : 'big';
+            return `<tr><td>${k + 1}</td>${ids.map((id, j) => `<td class="${j === 0 ? 'base' : ''}">${fmtVal(pval(polyOf(id), v), pb.money)}</td>`).join('')}` +
+                `<td>${fmtVal(tot, pb.money)}</td>${withExpr ? '' : `<td class="${verdict}">${t[verdict]}</td>`}</tr>`;
+        }).join('');
+        return `<div class="table-wrap"><table>${head}${exprRow}${rows}</table></div>`;
+    }
+
+    function renderS1() {
+        const pb = PB(), st = ST(), t = s();
+        let h = baseChooser();
+        if (!st.base) { put('s1', h + fbHtml('base')); return; }
+        const b = nom(st.base);
+        h += `<p class="intro">${t.s1Intro(b)}</p>`;
+        if (st.trials.length) h += trialTable(false);
+        const found = st.trials.some(v => same(pval(totalPoly(), v), pb.target));
+        if (!found) {
+            h += `<div class="row"><label for="tryIn">${t.tryLabel(b)}</label><input class="num-input" id="tryIn" type="text" inputmode="decimal" autocomplete="off">` +
+                `<button type="button" class="btn" data-act="try">${t.tryBtn}</button></div>`;
+        }
+        h += fbHtml('try');
+        if (st.trials.length >= 3 || found) {
+            h += `<h3><label for="whyIn">${t.whyQ}</label></h3><textarea id="whyIn">${esc(st.why)}</textarea><p class="note">${t.whyNote}</p>`;
+        }
+        if (found || st.revealed) h += strategies();
+        put('s1', h);
+    }
+
+    // Number of trials of three strategies, simulated on this problem
+    function strategies() {
+        const pb = PB(), st = ST(), t = s();
+        const p = totalPoly(), a = coef(p, 1), sol = solutionX();
+        const one = Number.isInteger(round2(sol)) && sol >= 1 ? Math.round(sol) : null;
+        let half = null, lo = 0, hi = pb.target, k = 0;
+        while (lo <= hi && k < 50) {
+            const g = Math.floor((lo + hi) / 2); k++;
+            const v = pval(p, g);
+            if (same(v, pb.target)) { half = k; break; }
+            if (v < pb.target) lo = g + 1; else hi = g - 1;
+        }
+        const n = v => v === null ? t.stratNever : t.trialsCount(v);
+        const foundAt = st.trials.findIndex(v => same(pval(p, v), pb.target));
+        const you = foundAt >= 0 ? `<tr><td>${t.stratYou}</td><td class="n">${t.trialsCount(foundAt + 1)}</td></tr>` : '';
+        return `<div class="strategies"><h3>${t.stratTitle}</h3><p class="note">${t.stratIntro}</p><table>` + you +
+            `<tr><td>${t.stratOne(nom(st.base))}</td><td class="n">${n(one)}</td></tr>` +
+            `<tr><td>${t.stratHalf}</td><td class="n">${n(half)}</td></tr>` +
+            `<tr><td>${t.stratGap(nom(st.base), fmtNum(a))}</td><td class="n">${t.trialsCount(3)}</td></tr></table></div>`;
+    }
+
+    // Bar model, to the scale of the starting quantity
+    function barsSvg() {
+        const pb = PB(), st = ST(), t = s();
+        const T = tree(), x = solutionX();
+        const segs = id => {
+            const q = T[id];
+            if (q.base) return [{ kind: 'base', v: x }];
+            if (q.add !== undefined) return [...segs(q.of), { kind: q.add < 0 ? 'minus' : 'const', v: Math.abs(q.add) }];
+            return Array.from({ length: q.mul }, () => segs(q.of)).flat();
+        };
+        const shown = pb.order.filter(id => T[id].base || sameRel(st.rels[id] || {}, T[id]));
+        const rows = shown.map(id => ({ label: nom(id), segs: segs(id) }));
+        if (shown.length === pb.order.length) rows.push({ label: t.together, segs: pb.order.flatMap(segs), total: true });
+        const length = sg => sg.reduce((acc, g) => acc + (g.kind === 'minus' ? 0 : g.v), 0);
+        const maxL = Math.max(...rows.map(r => length(r.segs)));
+        const W = 680, L = 100, R = 60, H = 30, G = 12;
+        const k = (W - L - R) / maxL;
+        let g = '';
+        rows.forEach((r, i) => {
+            const y = 10 + i * (H + G) + (r.total ? 8 : 0);
+            g += `<text x="${L - 10}" y="${y + H / 2 + 5}" text-anchor="end" font-size="14" fill="#1f2d4d">${r.label}</text>`;
+            let cx = L;
+            r.segs.forEach(sg => {
+                if (sg.kind === 'minus') {
+                    // Part taken away: dashed, drawn over the end of the bar
+                    const w = sg.v * k;
+                    cx -= w;
+                    g += `<rect x="${cx}" y="${y}" width="${w}" height="${H}" fill="white" stroke="#c84a16" stroke-width="2" stroke-dasharray="4 3"/>`;
+                    g += `<text x="${cx + w / 2}" y="${y + H / 2 + 5}" text-anchor="middle" font-size="12" fill="#c84a16">${M}${fmtNum(sg.v)}</text>`;
+                    return;
+                }
+                const w = sg.v * k;
+                const base = sg.kind === 'base';
+                g += `<rect x="${cx}" y="${y}" width="${w}" height="${H}" fill="${base ? '#1f5fa8' : '#c84a16'}" stroke="white" stroke-width="2" rx="3"/>`;
+                const lab = base ? (w > 34 ? XVsvg() : '') : (pb.money ? (state.lang === 'fr' ? `${fmtNum(sg.v)} $` : `$${fmtNum(sg.v)}`) : fmtNum(sg.v));
+                if (lab && w > 22) g += `<text x="${cx + w / 2}" y="${y + H / 2 + 5}" text-anchor="middle" font-size="12" fill="white" ${base ? 'font-style="italic" font-family="Georgia, serif"' : ''}>${lab}</text>`;
+                cx += w;
+            });
+            if (r.total) g += `<text x="${cx + 8}" y="${y + H / 2 + 5}" font-size="14" fill="#1f2d4d">${fmtVal(pb.target, pb.money)}</text>`;
+        });
+        const hgt = 20 + rows.length * (H + G) + 8;
+        return `<svg class="bars" viewBox="0 0 ${W} ${hgt}" role="img" aria-label="${rows.map(r => r.label).join(', ')}">${g}</svg>`;
+    }
+    // The base block is labelled with the letter only once step 3 has started
+    function XVsvg() { return Object.keys(ST().exprOk).length ? letter() : ''; }
+
+    function renderS2() {
+        const pb = PB(), st = ST(), t = s();
+        if (!st.base) { put('s2', `<p class="note">${t.needBase}</p>`); return; }
+        const T = tree(), base = pb.order.find(id => T[id].base);
+        let h = `<p class="intro">${t.s2Intro(nom(base))}</p>`;
+        h += `<div class="rel-row"><span class="who">${nom(base)}</span><span class="note">${t.startQty}</span></div>`;
+        others().forEach(id => {
+            const opts = pb.bases[st.base].options.filter(o => o.of !== id).map((o, i) => {
+                const sel = st.rels[id] && sameRel(st.rels[id], o) ? ' selected' : '';
+                return `<option value="${pb.bases[st.base].options.indexOf(o)}"${sel}>${relLabel(o)}</option>`;
+            }).join('');
+            const ok = st.rels[id] && sameRel(st.rels[id], T[id]);
+            h += `<div class="rel-row"><label class="who" for="rel-${id}">${nom(id)}</label>` +
+                `<select id="rel-${id}" data-rel="${id}" class="${ok ? 'ok-field' : ''}"><option value="">${t.choosePh}</option>${opts}</select></div>`;
+        });
+        h += fbHtml('rel');
+        h += barsSvg();
+        put('s2', h);
+    }
+
+    function renderS3() {
+        const pb = PB(), st = ST(), t = s();
+        if (!st.base) { put('s3', `<p class="note">${t.needBase}</p>`); return; }
+        const T = tree(), base = pb.order.find(id => T[id].base);
+        let h = `<p class="intro">${t.s3Intro(nom(base))}</p>`;
+        h += `<div class="exprs"><div class="rel-row"><span class="who">${nom(base)}</span><strong>${PB().def[st.base][state.lang]}</strong></div>`;
+        [...others(), 'total'].forEach(id => {
+            const label = id === 'total' ? t.totalLbl : nom(id);
+            h += `<div class="rel-row"><label class="who" for="ex-${id}">${label}</label>` +
+                `<input class="text-input${st.exprOk[id] ? ' ok-field' : ''}" id="ex-${id}" data-expr="${id}" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(st.exprs[id] || '')}">` +
+                `<button type="button" class="btn" data-check-expr="${id}">${t.check}</button></div>` + fbHtml('ex-' + id);
+        });
+        h += `</div>`;
+        if (st.trials.length && Object.values(st.exprOk).some(Boolean)) {
+            const v = st.trials[0];
+            const notes = [...others(), 'total'].filter(id => st.exprOk[id]).map(id => id === 'total'
+                ? `${t.totalLbl} : ${fmtPoly(totalPoly())} → ${pb.order.map(o => fmtNum(pval(polyOf(o), v))).join(' + ')} = ${fmtVal(pval(totalPoly(), v), pb.money)}`
+                : `${nom(id)} : ${exprOf(id)} → ${subOf(id, v)} = ${fmtVal(pval(polyOf(id), v), pb.money)}`);
+            h += `<h3>${t.linkTitle}</h3>${trialTable(true)}<div class="link-note">${t.linkNote}<br>${notes.join('<br>')}</div>`;
+        }
+        put('s3', h);
+    }
+
+    function renderS4() {
+        const pb = PB(), st = ST(), t = s();
+        if (!st.base) { put('s4', `<p class="note">${t.needBase}</p>`); return; }
+        let h = `<p class="intro">${t.s4Intro}</p>`;
+        h += `<div class="row"><label for="eqIn">${t.eqLabel}</label><input class="text-input${st.eqOk ? ' ok-field' : ''}" id="eqIn" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(st.eq)}">` +
+            `<button type="button" class="btn" data-act="eq">${t.check}</button></div>` + fbHtml('eq');
+        h += `<div class="row"><label for="xIn">${t.xLabel}</label><input class="num-input" id="xIn" type="text" inputmode="decimal" autocomplete="off" value="${esc(st.xv)}"></div>`;
+        h += `<div class="row"><label for="calcIn">${t.calcLabel}</label><input class="text-input${st.calcOk ? ' ok-field' : ''}" id="calcIn" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(st.calc)}">` +
+            `<button type="button" class="btn" data-act="calc">${t.check}</button></div>` + fbHtml('calc');
+        if (state.p === 2 && !st.calcOk) h += `<div class="center"><button type="button" class="btn light" data-act="gap">${t.gapBtn}</button></div>` + fbHtml('gap');
+        h += `<h3>${pb.money ? t.amountsTitleMoney : t.amountsTitle}</h3>`;
+        h += pb.order.map(id => `<div class="rel-row"><label class="who" for="am-${id}">${nom(id)}</label>` +
+            `<input class="num-input${st.amounts[id] !== undefined && same(parseNum(st.amounts[id]), pval(polyOf(id), solutionX())) && st.solved ? ' ok-field' : ''}" id="am-${id}" data-am="${id}" type="text" inputmode="decimal" autocomplete="off" value="${esc(st.amounts[id] || '')}">${pb.money ? (state.lang === 'fr' ? ' $' : '') : ''}</div>`).join('');
+        h += `<div class="center"><button type="button" class="btn" data-act="amounts">${t.check}</button></div>` + fbHtml('amounts');
+        put('s4', h);
+    }
+
+    function revealText() {
+        const pb = PB(), t = s();
+        const T = pb.bases[ST().base || Object.keys(pb.bases)[0]].tree;
+        const x = solutionX(T);
+        const list = pb.order.map(id => `${nom(id)} ${fmtVal(pval(polyOf(id, T), x), pb.money)}`).join(', ');
+        const ex = fmtPoly(totalPoly(T));
+        return t.answerIs(list, ex, `${ex} = ${fmtNum(pb.target)}`);
+    }
+
+    // ── Actions ──
+    function tryValue() {
+        const pb = PB(), st = ST(), t = s();
+        const v = parseNum($('tryIn').value);
+        if (isNaN(v)) { setFb('try', 'hint', t.badNum); return rerender('tryIn'); }
+        st.trials.push(v);
+        const p = totalPoly();
+        const found = same(pval(p, v), pb.target);
+        let fb = null;
+        if (found) fb = { cls: 'ok', html: t.found(st.trials.length) };
+        else {
+            // Two whole-number trials side by side, one too small and one too big: no whole number works
+            const ints = st.trials.filter(Number.isInteger);
+            const small = ints.filter(a => pval(p, a) < pb.target), big = ints.filter(a => pval(p, a) > pb.target);
+            const gap = small.find(a => big.includes(a + 1));
+            if (gap !== undefined) fb = { cls: 'info', html: t.integerGap(fmtNum(gap), fmtNum(gap + 1)) };
+            else if (st.trials.length >= 6) fb = { cls: 'info', html: t.longTrials };
+        }
+        st.fb.try = fb;
+        rerender(found ? 'whyIn' : 'tryIn');
+    }
+
+    function checkRels() {
+        const st = ST(), t = s(), T = tree();
+        const base = PB().order.find(id => T[id].base);
+        const sv = 10;
+        const bad = others().find(id => !st.rels[id] || !sameRel(st.rels[id], T[id]));
+        if (bad === undefined) setFb('rel', 'ok', t.relOk);
+        else if (!st.rels[bad]) setFb('rel', null);
+        else {
+            // What the chosen relation gives if the base were 10, compared with the text
+            const chosen = { ...T, [bad]: st.rels[bad] };
+            const tv = fmtNum(pval(polyOf(bad, chosen), sv));
+            setFb('rel', 'hint', t.relWrong(nom(bad), nom(base), sv, tv));
+        }
+    }
+
+    function checkExpr(id) {
+        const st = ST(), t = s(), pb = PB();
+        const raw = st.exprs[id] || '';
+        const r = parse(raw);
+        const truth = id === 'total' ? totalPoly() : polyOf(id);
+        const label = id === 'total' ? t.totalLbl : nom(id);
+        if (r.err === 'empty') { setFb('ex-' + id, null); st.exprOk[id] = false; }
+        else if (r.err) { setFb('ex-' + id, 'hint', parseErr(r)); st.exprOk[id] = false; }
+        else if (!peq(r.poly, truth)) {
+            st.exprOk[id] = false;
+            const v = st.trials[0];
+            setFb('ex-' + id, 'hint', v !== undefined
+                ? t.exprWrong(label, fmtNum(v), fmtVal(pval(truth, v), pb.money), fmtVal(pval(r.poly, v), pb.money))
+                : t.exprWrongNoTrial(label));
+        } else {
+            st.exprOk[id] = true;
+            if (id === 'total' && !r.reduced) setFb('ex-' + id, 'ok', t.totalUnreduced);
+            else if (!r.ordered) setFb('ex-' + id, 'ok', t.totalOrder);
+            else setFb('ex-' + id, null);
+        }
+        rerender('ex-' + id);
+    }
+
+    function checkEq() {
+        const st = ST(), t = s(), pb = PB();
+        const parts = st.eq.split('=');
+        st.eqOk = false;
+        if (parts.length !== 2) setFb('eq', 'hint', st.eq.trim() ? t.eqNoEq : t.needEq);
+        else {
+            const A = parse(parts[0]), B = parse(parts[1]);
+            if (A.err && A.err !== 'empty' || B.err && B.err !== 'empty') setFb('eq', 'hint', parseErr(A.err ? A : B));
+            else if (A.err || B.err) setFb('eq', 'hint', t.eqNoEq);
+            else {
+                const [ex, num] = A.hasX ? [A, B] : [B, A];
+                if (!ex.hasX || num.hasX) setFb('eq', 'hint', t.eqNoEq);
+                else if (!peq(ex.poly, totalPoly())) setFb('eq', 'hint', t.eqLeft);
+                else if (!same(pval(num.poly, 0), pb.target)) setFb('eq', 'hint', t.eqRight);
+                else { st.eqOk = true; setFb('eq', 'ok', t.eqOk); }
+            }
+        }
+        rerender('eqIn');
+    }
+
+    function checkCalc() {
+        const st = ST(), t = s(), pb = PB();
+        st.calcOk = false;
+        const v = parseNum(st.xv);
+        if (!st.eqOk) { setFb('calc', 'hint', t.needEq); return rerender('calcIn'); }
+        if (isNaN(v)) { setFb('calc', 'hint', t.badNum); return rerender('xIn'); }
+        const r = parse(st.calc);
+        if (r.err === 'empty') setFb('calc', 'hint', t.calcWrong(fmtNum(v)));
+        else if (r.err) setFb('calc', 'hint', parseErr(r));
+        // The value of x must appear in the calculation: the student replaces, the app does not
+        else if (r.hasX || !usesValue(st.calc, v) || !same(pval(r.poly, 0), pval(totalPoly(), v))) setFb('calc', 'hint', t.calcWrong(fmtNum(v)));
+        else {
+            const res = pval(totalPoly(), v);
+            if (same(res, pb.target)) { st.calcOk = true; setFb('calc', 'ok', t.calcOk(fmtNum(v), fmtVal(pb.target, pb.money))); }
+            else setFb('calc', 'hint', t.calcNotTotal(fmtNum(v), fmtVal(res, pb.money), fmtVal(pb.target, pb.money)));
+        }
+        rerender('calcIn');
+    }
+
+    function usesValue(calc, v) {
+        const nums = (calc.replace(/\s+/g, '').match(/\d+([.,]\d+)?/g) || []).map(n => Number(n.replace(',', '.')));
+        return nums.some(n => same(n, v));
+    }
+
+    function checkAmounts() {
+        const st = ST(), t = s(), pb = PB();
+        const x = solutionX();
+        if (pb.order.some(id => !(st.amounts[id] || '').trim())) { setFb('amounts', 'hint', t.needAll); return rerender(); }
+        const bad = pb.order.find(id => !same(parseNum(st.amounts[id]), pval(polyOf(id), x)));
+        if (bad) { setFb('amounts', 'hint', t.amountWrong(nom(bad))); return rerender('am-' + bad); }
+        st.solved = true;
+        let html = t.solved;
+        if (state.p === 2) html += `<br>${t.p3Lesson}`;
+        if (state.p === 1) {
+            const TA = pb.bases.ana.tree, TB = pb.bases.ben.tree;
+            html += `<br>${t.p2Compare(fmtPoly(totalPoly(TB)), fmtNum(solutionX(TA)), fmtPoly(totalPoly(TA)), fmtNum(solutionX(TB)))}`;
+        }
+        setFb('amounts', 'ok', html);
+        rerender();
+    }
+
+    // Re-render, then put the focus back where it was
+    function rerender(focusId) {
+        const a = document.activeElement;
+        const keep = focusId || (a && a.id);
+        render();
+        const el = keep && $(keep);
+        if (el) { el.focus(); if (el.setSelectionRange && el.type === 'text') el.setSelectionRange(el.value.length, el.value.length); }
+    }
+
+    // ── Événements ──
+    document.addEventListener('click', e => {
+        const chip = e.target.closest('#probChips [data-p]');
+        if (chip) { state.p = Number(chip.dataset.p); render(); $('probChips').querySelector(`[data-p="${state.p}"]`).focus(); return; }
+        const act = e.target.closest('[data-act]');
+        const ex = e.target.closest('[data-check-expr]');
+        if (ex) return checkExpr(ex.dataset.checkExpr);
+        if (!act) return;
+        const a = act.dataset.act;
+        if (a === 'try') tryValue();
+        else if (a === 'eq') checkEq();
+        else if (a === 'calc') checkCalc();
+        else if (a === 'amounts') checkAmounts();
+        else if (a === 'gap') { setFb('gap', 'info', s().gapHint); rerender(); }
+    });
+    document.addEventListener('change', e => {
+        const st = ST();
+        if (e.target.id === 'baseSel') {
+            const v = e.target.value;
+            if (v === 'cleo') { setFb('base', 'hint', s().baseCleo); st.base = null; }
+            else {
+                // New starting quantity: start the problem over with it
+                state.probs[state.p] = newProbState(PB());
+                state.probs[state.p].base = v || null;
+            }
+            rerender('baseSel');
+        } else if (e.target.dataset.rel) {
+            const opt = PB().bases[st.base].options[e.target.value];
+            st.rels[e.target.dataset.rel] = opt || null;
+            checkRels();
+            rerender(e.target.id);
+        }
+    });
+    document.addEventListener('input', e => {
+        const st = ST(), el = e.target;
+        if (el.id === 'whyIn') st.why = el.value;
+        else if (el.dataset.expr) st.exprs[el.dataset.expr] = el.value;
+        else if (el.id === 'eqIn') st.eq = el.value;
+        else if (el.id === 'xIn') st.xv = el.value;
+        else if (el.id === 'calcIn') st.calc = el.value;
+        else if (el.dataset.am) st.amounts[el.dataset.am] = el.value;
+    });
+    document.addEventListener('keydown', e => {
+        if (e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
+        const id = e.target.id;
+        if (id === 'tryIn') tryValue();
+        else if (e.target.dataset.expr) checkExpr(e.target.dataset.expr);
+        else if (id === 'eqIn') checkEq();
+        else if (id === 'xIn' || id === 'calcIn') checkCalc();
+        else if (e.target.dataset.am) checkAmounts();
+    });
+    $('revealBtn').addEventListener('click', () => { ST().revealed = true; rerender('revealBtn'); });
+
+    function applyLang() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const v = s()[el.dataset.i18n];
+            if (typeof v === 'string') el.innerHTML = v;
+        });
+        document.title = s().title.replace(/^\S+\s/, '') + ' – LaboMath';
+        // Feedback already shown stays in the previous language: clear it
+        state.probs.forEach(st => { st.fb = {}; });
+        render();
+    }
+
+    // The header's FR/EN button is handled by commun/langue.js
+    Langue.onChange(lang => { state.lang = lang; applyLang(); });
+    applyLang();
+</script>
+
+</body>
+</html>

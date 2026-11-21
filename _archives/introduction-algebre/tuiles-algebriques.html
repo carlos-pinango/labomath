@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tuiles algébriques et modèle d'aire – LaboMath</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../commun/style.css">
+    <script src="../commun/langue.js"></script>
+    <style>
+        /* Styles propres à cette activité (le reste vient de commun/style.css) */
+        [hidden] { display: none !important; }
+        :root {
+            --navy: #1f2d4d;
+            --blue: #1f5fa8;
+            --orange: #c84a16;
+            --pale: #eef3fa;
+            --line: #c9d4e5;
+            --ok: #1e7d45;
+        }
+
+        .container {
+            color: var(--navy);
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: var(--navy);
+            font-weight: 900;
+            line-height: 1.2;
+            border-bottom: 2px solid var(--pale);
+            padding-bottom: 10px;
+        }
+
+        h2.step {
+            font-size: 1.05em;
+            font-weight: 900;
+            margin: 26px 0 10px;
+            color: var(--navy);
+        }
+        h2.step .num {
+            display: inline-flex;
+            width: 26px; height: 26px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--blue);
+            color: white;
+            font-size: 0.85em;
+            margin-right: 8px;
+        }
+
+        em, .math em { font-family: Georgia, 'Times New Roman', serif; font-style: italic; }
+
+        .concept-box {
+            background: var(--pale);
+            padding: 15px;
+            border-left: 5px solid var(--blue);
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        .legend-tiles {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 10px 18px;
+            margin-top: 12px;
+        }
+        .legend-tiles figure { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .legend-tiles .pair { display: flex; gap: 4px; align-items: flex-end; }
+        .legend-tiles figcaption { font-size: 0.8em; font-weight: 700; color: #4a5878; text-align: center; }
+
+        .panel {
+            background: var(--pale);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 10px 16px;
+            font-weight: 700;
+        }
+
+        .toggle {
+            display: inline-flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            background: white;
+            border-radius: 20px;
+            padding: 3px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .toggle button, .chip {
+            border: none;
+            background: transparent;
+            color: #4a5878;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.9em;
+            border-radius: 18px;
+            padding: 6px 14px;
+            cursor: pointer;
+        }
+        .toggle button.active, .chip.active { background: var(--blue); color: white; }
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center; }
+        .chip { background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.08); min-width: 36px; }
+        .chip:hover { color: var(--blue); }
+        .chip.active:hover { color: white; }
+        .chips-label { font-size: 0.9em; }
+
+        .expr {
+            text-align: center;
+            font-size: 1.6em;
+            font-weight: 900;
+            margin: 4px 0 12px;
+        }
+        .expr .neg, .top-label.neg, .left-label.neg { color: var(--orange); }
+
+        /* ── Tuiles ── */
+        .tile {
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: none;
+            padding: 0;
+            border: 2px solid;
+            border-radius: 3px;
+            color: white;
+            font-family: Georgia, 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: 700;
+            line-height: 1;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .tile.k1 { font-family: var(--font); font-style: normal; }
+        .tile.pos { background: var(--blue); border-color: #143f72; }
+        .tile.neg { background: var(--orange); border-color: #84300d; }
+        .tile.vert span { writing-mode: vertical-rl; text-orientation: upright; letter-spacing: -2px; }
+        button.tile { cursor: grab; touch-action: none; }
+        button.tile:hover { filter: brightness(1.1); }
+        .tile.sel { outline: 3px solid var(--navy); outline-offset: 2px; transform: translateY(-4px); }
+        .tile:focus-visible, .block:focus-visible, .flip-btn:focus-visible { outline: 3px solid #f2b705; outline-offset: 2px; }
+        .ghost { position: fixed; z-index: 1000; pointer-events: none; opacity: 0.85; transform: translate(-50%, -50%); }
+        .dragging { opacity: 0.3; }
+        .vanish { animation: vanish 0.3s forwards; }
+        @keyframes vanish { to { transform: scale(0.2); opacity: 0; } }
+        .flipin { animation: flipin 0.5s; }
+        @keyframes flipin { from { transform: rotateY(180deg); } to { transform: rotateY(0); } }
+
+        .mat {
+            min-height: 110px;
+            background: #f7f9fc;
+            border: 2px dashed var(--line);
+            border-radius: 12px;
+            padding: 16px 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 8px;
+        }
+        .mat .empty { align-self: center; color: #4a5878; font-weight: 700; }
+
+        /* −( ) : les tuiles à retourner */
+        .paren-group {
+            position: relative;
+            display: inline-flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 8px;
+            padding: 8px 10px;
+            margin-left: 34px;
+            border-left: 3px solid var(--navy);
+            border-right: 3px solid var(--navy);
+            border-radius: 18px;
+        }
+        .flip-btn {
+            position: absolute;
+            left: -36px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            border: 2px solid var(--navy);
+            background: white;
+            color: var(--navy);
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 1.3em;
+            line-height: 1;
+            padding: 0;
+        }
+        .flip-btn:hover { background: var(--pale); }
+
+        .msg {
+            text-align: center;
+            min-height: 1.6em;
+            font-weight: 700;
+            font-size: 0.92em;
+            color: #4a5878;
+            margin-top: 8px;
+        }
+
+        /* ── Réserve et rectangle ── */
+        .palette {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 10px 14px;
+            padding: 12px;
+            background: var(--pale);
+            border-radius: 10px;
+            margin-bottom: 14px;
+        }
+        .palette .chips-label { width: 100%; text-align: center; font-weight: 700; }
+
+        .area-wrap { overflow-x: auto; padding: 4px 2px 8px; }
+        .area {
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: 4px 8px;
+            width: max-content;
+            margin: 0 auto;
+        }
+        .top-labels { grid-column: 2; display: flex; }
+        .top-label {
+            position: relative;
+            text-align: center;
+            font-weight: 900;
+            font-size: 1.1em;
+            border-bottom: 2px solid var(--navy);
+            padding-bottom: 2px;
+        }
+        .top-label::before, .top-label::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            width: 2px; height: 8px;
+            background: var(--navy);
+        }
+        .top-label::before { left: 0; }
+        .top-label::after { right: 0; }
+        .left-label {
+            grid-column: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            min-width: 28px;
+            padding-right: 6px;
+            font-weight: 900;
+            font-size: 1.1em;
+            border-right: 2px solid var(--navy);
+        }
+        .left-label::before, .left-label::after {
+            content: '';
+            position: absolute;
+            right: -2px;
+            width: 8px; height: 2px;
+            background: var(--navy);
+        }
+        .left-label::before { top: 0; }
+        .left-label::after { bottom: 0; }
+
+        .blocks { display: flex; outline: 3px solid var(--navy); }
+        .block {
+            display: grid;
+            padding: 0;
+            border: none;
+            background: white;
+            cursor: pointer;
+            font: inherit;
+        }
+        .block + .block { box-shadow: inset 3px 0 0 var(--navy); }
+        .block:not(.filled):hover, .block.over { background: #fff4ec; }
+        .block.filled { cursor: default; }
+        .cell { border: 1px dashed #9fb0c8; }
+
+        .rect-grid { display: grid; }
+        .rect-grid.complete { outline: 3px solid var(--navy); }
+
+        .compare {
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 10px;
+            background: var(--pale);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 14px 40px;
+        }
+        .compare figure { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .compare .tiles { display: flex; align-items: flex-end; gap: 2px; }
+        .compare figcaption { font-weight: 900; font-size: 1.1em; }
+        .compare p { width: 100%; text-align: center; line-height: 1.6; font-size: 0.95em; }
+
+        /* ── Réponse ── */
+        .answer-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8px 10px;
+            font-weight: 700;
+        }
+        .text-input {
+            width: 230px;
+            padding: 7px 10px;
+            border: 2px solid var(--line);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1.1em;
+            font-weight: 800;
+            color: var(--navy);
+            outline: none;
+            background: white;
+        }
+        .text-input:focus { border-color: var(--blue); }
+
+        .center { text-align: center; margin-top: 10px; }
+        .btn {
+            border: none;
+            background: var(--blue);
+            color: white;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95em;
+            border-radius: 20px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        .btn:hover { background: #184d8a; }
+        .btn.light { background: var(--pale); color: var(--blue); }
+        .btn.light:hover, .btn.light.active { background: #dde7f5; }
+        .btn.key { padding: 6px 12px; font-family: Georgia, serif; font-style: italic; }
+
+        .feedback {
+            border-radius: 10px;
+            padding: 12px 16px;
+            line-height: 1.6;
+            margin-top: 12px;
+            text-align: center;
+        }
+        .feedback.hint { background: #fbeee7; color: #84300d; }
+        .feedback.ok { background: #e7f4ec; color: var(--ok); }
+        .feedback.answer { background: var(--pale); color: var(--navy); }
+
+        .sr-only {
+            position: absolute; width: 1px; height: 1px;
+            overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px 14px; }
+            h1 { font-size: 1.4em; }
+            .expr { font-size: 1.3em; }
+            .text-input { width: 180px; }
+            .panel { padding: 10px; }
+            .toggle button { padding: 6px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="app-header">
+    <div class="header-inner">
+        <a class="back-btn" href="index.html">← <span data-en="Introduction to algebra">Introduction à l'algèbre</span></a>
+        <a class="logo" href="../index.html">
+            <div class="logo-icon">∑</div>
+            <span class="logo-text">Labo<span class="logo-accent">Math</span></span>
+        </a>
+        <button class="lang-btn" id="langBtn">EN</button>
+    </div>
+</header>
+
+<main class="page">
+<div class="container">
+    <h1 data-i18n="title">🧱 Tuiles algébriques et modèle d'aire</h1>
+
+    <div class="concept-box" id="concept"></div>
+
+    <div class="panel">
+        <div class="toggle" id="modeToggle">
+            <button type="button" data-mode="reduce" data-i18n="modeReduce">Réduire</button>
+            <button type="button" data-mode="mult" data-i18n="modeMult">Multiplier</button>
+            <button type="button" data-mode="factor" data-i18n="modeFactor">Mise en évidence</button>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="chips" id="exChips"></div>
+    </div>
+
+    <!-- Étape 1 : manipuler (contenu selon le mode) -->
+    <div id="work"></div>
+    <div class="msg" id="msg" aria-live="polite"></div>
+
+    <!-- Étape 2 : écrire la réponse -->
+    <h2 class="step"><span class="num">2</span><span id="step2"></span></h2>
+    <div class="answer-row">
+        <label for="answer" data-i18n="yourAnswer">Ta réponse :</label>
+        <input class="text-input" id="answer" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <button type="button" class="btn light key" id="keySq" aria-label="x²">x²</button>
+        <button type="button" class="btn" id="checkBtn" data-i18n="check">Vérifier</button>
+    </div>
+    <div class="center">
+        <button type="button" class="btn light" id="revealBtn" data-i18n="reveal">Voir la réponse</button>
+    </div>
+    <div class="feedback" id="feedback" aria-live="polite" hidden></div>
+</div>
+</main>
+
+<footer class="app-footer">
+    <span data-en="Designed by Carlos Pinango, engineer and high school math teacher">Conçu par Carlos Pinango, ingénieur et enseignant de mathématiques au secondaire</span>
+</footer>
+
+<script>
+    // ── Exercices ──
+    // Un terme est [coefficient, degré] : [3, 1] = 3x, [-5, 0] = −5, [2, 2] = 2x².
+    const EX = {
+        // Parties d'une expression ; p: true = entre parenthèses, précédée de −
+        reduce: [
+            { parts: [{ t: [[3, 1], [2, 0], [1, 1], [4, 0]] }] },
+            { parts: [{ t: [[4, 1], [3, 0], [-1, 1], [-5, 0]] }] },
+            { parts: [{ t: [[2, 2], [1, 1], [-1, 2], [3, 1], [-2, 0]] }] },
+            { parts: [{ t: [[5, 0]] }, { p: true, t: [[2, 1], [-3, 0]] }] },
+            { parts: [{ t: [[3, 1], [1, 0]] }, { p: true, t: [[1, 1], [4, 0]] }] },
+            { parts: [{ t: [[1, 2], [-2, 1], [4, 0]] }, { p: true, t: [[1, 2], [-1, 1], [1, 0]] }] },
+        ],
+        // L(R) : L est une constante ou un monôme du 1er degré ; R est un monôme ou un binôme
+        mult: [
+            { L: [3, 0], R: [[2, 1], [5, 0]] },
+            { L: [2, 0], R: [[1, 1], [4, 0]] },
+            { L: [2, 0], R: [[3, 1], [-4, 0]] },
+            { L: [4, 0], R: [[3, 1]] },
+            { L: [1, 1], R: [[2, 1]] },
+            { L: [3, 1], R: [[4, 1]] },
+        ],
+        // Aire ax + b ; on cherche le facteur numérique
+        factor: [
+            { a: 6, b: 15 },
+            { a: 4, b: 8 },
+            { a: 10, b: 4 },
+            { a: 6, b: -9 },
+            { a: 12, b: 18 },
+            { a: 8, b: -12 },
+        ],
+    };
+    const KIND = ['1', 'x', 'x2'];            // tile kind by degree
+    const DEG = { '1': 0, 'x': 1, 'x2': 2 };
+    const MAX_ROWS = 8;
+    const M = '−';                            // true minus sign
+
+    const STR = {
+        fr: {
+            title: `🧱 Tuiles algébriques et modèle d'aire`,
+            modeReduce: `Réduire`, modeMult: `Multiplier`, modeFactor: `Mise en évidence`,
+            exercise: n => `Exercice ${n}`,
+            yourAnswer: `Ta réponse :`, check: `Vérifier`, reveal: `Voir la réponse`,
+            conceptTiles: `Chaque tuile a une <strong>aire</strong>. <strong>Bleu</strong> : positif. <strong>Orange</strong> : négatif. ` +
+                `Une tuile et son <strong>opposée</strong> (même forme, autre couleur) forment une <strong>paire nulle</strong> : ensemble, elles valent 0.`,
+            legX2: `carré de côté <em>x</em>`, legX: `rectangle de <em>x</em> sur 1`, legOne: `carré de côté 1`, legPair: `paire nulle`,
+            conceptReduce: `Les tuiles montrent l'expression. Glisse une tuile sur une autre de même forme pour les regrouper, ou sur son opposée pour former une paire nulle. ` +
+                `Sans glisser : touche une tuile, puis une autre. Les tuiles placées dans <strong>${M}( )</strong> représentent l'opposé de ce qu'elles montrent : touche le <strong>${M}</strong> pour les retourner.`,
+            conceptMult: `Les deux facteurs sont les <strong>dimensions</strong> d'un rectangle, et le produit est son <strong>aire</strong>. ` +
+                `Remplis chaque bloc avec la tuile qui couvre exactement une case : glisse-la depuis la réserve, ou touche la tuile, puis le bloc. Écris ensuite l'aire.`,
+            conceptFactor: `Cette fois, on connaît l'<strong>aire</strong> : ce sont les tuiles. Choisis un nombre de rangées pour les placer en rectangle. ` +
+                `Quand le rectangle est complet, écris ses dimensions sous la forme <strong>hauteur(largeur)</strong>.`,
+            stepReduce1: `Manipule les tuiles`, stepReduce2: `Écris l'expression réduite`,
+            stepMult1: `Remplis le rectangle`, stepMult2: `Écris l'aire du rectangle`,
+            stepFactor1: `Place les tuiles en rangées`, stepFactor2: `Écris les dimensions du rectangle`,
+            restart: `↺ Recommencer`,
+            reserve: `Réserve de tuiles`,
+            rows: `Nombre de rangées :`,
+            areaIs: `Aire : `,
+            compareShow: `🔍 Comparer 2x et x²`, compareHide: `Cacher la comparaison`,
+            compareText: `<strong>2<em>x</em></strong>, c'est <em>x</em> + <em>x</em> : deux tuiles <em>x</em>, un rectangle de 2 sur <em>x</em>. ` +
+                `<strong><em>x</em>²</strong>, c'est <em>x</em>(<em>x</em>) : un carré de <em>x</em> sur <em>x</em>. ` +
+                `Leurs formes sont différentes. Par exemple, si <em>x</em> vaut 5, 2<em>x</em> vaut 10, mais <em>x</em>² vaut 25.`,
+            empty: `Il ne reste aucune tuile.`,
+            // Noms des tuiles
+            kindName: { 'x2': `<em>x</em>²`, 'x': `<em>x</em>`, '1': `1` },
+            tileAria: (k, sg) => `tuile ${sg < 0 ? 'négative' : 'positive'} ${{ 'x2': 'x carré', 'x': 'x', '1': '1' }[k]}`,
+            blockAria: (i, f) => `bloc ${i + 1} du rectangle, ${f ? 'rempli' : 'vide'}`,
+            flipAria: `Retourner les tuiles entre parenthèses`,
+            // Messages d'action
+            selTile: k => `Tuile ${k} choisie : touche une autre tuile, ou glisse-la.`,
+            selPal: k => `Tuile ${k} choisie : touche un bloc du rectangle.`,
+            unselect: `Aucune tuile choisie.`,
+            zeroPair: k => `Paire nulle : ${k} et son opposée valent 0 ensemble. Elles disparaissent.`,
+            grouped: `Tuiles semblables regroupées.`,
+            notLike: `Ces deux tuiles n'ont pas la même forme : elles ne sont pas semblables.`,
+            inParen: `Ces tuiles sont dans ${M}( ) : retourne-les d'abord en touchant le ${M}.`,
+            flipped: `Les tuiles sont retournées : chacune est devenue son opposée.`,
+            pickFirst: `Choisis d'abord une tuile dans la réserve.`,
+            blockFull: `Ce bloc est déjà rempli.`,
+            wrongShape: `Cette tuile ne couvre pas exactement une case de ce bloc. Compare sa largeur et sa hauteur avec celles d'une case.`,
+            wrongSign: `La forme convient. Regarde maintenant les signes des deux côtés de ce bloc.`,
+            filled: `Bloc rempli.`,
+            allFilled: `Le rectangle est rempli. Quelle est son aire ?`,
+            hComplete: h => `Avec ${h} rangée${h > 1 ? 's' : ''}, chaque colonne est pleine : c'est un rectangle.`,
+            hIncomplete: h => `Avec ${h} rangées, une colonne n'est pas pleine : ce n'est pas un rectangle.`,
+            // Rétroactions
+            fbEmpty: `Écris d'abord ta réponse.`,
+            fbParse: `Je ne reconnais pas cette écriture. Utilise des nombres, <em>x</em>, <em>x</em>², +, ${M} et des parenthèses.`,
+            fbTimes: `Pour multiplier, on écrit seulement des parenthèses, comme dans 4(3<em>x</em>) : pas de ×, d'astérisque ni de point.`,
+            fbNotReduced: `Ton expression est équivalente, mais elle n'est pas réduite : il reste des termes semblables ou des parenthèses.`,
+            fbParen: `Regarde les tuiles dans ${M}( ) : que devient chacune d'elles quand on la retourne ?`,
+            fbCountTiles: k => `Compte de nouveau les tuiles ${k} qui restent, en tenant compte de leur couleur.`,
+            fbCountRect: k => `Compte de nouveau les tuiles ${k} dans le rectangle.`,
+            fbShape: `Regarde la forme des tuiles qui remplissent le rectangle : sont-ce des tuiles <em>x</em> ou des tuiles <em>x</em>² ?`,
+            fbOneBlock: `As-tu compté les tuiles de tous les blocs ? Le côté de gauche touche chacun des blocs.`,
+            fbProduct: `C'est le produit lui-même. Écris plutôt l'aire : ce que valent toutes les tuiles du rectangle.`,
+            fbFillFirst: ` Remplis le rectangle : les tuiles montrent l'aire.`,
+            fbForm: `Écris les dimensions sous la forme hauteur(largeur), avec un nombre devant les parenthèses.`,
+            fbIsArea: `C'est l'aire elle-même. Écris plutôt les dimensions du rectangle : hauteur(largeur).`,
+            fbWrongArea: `Ce rectangle n'a pas la bonne aire. Place les tuiles avec ce nombre de rangées : que contient une rangée ?`,
+            fbInner: `La largeur doit être une expression réduite.`,
+            fbNotMax: `C'est juste ! Peux-tu former un rectangle encore plus haut avec les mêmes tuiles ?`,
+            fbNegK: `C'est équivalent, mais ici, la hauteur du rectangle doit être positive.`,
+            fbAsk: ` Si tu es bloqué, tu peux demander la réponse.`,
+            okReduce: (e, a) => `✅ Bravo ! ${e} = ${a}`,
+            okOrder: a => `✅ C'est juste ! On écrit habituellement les termes en ordre décroissant de degré : ${a}.`,
+            okMult: (e, a) => `✅ Bravo ! L'aire du rectangle est ${e} = ${a}.`,
+            okFactor: (a, f) => `✅ Bravo ! ${a} = ${f}. C'est le rectangle le plus haut possible.`,
+            answerIs: (e, a) => `Réponse : ${e} = ${a}`,
+        },
+        en: {
+            title: `🧱 Algebra tiles and the area model`,
+            modeReduce: `Simplify`, modeMult: `Multiply`, modeFactor: `Factor out`,
+            exercise: n => `Exercise ${n}`,
+            yourAnswer: `Your answer:`, check: `Check`, reveal: `Show the answer`,
+            conceptTiles: `Each tile has an <strong>area</strong>. <strong>Blue</strong>: positive. <strong>Orange</strong>: negative. ` +
+                `A tile and its <strong>opposite</strong> (same shape, other colour) form a <strong>zero pair</strong>: together, they are worth 0.`,
+            legX2: `square with side <em>x</em>`, legX: `rectangle <em>x</em> by 1`, legOne: `square with side 1`, legPair: `zero pair`,
+            conceptReduce: `The tiles show the expression. Drag a tile onto another one with the same shape to group them, or onto its opposite to make a zero pair. ` +
+                `Without dragging: tap a tile, then another. Tiles inside <strong>${M}( )</strong> stand for the opposite of what they show: tap the <strong>${M}</strong> to flip them.`,
+            conceptMult: `The two factors are the <strong>dimensions</strong> of a rectangle, and the product is its <strong>area</strong>. ` +
+                `Fill each block with the tile that covers exactly one cell: drag it from the tile bank, or tap the tile, then the block. Then write the area.`,
+            conceptFactor: `This time, the <strong>area</strong> is known: it is the tiles. Choose a number of rows to arrange them into a rectangle. ` +
+                `When the rectangle is complete, write its dimensions in the form <strong>height(width)</strong>.`,
+            stepReduce1: `Move the tiles`, stepReduce2: `Write the simplified expression`,
+            stepMult1: `Fill the rectangle`, stepMult2: `Write the area of the rectangle`,
+            stepFactor1: `Arrange the tiles in rows`, stepFactor2: `Write the dimensions of the rectangle`,
+            restart: `↺ Start over`,
+            reserve: `Tile bank`,
+            rows: `Number of rows:`,
+            areaIs: `Area: `,
+            compareShow: `🔍 Compare 2x and x²`, compareHide: `Hide the comparison`,
+            compareText: `<strong>2<em>x</em></strong> is <em>x</em> + <em>x</em>: two <em>x</em> tiles, a rectangle 2 by <em>x</em>. ` +
+                `<strong><em>x</em>²</strong> is <em>x</em>(<em>x</em>): a square <em>x</em> by <em>x</em>. ` +
+                `Their shapes are different. For example, if <em>x</em> is 5, 2<em>x</em> is 10, but <em>x</em>² is 25.`,
+            empty: `No tiles are left.`,
+            kindName: { 'x2': `<em>x</em>²`, 'x': `<em>x</em>`, '1': `1` },
+            tileAria: (k, sg) => `${sg < 0 ? 'negative' : 'positive'} ${{ 'x2': 'x squared', 'x': 'x', '1': '1' }[k]} tile`,
+            blockAria: (i, f) => `block ${i + 1} of the rectangle, ${f ? 'filled' : 'empty'}`,
+            flipAria: `Flip the tiles in parentheses`,
+            selTile: k => `${k} tile selected: tap another tile, or drag it.`,
+            selPal: k => `${k} tile selected: tap a block of the rectangle.`,
+            unselect: `No tile selected.`,
+            zeroPair: k => `Zero pair: ${k} and its opposite are worth 0 together. They disappear.`,
+            grouped: `Like tiles grouped.`,
+            notLike: `These two tiles do not have the same shape: they are not like terms.`,
+            inParen: `These tiles are inside ${M}( ): flip them first by tapping the ${M}.`,
+            flipped: `The tiles are flipped: each one became its opposite.`,
+            pickFirst: `First choose a tile from the tile bank.`,
+            blockFull: `This block is already filled.`,
+            wrongShape: `This tile does not cover exactly one cell of this block. Compare its width and height with those of a cell.`,
+            wrongSign: `The shape fits. Now look at the signs of the two sides of this block.`,
+            filled: `Block filled.`,
+            allFilled: `The rectangle is filled. What is its area?`,
+            hComplete: h => `With ${h} row${h > 1 ? 's' : ''}, every column is full: it is a rectangle.`,
+            hIncomplete: h => `With ${h} rows, one column is not full: it is not a rectangle.`,
+            fbEmpty: `First write your answer.`,
+            fbParse: `I don't recognize this. Use numbers, <em>x</em>, <em>x</em>², +, ${M} and parentheses.`,
+            fbTimes: `To multiply, only write parentheses, as in 4(3<em>x</em>): no ×, asterisk or dot.`,
+            fbNotReduced: `Your expression is equivalent, but it is not simplified: there are still like terms or parentheses.`,
+            fbParen: `Look at the tiles inside ${M}( ): what does each one become when you flip it?`,
+            fbCountTiles: k => `Count the remaining ${k} tiles again, paying attention to their colour.`,
+            fbCountRect: k => `Count the ${k} tiles in the rectangle again.`,
+            fbShape: `Look at the shape of the tiles that fill the rectangle: are they <em>x</em> tiles or <em>x</em>² tiles?`,
+            fbOneBlock: `Did you count the tiles in every block? The left side touches each block.`,
+            fbProduct: `That is the product itself. Write the area instead: what all the tiles in the rectangle are worth.`,
+            fbFillFirst: ` Fill the rectangle: the tiles show the area.`,
+            fbForm: `Write the dimensions in the form height(width), with a number in front of the parentheses.`,
+            fbIsArea: `That is the area itself. Write the dimensions of the rectangle instead: height(width).`,
+            fbWrongArea: `This rectangle does not have the right area. Arrange the tiles with that number of rows: what is in one row?`,
+            fbInner: `The width must be a simplified expression.`,
+            fbNotMax: `That's right! Can you make an even taller rectangle with the same tiles?`,
+            fbNegK: `That is equivalent, but here the height of the rectangle must be positive.`,
+            fbAsk: ` If you are stuck, you can ask for the answer.`,
+            okReduce: (e, a) => `✅ Well done! ${e} = ${a}`,
+            okOrder: a => `✅ That's right! We usually write the terms in decreasing order of degree: ${a}.`,
+            okMult: (e, a) => `✅ Well done! The area of the rectangle is ${e} = ${a}.`,
+            okFactor: (a, f) => `✅ Well done! ${a} = ${f}. It is the tallest possible rectangle.`,
+            answerIs: (e, a) => `Answer: ${e} = ${a}`,
+        },
+    };
+
+    const state = {
+        lang: Langue.lang,          // shared language, see commun/langue.js
+        mode: 'reduce',             // 'reduce' | 'mult' | 'factor'
+        idx: { reduce: 0, mult: 0, factor: 0 },
+        tiles: [],                  // reduce: [{ id, kind, sign, group }]
+        blocks: [],                 // mult: [{ rows, rowSize, cols, colSize, kind, sign, orient, term, filled }]
+        h: null,                    // factor: number of rows chosen
+        sel: null,                  // { type: 'tile', id } | { type: 'pal', kind, sign }
+        compare: false,
+        solved: false,
+        revealed: false,
+        attempts: 0,
+        msg: '',
+        fb: null,                   // { cls, html }
+        busy: false,
+    };
+
+    const $ = id => document.getElementById(id);
+    const s = () => STR[state.lang];
+    const current = () => EX[state.mode][state.idx[state.mode]];
+    let SZ = sizes();
+    function sizes() { return window.innerWidth < 600 ? { u: 18, x: 56 } : { u: 22, x: 70 }; }
+
+    // ── Polynômes : tableaux de coefficients [c0, c1, c2, …] ──
+    const coef = (p, d) => p[d] || 0;
+    function padd(p, q) { const r = []; for (let d = 0; d < Math.max(p.length, q.length); d++) r[d] = coef(p, d) + coef(q, d); return r; }
+    function pmul(p, q) {
+        const r = [];
+        p.forEach((a, i) => q.forEach((b, j) => { r[i + j] = (r[i + j] || 0) + a * b; }));
+        return r;
+    }
+    const pscale = (p, k) => p.map(c => c * k);
+    function peq(p, q) { for (let d = 0; d < Math.max(p.length, q.length, 3); d++) if (coef(p, d) !== coef(q, d)) return false; return true; }
+    const mono = ([c, d]) => { const p = [0, 0, 0]; p[d] = c; return p; };
+    const sumTerms = terms => terms.reduce((acc, t) => padd(acc, mono(t)), [0, 0, 0]);
+    const gcd = (a, b) => b ? gcd(b, a % b) : Math.abs(a);
+
+    // ── Écriture : termes en ordre décroissant de degré, vrai signe moins ──
+    function fmtTerm(c, d, first, html = true) {
+        const v = d === 0 ? '' : (html ? '<em>x</em>' : 'x') + (d === 2 ? '²' : '');
+        const a = Math.abs(c);
+        const body = (d > 0 && a === 1) ? v : a + v;
+        if (first) return (c < 0 ? M : '') + body;
+        return (c < 0 ? ` ${M} ` : ' + ') + body;
+    }
+    const fmtTerms = (terms, html) => terms.map(([c, d], i) => fmtTerm(c, d, i === 0, html)).join('');
+    function fmtPoly(p, html) {
+        const terms = [];
+        for (let d = 2; d >= 0; d--) if (coef(p, d)) terms.push([coef(p, d), d]);
+        return terms.length ? fmtTerms(terms, html) : '0';
+    }
+    function fmtReduceEx(ex) {
+        return ex.parts.map((part, i) => {
+            const inner = fmtTerms(part.t);
+            if (!part.p) return i === 0 ? inner : (part.t[0][0] < 0 ? inner : ' + ' + inner);
+            return (i === 0 ? M : ` ${M} `) + '(' + inner + ')';
+        }).join('');
+    }
+    const fmtMono = t => fmtTerm(t[0], t[1], true);
+    const fmtProd = ex => fmtMono(ex.L) + '(' + fmtTerms(ex.R) + ')';
+
+    // ── Lecture d'une réponse de l'élève ──
+    // Accepte : 3x² − 2x + 5, x^2, 4(3x), 3x(4x), −(2x − 3), etc.
+    function parse(raw) {
+        const str = raw.replace(/\s+/g, '').replace(/[−–—]/g, '-').replace(/X/g, 'x').replace(/\^2/g, '²');
+        if (!str) return { err: 'empty' };
+        if (/[*×·•∙]/.test(str)) return { err: 'times' };
+        let i = 0, paren = false;
+        function expr() {
+            const terms = [];
+            while (i < str.length && str[i] !== ')') {
+                let sign = 1;
+                if (str[i] === '+' || str[i] === '-') { sign = str[i] === '-' ? -1 : 1; i++; }
+                else if (terms.length) throw 0;
+                terms.push(pscale(product(), sign));
+            }
+            if (!terms.length) throw 0;
+            return terms;
+        }
+        function product() {
+            let p = [1], n = 0;
+            while (i < str.length) {
+                const ch = str[i];
+                if (/\d/.test(ch)) {
+                    if (n > 0) throw 0;              // a number only in front
+                    const j = i;
+                    while (/\d/.test(str[i] || '')) i++;
+                    p = pmul(p, [Number(str.slice(j, i))]);
+                } else if (ch === 'x') {
+                    i++;
+                    let d = 1;
+                    if (str[i] === '²') { i++; d = 2; }
+                    p = pmul(p, mono([1, d]));
+                } else if (ch === '(') {
+                    i++; paren = true;
+                    const inner = expr();
+                    if (str[i] !== ')') throw 0;
+                    i++;
+                    p = pmul(p, inner.reduce(padd, [0]));
+                } else break;
+                n++;
+            }
+            if (!n) throw 0;
+            return p;
+        }
+        try {
+            const terms = expr();
+            if (i !== str.length) throw 0;
+            const poly = terms.reduce(padd, [0]);
+            if (poly.length > 3 && poly.slice(3).some(c => c)) return { err: 'parse' };
+            // Degree of each written term (−1 when it is not a single nonzero term)
+            const degs = terms.map(t => {
+                const nz = t.map((c, d) => c ? d : -1).filter(d => d >= 0);
+                return nz.length === 1 ? nz[0] : -1;
+            });
+            const reduced = !paren && degs.every(d => d >= 0) && new Set(degs).size === degs.length;
+            const ordered = degs.every((d, k) => k === 0 || d < degs[k - 1]);
+            return { poly, paren, reduced, ordered, str };
+        } catch (e) {
+            return { err: 'parse' };
+        }
+    }
+
+    // ── Préparer un exercice ──
+    function setup() {
+        Object.assign(state, { sel: null, solved: false, revealed: false, attempts: 0, msg: '', fb: null, busy: false });
+        $('answer').value = '';
+        const ex = current();
+        if (state.mode === 'reduce') {
+            state.tiles = [];
+            let id = 0, g = 0;
+            ex.parts.forEach(part => {
+                const group = part.p ? 'g' + (g++) : null;
+                part.t.forEach(([c, d]) => {
+                    for (let k = 0; k < Math.abs(c); k++) state.tiles.push({ id: id++, kind: KIND[d], sign: Math.sign(c), group });
+                });
+            });
+        } else if (state.mode === 'mult') {
+            const [lc, ld] = ex.L;
+            state.blocks = ex.R.map(([rc, rd]) => ({
+                rows: Math.abs(lc), rowSize: ld ? 'x' : 'u',
+                cols: Math.abs(rc), colSize: rd ? 'x' : 'u',
+                kind: KIND[ld + rd], sign: Math.sign(lc) * Math.sign(rc),
+                orient: (!ld && rd) ? 'h' : 'v',     // x tile lying down when the row is 1 high
+                term: [rc, rd], filled: false,
+            }));
+        } else {
+            state.h = null;
+        }
+        render();
+    }
+
+    // ── Dessin ──
+    function tileHtml(kind, sign, o = {}) {
+        const { u, x } = SZ;
+        const orient = o.orient || 'v';
+        const [w, h] = kind === 'x2' ? [x, x] : kind === 'x' ? (orient === 'h' ? [x, u] : [u, x]) : [u, u];
+        const tag = o.tag || 'span';
+        const label = (sign < 0 ? M : '') + (kind === 'x2' ? 'x²' : kind);
+        const fs = kind === 'x2' ? Math.round(x * 0.3) : kind === 'x' ? Math.round(u * 0.6) : Math.round(u * 0.48);
+        const cls = `tile ${sign < 0 ? 'neg' : 'pos'} k${kind}${kind === 'x' && orient === 'v' ? ' vert' : ''} ${o.cls || ''}`;
+        const aria = tag === 'button' ? ` type="button" aria-label="${s().tileAria(kind, sign)}"` : ' aria-hidden="true"';
+        return `<${tag} class="${cls}" style="width:${w}px;height:${h}px;font-size:${fs}px;${o.style || ''}"${aria} ${o.attrs || ''}><span>${label}</span></${tag}>`;
+    }
+    const isSel = (type, test) => state.sel && state.sel.type === type && test(state.sel);
+    const signed = (html, neg) => neg ? `<span class="neg">${html}</span>` : html;
+
+    function renderConcept() {
+        const t = s();
+        const fig = (tiles, cap) => `<figure><div class="pair">${tiles}</div><figcaption>${cap}</figcaption></figure>`;
+        const legend = `<div class="legend-tiles">` +
+            fig(tileHtml('x2', 1), `<em>x</em>² : ${t.legX2}`) +
+            fig(tileHtml('x', 1), `<em>x</em> : ${t.legX}`) +
+            fig(tileHtml('1', 1), `1 : ${t.legOne}`) +
+            fig(tileHtml('x', 1) + tileHtml('x', -1), t.legPair) +
+            `</div>`;
+        const modeText = { reduce: t.conceptReduce, mult: t.conceptMult, factor: t.conceptFactor }[state.mode];
+        $('concept').innerHTML = `${t.conceptTiles}<br>${modeText}${legend}`;
+    }
+
+    function reduceHtml() {
+        if (!state.tiles.length) return `<div class="empty">${s().empty}</div>`;
+        let h = '', open = null;
+        state.tiles.forEach(t => {
+            if (t.group !== open) {
+                if (open) h += '</span>';
+                if (t.group) h += `<span class="paren-group"><button type="button" class="flip-btn" data-flip="${t.group}" aria-label="${s().flipAria}">${M}</button>`;
+                open = t.group;
+            }
+            const sel = isSel('tile', x => x.id === t.id) ? 'sel' : '';
+            h += tileHtml(t.kind, t.sign, { tag: 'button', attrs: `data-tile="${t.id}" data-drag="1"`, cls: `${sel} ${t.anim || ''}` });
+        });
+        if (open) h += '</span>';
+        return h;
+    }
+
+    function multAreaHtml() {
+        const ex = current();
+        const { u, x } = SZ;
+        const px = size => size === 'x' ? x : u;
+        const rows = state.blocks[0].rows, rowH = px(state.blocks[0].rowSize);
+        const top = state.blocks.map(b =>
+            `<div class="top-label${b.term[0] < 0 ? ' neg' : ''}" style="width:${b.cols * px(b.colSize)}px">${fmtMono(b.term)}</div>`).join('');
+        const blocks = state.blocks.map((b, i) => {
+            const n = b.rows * b.cols;
+            const cells = b.filled
+                ? Array.from({ length: n }, () => tileHtml(b.kind, b.sign, { orient: b.orient })).join('')
+                : '<span class="cell"></span>'.repeat(n);
+            return `<button type="button" class="block${b.filled ? ' filled' : ''}" data-block="${i}" aria-label="${s().blockAria(i, b.filled)}" ` +
+                `style="grid-template-columns:repeat(${b.cols},${px(b.colSize)}px);grid-template-rows:repeat(${b.rows},${rowH}px)">${cells}</button>`;
+        }).join('');
+        return `<div class="area-wrap"><div class="area"><div></div><div class="top-labels">${top}</div>` +
+            `<div class="left-label${ex.L[0] < 0 ? ' neg' : ''}" style="height:${rows * rowH}px">${fmtMono(ex.L)}</div>` +
+            `<div class="blocks">${blocks}</div></div></div>`;
+    }
+
+    function factorHtml() {
+        const { a, b } = current();
+        const { u, x } = SZ;
+        const sb = Math.sign(b), nb = Math.abs(b);
+        const h = state.h;
+        if (!h) {
+            const tiles = tileHtml('x', 1, { orient: 'h' }).repeat(a) + tileHtml('1', sb).repeat(nb);
+            return `<div class="mat">${tiles}</div>`;
+        }
+        const nx = Math.ceil(a / h), nu = Math.ceil(nb / h);
+        const complete = a % h === 0 && nb % h === 0;
+        let tiles = '';
+        for (let i = 0; i < a; i++) tiles += tileHtml('x', 1, { orient: 'h', style: `grid-column:${Math.floor(i / h) + 1};grid-row:${i % h + 1}` });
+        for (let i = 0; i < nb; i++) tiles += tileHtml('1', sb, { style: `grid-column:${nx + Math.floor(i / h) + 1};grid-row:${i % h + 1}` });
+        const cols = `repeat(${nx},${x}px)` + (nu ? ` repeat(${nu},${u}px)` : '');
+        const showWidth = complete && (state.solved || state.revealed);
+        const top = showWidth
+            ? `<div class="top-label" style="width:${nx * x}px">${fmtTerm(a / h, 1, true)}</div>` +
+              `<div class="top-label${sb < 0 ? ' neg' : ''}" style="width:${nu * u}px">${fmtTerm(b / h, 0, true)}</div>`
+            : '';
+        return `<div class="area-wrap"><div class="area"><div></div><div class="top-labels">${top}</div>` +
+            `<div class="left-label" style="height:${h * u}px">${h}</div>` +
+            `<div class="rect-grid${complete ? ' complete' : ''}" style="grid-template-columns:${cols};grid-template-rows:repeat(${h},${u}px)">${tiles}</div>` +
+            `</div></div>`;
+    }
+
+    function render() {
+        const t = s();
+        const ex = current();
+        renderConcept();
+        document.querySelectorAll('#modeToggle button').forEach(b => b.classList.toggle('active', b.dataset.mode === state.mode));
+        $('exChips').innerHTML = EX[state.mode].map((_, i) =>
+            `<button type="button" class="chip${i === state.idx[state.mode] ? ' active' : ''}" data-ex="${i}" aria-label="${t.exercise(i + 1)}" aria-pressed="${i === state.idx[state.mode]}">${i + 1}</button>`).join('');
+
+        let html = '';
+        if (state.mode === 'reduce') {
+            html = `<h2 class="step"><span class="num">1</span>${t.stepReduce1}</h2>` +
+                `<div class="expr">${fmtReduceEx(ex)}</div>` +
+                `<div class="mat" id="mat">${reduceHtml()}</div>` +
+                `<div class="center"><button type="button" class="btn light" data-act="restart">${t.restart}</button></div>`;
+            $('step2').textContent = t.stepReduce2;
+        } else if (state.mode === 'mult') {
+            const pal = [['x2', 1], ['x', 1], ['1', 1], ['x2', -1], ['x', -1], ['1', -1]].map(([k, sg]) =>
+                tileHtml(k, sg, { tag: 'button', attrs: `data-pal="${k}" data-sign="${sg}" data-drag="1"`,
+                    cls: isSel('pal', p => p.kind === k && p.sign === sg) ? 'sel' : '' })).join('');
+            html = `<h2 class="step"><span class="num">1</span>${t.stepMult1}</h2>` +
+                `<div class="expr">${fmtProd(ex)}</div>` +
+                `<div class="palette" role="group" aria-label="${t.reserve}"><span class="chips-label">${t.reserve}</span>${pal}</div>` +
+                multAreaHtml() +
+                `<div class="center"><button type="button" class="btn light" data-act="restart">${t.restart}</button> ` +
+                `<button type="button" class="btn light${state.compare ? ' active' : ''}" data-act="compare" aria-expanded="${state.compare}">${state.compare ? t.compareHide : t.compareShow}</button></div>` +
+                (state.compare
+                    ? `<div class="compare"><figure><div class="tiles">${tileHtml('x', 1)}${tileHtml('x', 1)}</div><figcaption>2<em>x</em></figcaption></figure>` +
+                      `<figure><div class="tiles">${tileHtml('x2', 1)}</div><figcaption><em>x</em>²</figcaption></figure><p>${t.compareText}</p></div>`
+                    : '');
+            $('step2').textContent = t.stepMult2;
+        } else {
+            const { a, b } = ex;
+            const hs = Array.from({ length: MAX_ROWS }, (_, i) => i + 1).map(n =>
+                `<button type="button" class="chip${n === state.h ? ' active' : ''}" data-h="${n}" aria-pressed="${n === state.h}">${n}</button>`).join('');
+            html = `<h2 class="step"><span class="num">1</span>${t.stepFactor1}</h2>` +
+                `<div class="expr">${t.areaIs}${fmtPoly([b, a])}</div>` +
+                `<div class="panel"><div class="chips"><span class="chips-label">${t.rows}</span>${hs}</div></div>` +
+                factorHtml();
+            $('step2').textContent = t.stepFactor2;
+        }
+        $('work').innerHTML = html;
+        $('msg').innerHTML = state.msg;
+        const fb = $('feedback');
+        fb.hidden = !state.fb;
+        if (state.fb) { fb.className = 'feedback ' + state.fb.cls; fb.innerHTML = state.fb.html; }
+        state.tiles.forEach(tl => delete tl.anim);
+    }
+
+    // Re-render, then give the focus back to the same control (keyboard users)
+    function rerender() {
+        const a = document.activeElement;
+        const keys = ['data-tile', 'data-pal', 'data-block', 'data-h', 'data-act', 'data-ex'];
+        const key = a && keys.find(k => a.hasAttribute && a.hasAttribute(k));
+        const sel = key ? `[${key}="${a.getAttribute(key)}"]` + (key === 'data-pal' ? `[data-sign="${a.dataset.sign}"]` : '') : null;
+        const inWork = a && $('work').contains(a);
+        render();
+        if (!inWork) return;
+        const again = sel && $('work').querySelector(sel);
+        const fallback = $('work').querySelector('[data-tile], [data-flip], [data-block]:not(.filled), [data-act]');
+        (again || fallback) && (again || fallback).focus();
+    }
+
+    // ── Actions ──
+    function say(msg) { state.msg = msg; }
+    const kname = k => s().kindName[k];
+
+    function tileById(id) { return state.tiles.find(t => t.id === id); }
+
+    function selectTile(id) {
+        if (isSel('tile', x => x.id === id)) { state.sel = null; say(s().unselect); }
+        else { state.sel = { type: 'tile', id }; say(s().selTile(kname(tileById(id).kind))); }
+        rerender();
+    }
+
+    function actReduce(fromId, toId) {
+        const a = tileById(fromId), b = tileById(toId);
+        state.sel = null;
+        if (!a || !b || a === b) { say(s().unselect); return rerender(); }
+        if (a.group || b.group) { say(s().inParen); return rerender(); }
+        if (a.kind !== b.kind) { say(s().notLike); return rerender(); }
+        if (a.sign === -b.sign) {
+            say(s().zeroPair(kname(a.kind)));
+            state.busy = true;
+            $('msg').innerHTML = state.msg;
+            document.querySelectorAll(`[data-tile="${a.id}"], [data-tile="${b.id}"]`).forEach(el => el.classList.add('vanish'));
+            setTimeout(() => {
+                state.tiles = state.tiles.filter(t => t !== a && t !== b);
+                state.busy = false;
+                const focusMat = $('work').contains(document.activeElement);
+                render();
+                if (focusMat) { const f = $('work').querySelector('[data-tile], [data-flip], [data-act]'); f && f.focus(); }
+            }, 300);
+            return;
+        }
+        // Same kind, same sign: put a right after b
+        state.tiles.splice(state.tiles.indexOf(a), 1);
+        state.tiles.splice(state.tiles.indexOf(b) + 1, 0, a);
+        say(s().grouped);
+        rerender();
+    }
+
+    function flip(group) {
+        state.tiles.forEach(t => { if (t.group === group) { t.sign = -t.sign; t.group = null; t.anim = 'flipin'; } });
+        state.sel = null;
+        say(s().flipped);
+        rerender();
+    }
+
+    function actMult(pal, i) {
+        const b = state.blocks[i];
+        if (!pal) { say(s().pickFirst); return rerender(); }
+        if (b.filled) say(s().blockFull);
+        else if (pal.kind !== b.kind) say(s().wrongShape);
+        else if (pal.sign !== b.sign) say(s().wrongSign);
+        else {
+            b.filled = true;
+            say(state.blocks.every(x => x.filled) ? s().allFilled : s().filled);
+        }
+        rerender();
+    }
+
+    function setRows(h) {
+        const { a, b } = current();
+        state.h = h;
+        say(a % h === 0 && Math.abs(b) % h === 0 ? s().hComplete(h) : s().hIncomplete(h));
+        rerender();
+    }
+
+    // ── Vérifier la réponse ──
+    function feedback(cls, html) { state.fb = { cls, html }; }
+    function wrong(html) {
+        state.attempts++;
+        feedback('hint', html + (state.attempts >= 2 ? s().fbAsk : ''));
+    }
+
+    function check() {
+        const t = s();
+        const ex = current();
+        const raw = $('answer').value;
+        if (state.mode === 'factor') return checkFactor(raw);
+        const r = parse(raw);
+        if (r.err === 'empty') feedback('hint', t.fbEmpty);
+        else if (r.err === 'times') wrong(t.fbTimes);
+        else if (r.err) wrong(t.fbParse);
+        else if (state.mode === 'reduce') {
+            const target = ex.parts.reduce((acc, part) => padd(acc, pscale(sumTerms(part.t), part.p ? -1 : 1)), [0]);
+            const ans = fmtPoly(target);
+            if (peq(r.poly, target)) {
+                if (!r.reduced) wrong(t.fbNotReduced);
+                else { state.solved = true; feedback('ok', r.ordered ? t.okReduce(fmtReduceEx(ex), ans) : t.okOrder(ans)); }
+            } else {
+                if (parenMistake(ex, r.poly)) wrong(t.fbParen);
+                else {
+                    const d = [2, 1, 0].find(d => coef(r.poly, d) !== coef(target, d));
+                    wrong(t.fbCountTiles(kname(KIND[d])));
+                }
+            }
+        } else {
+            const target = pmul(mono(ex.L), sumTerms(ex.R));
+            const ans = fmtPoly(target);
+            const filled = state.blocks.every(b => b.filled);
+            if (peq(r.poly, target)) {
+                if (r.paren) wrong(t.fbProduct);
+                else if (!r.reduced) wrong(t.fbNotReduced);
+                else { state.solved = true; feedback('ok', r.ordered ? t.okMult(fmtProd(ex), ans) : t.okOrder(ans)); }
+            } else {
+                const firstOnly = ex.R.length === 2 ? padd(pmul(mono(ex.L), mono(ex.R[0])), mono(ex.R[1])) : null;
+                const degTarget = coef(target, 2) ? 2 : 1;
+                const shapeMix = degTarget === 2
+                    ? (coef(r.poly, 1) === coef(target, 2) && !coef(r.poly, 2))
+                    : (coef(r.poly, 2) !== 0 && !coef(r.poly, 1));
+                let msg;
+                if (shapeMix) msg = t.fbShape;
+                else if (firstOnly && peq(r.poly, firstOnly)) msg = t.fbOneBlock;
+                else msg = t.fbCountRect(kname(KIND[[2, 1, 0].find(d => coef(r.poly, d) !== coef(target, d))]));
+                wrong(msg + (filled ? '' : t.fbFillFirst));
+            }
+        }
+        rerender();
+    }
+
+    // Typical mistake with −( ): some of the tiles inside were not flipped
+    // (the minus ignored, or applied to some terms only). Tries every such combination.
+    function parenMistake(ex, poly) {
+        const inParen = [];
+        ex.parts.forEach(part => part.t.forEach(t => { if (part.p) inParen.push(t); }));
+        const outside = sumTerms(ex.parts.filter(p => !p.p).flatMap(p => p.t));
+        const n = inParen.length;
+        for (let mask = 0; mask < (1 << n) - 1; mask++) {   // the last mask = all flipped = correct
+            const terms = inParen.map(([c, d], k) => [(mask >> k) & 1 ? -c : c, d]);
+            if (peq(poly, padd(outside, sumTerms(terms)))) return true;
+        }
+        return false;
+    }
+
+    function checkFactor(raw) {
+        const t = s();
+        const { a, b } = current();
+        const area = [b, a];
+        const g = gcd(a, b);
+        const norm = raw.replace(/\s+/g, '').replace(/[−–—]/g, '-');
+        const m = norm.match(/^(-?\d+)\((.+)\)$/);
+        if (!norm) feedback('hint', t.fbEmpty);
+        else if (/[*×·•∙]/.test(norm)) wrong(t.fbTimes);
+        else if (!m) {
+            const r = parse(raw);
+            if (!r.err && peq(r.poly, area) && !r.paren) wrong(t.fbIsArea);
+            else wrong(r.err ? t.fbParse : t.fbForm);
+        } else {
+            const k = Number(m[1]);
+            const inner = parse(m[2]);
+            if (inner.err) wrong(t.fbParse);
+            else if (!peq(pscale(inner.poly, k), area)) wrong(t.fbWrongArea);
+            else if (!inner.reduced) wrong(t.fbInner);
+            else if (k < 0) wrong(t.fbNegK);
+            else if (k < g) feedback('hint', t.fbNotMax);
+            else {
+                state.solved = true;
+                state.h = g;
+                feedback('ok', t.okFactor(fmtPoly(area), factorAnswer()));
+            }
+        }
+        rerender();
+    }
+
+    function factorAnswer() {
+        const { a, b } = current();
+        const g = gcd(a, b);
+        return `${g}(${fmtPoly([b / g, a / g])})`;
+    }
+
+    function reveal() {
+        const t = s();
+        const ex = current();
+        state.revealed = true;
+        if (state.mode === 'reduce') {
+            const target = ex.parts.reduce((acc, part) => padd(acc, pscale(sumTerms(part.t), part.p ? -1 : 1)), [0]);
+            feedback('answer', t.answerIs(fmtReduceEx(ex), fmtPoly(target)));
+        } else if (state.mode === 'mult') {
+            state.blocks.forEach(b => { b.filled = true; });
+            feedback('answer', t.answerIs(fmtProd(ex), fmtPoly(pmul(mono(ex.L), sumTerms(ex.R)))));
+        } else {
+            const { a, b } = ex;
+            state.h = gcd(a, b);
+            feedback('answer', t.answerIs(fmtPoly([b, a]), factorAnswer()));
+        }
+        rerender();
+    }
+
+    // ── Glisser-déposer (souris, doigt, stylet) ──
+    let drag = null, suppressClick = false;
+
+    function payloadOf(el) {
+        if (el.dataset.tile !== undefined) return { type: 'tile', id: Number(el.dataset.tile) };
+        return { type: 'pal', kind: el.dataset.pal, sign: Number(el.dataset.sign) };
+    }
+    function dropTargetAt(x, y) {
+        const el = document.elementFromPoint(x, y);
+        return el && el.closest('#work [data-tile], #work [data-block]');
+    }
+    function drop(payload, target) {
+        if (!target) return;
+        if (payload.type === 'tile' && target.dataset.tile !== undefined) actReduce(payload.id, Number(target.dataset.tile));
+        else if (payload.type === 'pal' && target.dataset.block !== undefined) actMult(payload, Number(target.dataset.block));
+    }
+
+    $('work').addEventListener('pointerdown', e => {
+        const el = e.target.closest('[data-drag]');
+        if (!el || e.button > 0 || state.busy) return;
+        drag = { el, x0: e.clientX, y0: e.clientY, on: false, payload: payloadOf(el), ghost: null, over: null };
+    });
+    window.addEventListener('pointermove', e => {
+        if (!drag) return;
+        if (!drag.on) {
+            if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) < 6) return;
+            drag.on = true;
+            drag.ghost = drag.el.cloneNode(true);
+            drag.ghost.classList.remove('sel');
+            drag.ghost.classList.add('ghost');
+            drag.ghost.removeAttribute('data-tile');
+            drag.ghost.removeAttribute('data-drag');
+            document.body.appendChild(drag.ghost);
+            drag.el.classList.add('dragging');
+        }
+        e.preventDefault();
+        drag.ghost.style.left = e.clientX + 'px';
+        drag.ghost.style.top = e.clientY + 'px';
+        const over = dropTargetAt(e.clientX, e.clientY);
+        if (over !== drag.over) {
+            if (drag.over) drag.over.classList.remove('over');
+            if (over && over.dataset.block !== undefined) over.classList.add('over');
+            drag.over = over;
+        }
+    }, { passive: false });
+    function endDrag(e, cancelled) {
+        if (!drag) return;
+        const d = drag;
+        drag = null;
+        if (!d.on) return;
+        d.ghost.remove();
+        d.el.classList.remove('dragging');
+        if (d.over) d.over.classList.remove('over');
+        suppressClick = true;
+        setTimeout(() => { suppressClick = false; }, 50);
+        if (!cancelled) drop(d.payload, dropTargetAt(e.clientX, e.clientY));
+    }
+    window.addEventListener('pointerup', e => endDrag(e, false));
+    window.addEventListener('pointercancel', e => endDrag(e, true));
+
+    // ── Clics et clavier (Entrée ou Espace sur un bouton = clic) ──
+    $('work').addEventListener('click', e => {
+        if (suppressClick || state.busy) return;
+        const el = e.target.closest('[data-act], [data-flip], [data-tile], [data-pal], [data-block], [data-h]');
+        if (!el) return;
+        if (el.dataset.act === 'restart') {
+            const keepCompare = state.compare;
+            setup();
+            state.compare = keepCompare;
+            render();
+            const btn = $('work').querySelector('[data-act="restart"]');
+            btn && btn.focus();
+        } else if (el.dataset.act === 'compare') { state.compare = !state.compare; rerender(); }
+        else if (el.dataset.flip) flip(el.dataset.flip);
+        else if (el.dataset.tile !== undefined) {
+            const id = Number(el.dataset.tile);
+            if (state.sel && state.sel.type === 'tile' && state.sel.id !== id) actReduce(state.sel.id, id);
+            else selectTile(id);
+        } else if (el.dataset.pal) {
+            const k = el.dataset.pal, sg = Number(el.dataset.sign);
+            if (isSel('pal', p => p.kind === k && p.sign === sg)) { state.sel = null; say(s().unselect); }
+            else { state.sel = { type: 'pal', kind: k, sign: sg }; say(s().selPal(kname(k))); }
+            rerender();
+        } else if (el.dataset.block !== undefined) actMult(state.sel && state.sel.type === 'pal' ? state.sel : null, Number(el.dataset.block));
+        else if (el.dataset.h) setRows(Number(el.dataset.h));
+    });
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && state.sel) { state.sel = null; say(s().unselect); rerender(); }
+    });
+
+    $('modeToggle').addEventListener('click', e => {
+        const btn = e.target.closest('button');
+        if (!btn || btn.dataset.mode === state.mode) return;
+        state.mode = btn.dataset.mode;
+        setup();
+    });
+    $('exChips').addEventListener('click', e => {
+        const btn = e.target.closest('[data-ex]');
+        if (!btn) return;
+        state.idx[state.mode] = Number(btn.dataset.ex);
+        setup();
+        const again = $('exChips').querySelector(`[data-ex="${btn.dataset.ex}"]`);
+        again && again.focus();
+    });
+    $('checkBtn').addEventListener('click', check);
+    $('answer').addEventListener('keydown', e => { if (e.key === 'Enter') check(); });
+    $('revealBtn').addEventListener('click', reveal);
+    $('keySq').addEventListener('click', () => {
+        const inp = $('answer');
+        const a = inp.selectionStart ?? inp.value.length, b = inp.selectionEnd ?? inp.value.length;
+        inp.value = inp.value.slice(0, a) + 'x²' + inp.value.slice(b);
+        inp.focus();
+        inp.setSelectionRange(a + 2, a + 2);
+    });
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            const n = sizes();
+            if (n.u !== SZ.u) { SZ = n; render(); }
+        }, 150);
+    });
+
+    function applyLang() {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const v = s()[el.dataset.i18n];
+            if (typeof v === 'string') el.textContent = v;
+        });
+        document.title = s().title.replace(/^\S+\s/, '') + ' – LaboMath';
+        $('answer').setAttribute('aria-label', s().yourAnswer);
+        state.msg = '';
+        if (state.fb && !state.fb.keep) state.fb = null;
+        render();
+    }
+
+    // The header's FR/EN button is handled by commun/langue.js
+    Langue.onChange(lang => { state.lang = lang; applyLang(); });
+    setup();
+    applyLang();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La piscine – LaboMath</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../commun/style.css">
+    <script src="../commun/langue.js"></script>
+    <style>
+        /* Styles propres à cette activité (le reste vient de commun/style.css) */
+        [hidden] { display: none !important; }
+        :root {
+            --navy: #1f2d4d;
+            --blue: #1f5fa8;
+            --orange: #c84a16;
+            --pale: #eef3fa;
+            --line: #c9d4e5;
+            --ok: #1e7d45;
+            --muted: #4a5878;
+        }
+
+        .container {
+            color: var(--navy);
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            color: var(--navy);
+            font-weight: 900;
+            line-height: 1.2;
+            border-bottom: 2px solid var(--pale);
+            padding-bottom: 10px;
+        }
+
+        h2.step {
+            font-size: 1.15em;
+            font-weight: 900;
+            margin: 34px 0 10px;
+            padding-top: 14px;
+            border-top: 2px solid var(--pale);
+            color: var(--navy);
+            scroll-margin-top: 140px;
+        }
+        h2.step .num {
+            display: inline-flex;
+            width: 28px; height: 28px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--blue);
+            color: white;
+            font-size: 0.85em;
+            margin-right: 8px;
+        }
+        h3 { font-size: 1em; font-weight: 900; margin: 18px 0 8px; }
+
+        em { font-family: Georgia, 'Times New Roman', serif; font-style: italic; }
+        p { line-height: 1.6; }
+        .intro { margin: 6px 0 10px; }
+
+        .concept-box {
+            background: var(--pale);
+            padding: 15px;
+            border-left: 5px solid var(--blue);
+            margin: 20px 0;
+            border-radius: 4px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        /* Navigation entre les étapes */
+        .step-nav { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 14px; }
+        .step-nav a {
+            text-decoration: none;
+            background: var(--pale);
+            color: var(--blue);
+            font-weight: 800;
+            font-size: 0.85em;
+            border-radius: 18px;
+            padding: 5px 12px;
+        }
+        .step-nav a:hover { background: #dde7f5; }
+
+        /* Curseur n, toujours visible */
+        .n-panel {
+            position: sticky;
+            top: 64px;
+            z-index: 50;
+            background: white;
+            border: 2px solid var(--line);
+            border-radius: 12px;
+            padding: 8px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            box-shadow: 0 4px 12px rgba(31,45,77,0.08);
+        }
+        .n-panel input[type=range] { flex: 1; accent-color: var(--blue); min-width: 0; }
+        .n-panel .n-val { font-size: 1.3em; min-width: 72px; }
+
+        .panel {
+            background: var(--pale);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8px 14px;
+            font-weight: 700;
+        }
+
+        .toggle {
+            display: inline-flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            background: white;
+            border-radius: 20px;
+            padding: 3px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .toggle button {
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.9em;
+            border-radius: 18px;
+            padding: 6px 14px;
+            cursor: pointer;
+        }
+        .toggle button.active { background: var(--blue); color: white; }
+
+        /* Dessins */
+        .draw { display: flex; justify-content: center; }
+        svg.pool { width: 100%; max-width: 420px; height: auto; display: block; touch-action: none; user-select: none; -webkit-user-select: none; }
+        svg.pool.small { max-width: 300px; touch-action: auto; }
+        svg.pool:focus-visible { outline: 3px solid #f2b705; outline-offset: 4px; border-radius: 4px; }
+        svg.pool text { font-family: Nunito, sans-serif; font-weight: 800; pointer-events: none; }
+        .paintable rect.b { cursor: pointer; }
+
+        .swatches { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; }
+        .swatch {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px var(--line);
+            color: white;
+            font-family: inherit;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        .swatch.active { box-shadow: 0 0 0 3px var(--navy); transform: scale(1.1); }
+        .swatch.eraser { background: white; color: var(--navy); font-size: 1.1em; }
+        .swatch:focus-visible { outline: 3px solid #f2b705; outline-offset: 2px; }
+
+        .expr-live {
+            text-align: center;
+            font-size: 1.4em;
+            font-weight: 900;
+            min-height: 1.6em;
+            margin: 10px 0 2px;
+        }
+        .expr-sub { text-align: center; color: var(--muted); font-weight: 700; min-height: 1.4em; }
+
+        .ways { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; margin-top: 12px; }
+        .way {
+            border: 2px dashed var(--line);
+            border-radius: 10px;
+            padding: 8px 10px;
+            text-align: center;
+            font-weight: 800;
+            color: var(--muted);
+        }
+        .way.found { border-style: solid; border-color: var(--ok); background: #e7f4ec; color: var(--ok); }
+        .way .big { font-size: 1.15em; color: var(--navy); }
+
+        textarea {
+            width: 100%;
+            min-height: 80px;
+            border: 2px solid var(--line);
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-family: inherit;
+            font-size: 1em;
+            color: var(--navy);
+            resize: vertical;
+        }
+        textarea:focus { outline: none; border-color: var(--blue); }
+        .note { font-size: 0.85em; color: var(--muted); }
+
+        /* Champs */
+        .row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; font-weight: 700; margin: 8px 0; }
+        .text-input, .num-input {
+            padding: 6px 10px;
+            border: 2px solid var(--line);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1.05em;
+            font-weight: 800;
+            color: var(--navy);
+            background: white;
+            outline: none;
+        }
+        .text-input { width: 200px; }
+        .num-input { width: 90px; text-align: center; }
+        .text-input:focus, .num-input:focus { border-color: var(--blue); }
+        .num-input.ok { border-color: var(--ok); background: #e7f4ec; }
+
+        .btn {
+            border: none;
+            background: var(--blue);
+            color: white;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95em;
+            border-radius: 20px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        .btn:hover { background: #184d8a; }
+        .btn.light { background: var(--pale); color: var(--blue); }
+        .btn.light:hover { background: #dde7f5; }
+        .btn.key { padding: 6px 12px; font-family: Georgia, serif; font-style: italic; }
+        .center { text-align: center; margin-top: 10px; }
+
+        .feedback {
+            border-radius: 10px;
+            padding: 10px 14px;
+            line-height: 1.6;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .feedback.hint { background: #fbeee7; color: #84300d; }
+        .feedback.ok { background: #e7f4ec; color: var(--ok); }
+        .feedback.info { background: var(--pale); color: var(--navy); }
+
+        /* Étape 2 */
+        .count-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+        .card {
+            border: 2px solid var(--pale);
+            border-radius: 12px;
+            padding: 12px;
+        }
+        .card h3 { margin-top: 0; text-align: center; }
+        .counter { text-align: center; font-weight: 900; font-size: 1.1em; min-height: 1.5em; }
+
+        /* Étape 3 */
+        .table-wrap { overflow-x: auto; }
+        table { border-collapse: collapse; margin: 0 auto; }
+        th, td { padding: 6px 8px; text-align: center; border: 1px solid var(--line); white-space: nowrap; }
+        th { background: var(--pale); text-align: left; font-size: 0.95em; }
+        td.v { font-weight: 800; min-width: 64px; }
+        td.v.same { color: var(--ok); background: #f1f9f4; }
+        td.v.diff { color: var(--orange); background: #fdf1eb; }
+        tr.trap th { background: #fdf1eb; }
+        .choice { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+        .choice input { accent-color: var(--blue); width: 18px; height: 18px; }
+
+        /* Étape 4 */
+        .derivs { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+        .lines { margin: 10px 0; }
+        .line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 6px 0;
+            font-size: 1.15em;
+            font-weight: 800;
+        }
+        .line .eq { width: 18px; text-align: center; }
+        .line button.show {
+            border: 2px solid transparent;
+            background: var(--pale);
+            color: var(--navy);
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 1em;
+            border-radius: 8px;
+            padding: 4px 10px;
+            cursor: pointer;
+        }
+        .line button.show.active { border-color: var(--blue); background: white; }
+        .line .text-input { width: 170px; }
+        .legend { display: flex; flex-wrap: wrap; gap: 6px 14px; justify-content: center; font-size: 0.9em; font-weight: 700; margin-top: 6px; }
+        .legend .sw { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 5px; }
+        .done-badge { color: var(--ok); font-weight: 900; text-align: center; margin-top: 6px; }
+
+        /* Étape 5 */
+        .surfaces { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; align-items: end; }
+        .surfaces figure { text-align: center; }
+        .surfaces figcaption { font-weight: 800; margin-top: 6px; }
+        svg.graph { width: 100%; max-width: 640px; height: auto; display: block; margin: 0 auto; }
+        .graph text { font-family: Nunito, sans-serif; }
+        .graph .tick { font-size: 12px; fill: var(--muted); }
+        .graph .axis-label { font-size: 13px; font-weight: 800; fill: var(--navy); }
+        .readout { text-align: center; font-weight: 800; margin-top: 8px; line-height: 1.6; }
+
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px 14px; }
+            h1 { font-size: 1.4em; }
+            .expr-live { font-size: 1.2em; }
+            .text-input { width: 170px; }
+            .line .text-input { width: 150px; }
+            .panel { padding: 10px; }
+            .n-panel { padding: 6px 10px; gap: 8px; }
+            .swatch { width: 34px; height: 34px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="app-header">
+    <div class="header-inner">
+        <a class="back-btn" href="index.html">← <span data-en="Introduction to algebra">Introduction à l'algèbre</span></a>
+        <a class="logo" href="../index.html">
+            <div class="logo-icon">∑</div>
+            <span class="logo-text">Labo<span class="logo-accent">Math</span></span>
+        </a>
+        <button class="lang-btn" id="langBtn">EN</button>
+    </div>
+</header>
+
+<main class="page">
+<div class="container">
+    <h1 data-i18n="title">🏊 La piscine</h1>
+
+    <div class="concept-box" id="context"></div>
+
+    <nav class="step-nav" id="stepNav" aria-label="Étapes"></nav>
+
+    <div class="n-panel">
+        <label for="nRange" id="nLabel">n</label>
+        <input type="range" id="nRange" min="1" max="20" value="5">
+        <span class="n-val" id="nVal" aria-live="polite"></span>
+    </div>
+
+    <!-- ── Étape 1 ── -->
+    <h2 class="step" id="etape1"><span class="num">1</span><span data-i18n="s1Title"></span></h2>
+    <p class="intro" id="s1Intro"></p>
+    <div class="panel">
+        <div class="swatches" id="swatches" role="group"></div>
+        <button type="button" class="btn light" id="clearBtn" data-i18n="clear"></button>
+    </div>
+    <div class="draw" id="s1Draw"></div>
+    <div class="sr-only" id="s1Live" aria-live="polite"></div>
+    <div class="expr-live" id="s1Expr" aria-live="polite"></div>
+    <div class="expr-sub" id="s1Sub"></div>
+    <div class="feedback hint" id="s1Fb" hidden></div>
+    <div class="ways" id="ways"></div>
+    <div class="center"><button type="button" class="btn light" id="s1HintBtn" data-i18n="hintBtn"></button></div>
+    <div class="feedback info" id="s1Hint" hidden></div>
+    <h3 data-i18n="s1Question"></h3>
+    <textarea id="s1Why" aria-labelledby="s1WhyNote"></textarea>
+    <p class="note" id="s1WhyNote" data-i18n="s1Note"></p>
+
+    <!-- ── Étape 2 ── -->
+    <h2 class="step" id="etape2"><span class="num">2</span><span data-i18n="s2Title"></span></h2>
+    <p class="intro" id="s2Intro"></p>
+    <div class="count-cards" id="s2Cards"></div>
+
+    <!-- ── Étape 3 ── -->
+    <h2 class="step" id="etape3"><span class="num">3</span><span data-i18n="s3Title"></span></h2>
+    <p class="intro" id="s3Intro"></p>
+    <div class="table-wrap"><table id="s3Table"></table></div>
+    <div class="concept-box" id="s3Trap"></div>
+    <div class="row" role="radiogroup" id="s3Choices">
+        <label class="choice"><input type="radio" name="s3eq" value="yes"> <span data-i18n="s3Yes"></span></label>
+        <label class="choice"><input type="radio" name="s3eq" value="no"> <span data-i18n="s3No"></span></label>
+    </div>
+    <div class="row">
+        <label for="s3N" id="s3NLabel"></label>
+        <input class="num-input" id="s3N" type="text" inputmode="numeric" autocomplete="off">
+        <button type="button" class="btn" id="s3Check" data-i18n="check"></button>
+    </div>
+    <div class="feedback" id="s3Fb" hidden></div>
+
+    <!-- ── Étape 4 ── -->
+    <h2 class="step" id="etape4"><span class="num">4</span><span data-i18n="s4Title"></span></h2>
+    <p class="intro" id="s4Intro"></p>
+    <div class="derivs" id="s4"></div>
+
+    <!-- ── Étape 5 ── -->
+    <h2 class="step" id="etape5"><span class="num">5</span><span data-i18n="s5Title"></span></h2>
+    <p class="intro" id="s5Intro"></p>
+    <div class="surfaces">
+        <figure>
+            <div id="s5Square"></div>
+            <figcaption id="s5SquareCap"></figcaption>
+        </figure>
+        <figure>
+            <div id="s5Rect"></div>
+            <figcaption id="s5RectCap"></figcaption>
+        </figure>
+    </div>
+    <div class="row">
+        <label for="s5Ans" id="s5AnsLabel"></label>
+        <input class="text-input" id="s5Ans" type="text" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <button type="button" class="btn light key" id="s5Sq" aria-label="n²">n²</button>
+        <button type="button" class="btn" id="s5Check" data-i18n="check"></button>
+    </div>
+    <div class="feedback" id="s5Fb" hidden></div>
+
+    <h3 data-i18n="s5Compare"></h3>
+    <div class="panel">
+        <div class="toggle" id="s5Pair">
+            <button type="button" data-pair="border"></button>
+            <button type="button" data-pair="side"></button>
+        </div>
+    </div>
+    <svg class="graph" id="s5Graph" viewBox="0 0 600 340" role="img"></svg>
+    <div class="readout" id="s5Read" aria-live="polite"></div>
+    <div class="feedback info" id="s5Insight"></div>
+</div>
+</main>
+
+<footer class="app-footer">
+    <span data-en="Designed by Carlos Pinango, engineer and high school math teacher">Conçu par Carlos Pinango, ingénieur et enseignant de mathématiques au secondaire</span>
+</footer>
+
+<script>
+    const M = '−';                          // true minus sign
+    const NV = '<em>n</em>';
+    const GROUP_COLORS = ['#1f5fa8', '#c84a16', '#2e7d4f', '#7b4fa0', '#a8740f', '#1f2d4d'];
+    const COL = { water: '#d7e8f7', waterLine: '#b9d3ec', free: '#ffffff', freeLine: '#9fb0c8', hl1: '#1f5fa8', hl2: '#c84a16', hl3: '#2e7d4f', hl4: '#a8740f' };
+
+    // The four ways of counting to recognize in step 1: signature → expression
+    // signature = sides counted as n + 2, n + 1, n | constant tiles | tiles counted twice
+    const WAYS = [
+        { key: '0,0,4|4|0', html: `4${NV} + 4`, poly: [4, 4] },
+        { key: '0,4,0|0|0', html: `4(${NV} + 1)`, poly: [4, 4] },
+        { key: '2,0,2|0|0', html: `2(${NV} + 2) + 2${NV}`, poly: [4, 4] },
+        { key: '4,0,0|0|4', html: `4(${NV} + 2) ${M} 4`, poly: [4, 4] },
+    ];
+    const TRAP = { html: `5${NV} + 1`, poly: [1, 5] };
+
+    const STR = {
+        fr: {
+            title: `🏊 La piscine`,
+            context: `Une piscine carrée mesure <strong>${NV} carreaux de 1 m sur 1 m</strong> de chaque côté. ` +
+                `Elle est entourée d'une <strong>bordure</strong> d'une rangée de carreaux. ` +
+                `Combien faut-il de carreaux pour la bordure ? Déplace le curseur : tous les dessins changent avec ${NV}.`,
+            stepNav: [`1. Compter`, `2. Combien ?`, `3. Toujours pareil ?`, `4. Retrouver 4n + 4`, `5. Surface`],
+            nLabel: `Valeur de <em>n</em>`,
+            nVal: n => `<em>n</em> = ${n}`,
+            check: `Vérifier`,
+            // Step 1
+            s1Title: `Compter de plusieurs façons`,
+            s1Intro: `Choisis une couleur, puis touche ou glisse sur les carreaux de la bordure pour former des <strong>groupes</strong>. ` +
+                `Un groupe peut contenir des côtés complets (avec ou sans leurs coins) et des coins. Un carreau peut aussi être compté deux fois : colorie-le avec une deuxième couleur. ` +
+                `Au clavier : place-toi sur le dessin, puis utilise les flèches et la barre d'espacement.`,
+            color: i => `Couleur ${i}`,
+            eraser: `Gomme`,
+            clear: `Tout effacer`,
+            drawAria: `Bordure de la piscine. Flèches pour se déplacer autour de la bordure, espace pour colorier.`,
+            cellState: (i, total, cols) => `Carreau ${i} sur ${total} : ${cols.length ? 'couleur ' + cols.join(' et ') : 'sans couleur'}.`,
+            s1Empty: `Colorie la bordure pour voir l'expression qui correspond à ta façon de compter.`,
+            s1Left: k => `Il reste ${k} carreau${k > 1 ? 'x' : ''} à colorier.`,
+            s1Corner: i => `Un coin de la couleur ${i} touche deux côtés de la même couleur : on ne sait pas avec quel côté le compter. Colorie un de ces côtés d'une autre couleur.`,
+            s1Partial: i => `Le groupe de la couleur ${i} couvre seulement une partie d'un côté. Colorie tout le côté (avec ou sans les coins) pour que le groupe suive ${NV}.`,
+            s1Sub: (sub, v) => `Pour <em>n</em> = ${state.n} : ${sub} = ${v} carreaux`,
+            s1New: `✅ Nouvelle façon de compter trouvée !`,
+            s1Other: `Cette façon de compter fonctionne aussi ! Essaie de trouver les façons qui manquent.`,
+            s1Already: `Tu as déjà trouvé cette façon. Essaie un autre coloriage.`,
+            way: i => `Façon ${i}`,
+            hintBtn: `💡 Un indice`,
+            s1Hints: [
+                `Colorie chaque côté sans ses coins, puis les quatre coins avec une autre couleur.`,
+                `Donne à chaque côté un seul de ses coins, en tournant autour de la piscine comme les ailes d'un moulin. Deux couleurs qui alternent suffisent.`,
+                `Colorie au complet la rangée du haut et celle du bas, puis les deux côtés qui restent.`,
+                `Colorie au complet, coins compris, la rangée du haut et celle du bas d'une couleur, puis les côtés gauche et droit d'une autre couleur, eux aussi avec leurs coins : chaque coin sera compté deux fois.`,
+            ],
+            s1AllFound: `Tu as trouvé les quatre façons !`,
+            s1Question: `Quelle façon de compter préfères-tu ? Pourquoi ?`,
+            s1Note: `Ta réponse reste sur cet écran : elle n'est ni enregistrée ni envoyée.`,
+            // Step 2
+            s2Title: `Combien de carreaux ?`,
+            s2Intro: `Choisis une expression de l'étape 1. Remplace ${NV} par sa valeur et calcule le nombre de carreaux de la bordure. Pour multiplier, écris des parenthèses : 4(5).`,
+            s2Card: n => `Piscine de ${n} sur ${n}`,
+            s2Calc: `Ton calcul :`,
+            s2Res: `Nombre de carreaux :`,
+            s2Count: `Compter les carreaux`,
+            s2Counting: (k) => `${k} carreaux comptés`,
+            s2CountDone: (k) => `Le compte donne ${k} carreaux.`,
+            s2NeedRes: `Écris le nombre de carreaux.`,
+            s2NeedCalc: `Écris aussi ton calcul, à partir d'une expression de l'étape 1.`,
+            s2BadExpr: `Cette expression ne compte pas les carreaux de la bordure. Reprends une des expressions de l'étape 1.`,
+            s2BadSub: n => `Ton calcul ne donne pas le nombre de carreaux. As-tu remplacé ${NV} par ${n} partout ? Fais d'abord les multiplications.`,
+            s2BadRes: `Ton calcul est bon ; refais l'opération pour trouver le résultat.`,
+            s2Ok: k => `✅ C'est juste : ${k} carreaux. Le compte le confirme.`,
+            // Step 3
+            s3Title: `Toujours le même nombre ?`,
+            s3Intro: `Choisis 4 valeurs de ${NV}. Le tableau calcule chaque expression et le nombre de carreaux compté sur le dessin.`,
+            s3Values: `Valeurs de <em>n</em>`,
+            s3Counted: `Carreaux comptés`,
+            s3NPlaceholder: `n`,
+            s3TrapRow: e => `Expression d'Alex : ${e}`,
+            s3Trap: `Alex a compté autrement et propose <strong>5${NV} + 1</strong>. Pour ${NV} = 3, Alex vérifie sur le dessin : 16 carreaux. C'est bien le bon nombre ! ` +
+                `<br>L'expression d'Alex est-elle <strong>équivalente</strong> aux expressions de l'étape 1, c'est-à-dire égale pour <strong>toutes</strong> les valeurs de ${NV} ?`,
+            s3Yes: `Oui, elle est équivalente`,
+            s3No: `Non, elle n'est pas équivalente`,
+            s3NLabel: `Une valeur de <em>n</em> qui le montre :`,
+            s3Pick: `Choisis d'abord une réponse.`,
+            s3SayYes: `Essaie d'autres valeurs de ${NV} dans le tableau. Les deux expressions donnent-elles toujours le même nombre ?`,
+            s3NeedN: `Donne une valeur de ${NV} qui montre ta réponse.`,
+            s3BadN: `Écris un nombre entier de 1 à 1000.`,
+            s3Same: n => `Pour ${NV} = ${n}, l'expression d'Alex donne aussi ${4 * n + 4} carreaux. Cherche une valeur de ${NV} où elle se trompe.`,
+            s3Ok: (n, a, b) => `✅ Bravo ! Pour ${NV} = ${n}, l'expression d'Alex donne ${a}, mais la piscine a ${b} carreaux. ` +
+                `Une seule valeur suffit pour montrer que deux expressions ne sont pas équivalentes. Être égales pour ${NV} = 3 ne suffit pas.`,
+            // Step 4
+            s4Title: `Retrouver 4n + 4`,
+            s4Intro: `Réduis chaque expression étape par étape jusqu'à 4${NV} + 4. Touche une ligne pour voir les carreaux qu'elle compte.`,
+            s4Next: `Étape suivante`,
+            s4Done: `✅ On retrouve 4<em>n</em> + 4 !`,
+            s4NotEq: (n, a, b) => `Pour ${NV} = ${n}, l'expression de départ vaut ${a}, mais la tienne vaut ${b}. Revois cette étape.`,
+            s4OnlyFirst: k => `Le ${k} devant la parenthèse multiplie ${NV} et aussi 2 : dans le dessin, chaque côté complet contient ${NV} + 2 carreaux.`,
+            s4Forgot4: `Où est passé le ${M} 4 ? Les quatre coins ont été comptés deux fois : il faut en retirer un compte.`,
+            s4Paren: `C'est équivalent, mais il reste des parenthèses. Que donne la multiplication par le nombre devant la parenthèse ?`,
+            s4Same: `C'est la même expression qu'à la ligne précédente. Regroupe maintenant les termes semblables.`,
+            s4Order: `C'est juste ! On écrit habituellement le terme en ${NV} avant le nombre : 4${NV} + 4.`,
+            leg: {
+                rows2: `2 rangées complètes de ${NV} + 2`,
+                sides2: `2 côtés de ${NV}`,
+                mids2a: `2 côtés de ${NV} (haut et bas)`,
+                mids2b: `2 côtés de ${NV} (gauche et droite)`,
+                corners4: `4 coins`,
+                mids4: `4 côtés de ${NV}`,
+                full4: `4 côtés complets de ${NV} + 2`,
+                twice: `coins comptés deux fois`,
+                corners8: `8 : les coins, comptés deux fois`,
+                minus4: `${M} 4 : un compte de moins par coin`,
+            },
+            // Step 5
+            s5Title: `La surface de l'eau`,
+            s5Intro: `La bordure compte les carreaux <strong>autour</strong> de l'eau. La surface de l'eau compte les carreaux <strong>à l'intérieur</strong>, en m².`,
+            s5SquareCap: n => `Piscine carrée de ${NV} sur ${NV} : surface ${NV}(${NV}) = ${NV}² = ${n * n} m²`,
+            s5RectCap: `Piscine rectangulaire de 2${NV} sur ${NV} : surface = ?`,
+            s5AnsLabel: `Surface de la piscine rectangulaire :`,
+            s5Ok: `✅ Bravo ! 2${NV}(${NV}) = 2${NV}² : deux carrés de ${NV} sur ${NV}.`,
+            s5OkProduct: `✅ C'est juste ! 2${NV}(${NV}) s'écrit aussi 2${NV}².`,
+            s5Sum: `Tu as additionné les côtés. La surface compte les carreaux à l'intérieur : combien de rangées, et combien de carreaux par rangée ?`,
+            s5Linear: `Cette expression compte des carreaux en ligne. La surface en compte ${NV} rangées de 2${NV} carreaux.`,
+            s5Bad: (n, a, b) => `Pour ${NV} = ${n}, il y a ${a} carreaux d'eau, mais ton expression donne ${b}.`,
+            s5Compare: `Comparer avec le curseur`,
+            pairBorder: `Bordure 4n + 4 et surface n²`,
+            pairSide: `4n et n²`,
+            read: (n, la, a, lb, b) => `Pour ${NV} = ${n} : ${la} = <strong>${a}</strong> ; ${lb} = <strong>${b}</strong>`,
+            insightBorder: `La bordure (4${NV} + 4) et la surface (${NV}²) ne comptent pas la même chose : la bordure fait le tour, la surface remplit l'intérieur. ` +
+                `Pour les petites piscines, la bordure a plus de carreaux ; dès ${NV} = 5, l'eau en a plus, et l'écart grandit vite.`,
+            insightSide: `4${NV} et ${NV}² sont égales pour ${NV} = 4 seulement : elles ne sont pas équivalentes. ` +
+                `4${NV}, c'est ${NV} + ${NV} + ${NV} + ${NV}, quatre côtés de ${NV} carreaux. ${NV}², c'est ${NV}(${NV}), ${NV} rangées de ${NV} carreaux.`,
+            graphX: `n`, graphY: `carreaux`,
+            // Common
+            fbEmpty: `Écris d'abord ta réponse.`,
+            fbParse: `Je ne reconnais pas cette écriture. Utilise des nombres, ${NV}, ${NV}², +, ${M} et des parenthèses.`,
+            fbTimes: `Pour multiplier, écris seulement des parenthèses, comme dans 4(${NV}) : pas de ×, d'astérisque ni de point.`,
+        },
+        en: {
+            title: `🏊 The pool`,
+            context: `A square pool measures <strong>${NV} tiles of 1 m by 1 m</strong> on each side. ` +
+                `It is surrounded by a <strong>border</strong> one tile wide. ` +
+                `How many tiles are needed for the border? Move the slider: every drawing changes with ${NV}.`,
+            stepNav: [`1. Count`, `2. How many?`, `3. Always the same?`, `4. Back to 4n + 4`, `5. Surface`],
+            nLabel: `Value of <em>n</em>`,
+            nVal: n => `<em>n</em> = ${n}`,
+            check: `Check`,
+            s1Title: `Count in several ways`,
+            s1Intro: `Choose a colour, then tap or drag over the border tiles to make <strong>groups</strong>. ` +
+                `A group can contain whole sides (with or without their corners) and corners. A tile can also be counted twice: colour it with a second colour. ` +
+                `With the keyboard: move onto the drawing, then use the arrow keys and the space bar.`,
+            color: i => `Colour ${i}`,
+            eraser: `Eraser`,
+            clear: `Clear all`,
+            drawAria: `Border of the pool. Arrow keys to move around the border, space to colour.`,
+            cellState: (i, total, cols) => `Tile ${i} of ${total}: ${cols.length ? 'colour ' + cols.join(' and ') : 'no colour'}.`,
+            s1Empty: `Colour the border to see the expression that matches your way of counting.`,
+            s1Left: k => `${k} tile${k > 1 ? 's' : ''} left to colour.`,
+            s1Corner: i => `A corner in colour ${i} touches two sides of the same colour: we can't tell which side it belongs to. Colour one of those sides in another colour.`,
+            s1Partial: i => `The group in colour ${i} covers only part of a side. Colour the whole side (with or without the corners) so the group follows ${NV}.`,
+            s1Sub: (sub, v) => `For <em>n</em> = ${state.n}: ${sub} = ${v} tiles`,
+            s1New: `✅ New way of counting found!`,
+            s1Other: `This way of counting works too! Try to find the missing ways.`,
+            s1Already: `You already found this way. Try another colouring.`,
+            way: i => `Way ${i}`,
+            hintBtn: `💡 A hint`,
+            s1Hints: [
+                `Colour each side without its corners, then the four corners in another colour.`,
+                `Give each side just one of its corners, going around the pool like the sails of a windmill. Two alternating colours are enough.`,
+                `Colour the whole top row and the whole bottom row, then the two remaining sides.`,
+                `Colour the whole top and bottom rows, corners included, in one colour, then the left and right sides, also with their corners, in another colour: each corner will be counted twice.`,
+            ],
+            s1AllFound: `You found all four ways!`,
+            s1Question: `Which way of counting do you prefer? Why?`,
+            s1Note: `Your answer stays on this screen: it is not saved or sent.`,
+            s2Title: `How many tiles?`,
+            s2Intro: `Choose an expression from step 1. Replace ${NV} with its value and calculate the number of border tiles. To multiply, write parentheses: 4(5).`,
+            s2Card: n => `Pool ${n} by ${n}`,
+            s2Calc: `Your calculation:`,
+            s2Res: `Number of tiles:`,
+            s2Count: `Count the tiles`,
+            s2Counting: k => `${k} tiles counted`,
+            s2CountDone: k => `The count gives ${k} tiles.`,
+            s2NeedRes: `Write the number of tiles.`,
+            s2NeedCalc: `Also write your calculation, using an expression from step 1.`,
+            s2BadExpr: `This expression does not count the border tiles. Use one of the expressions from step 1.`,
+            s2BadSub: n => `Your calculation does not give the number of tiles. Did you replace ${NV} with ${n} everywhere? Do the multiplications first.`,
+            s2BadRes: `Your calculation is right; do the arithmetic again to find the result.`,
+            s2Ok: k => `✅ That's right: ${k} tiles. The count confirms it.`,
+            s3Title: `Always the same number?`,
+            s3Intro: `Choose 4 values of ${NV}. The table calculates each expression and the number of tiles counted on the drawing.`,
+            s3Values: `Values of <em>n</em>`,
+            s3Counted: `Tiles counted`,
+            s3NPlaceholder: `n`,
+            s3TrapRow: e => `Alex's expression: ${e}`,
+            s3Trap: `Alex counted differently and suggests <strong>5${NV} + 1</strong>. For ${NV} = 3, Alex checks on the drawing: 16 tiles. That is the right number! ` +
+                `<br>Is Alex's expression <strong>equivalent</strong> to the expressions from step 1, that is, equal for <strong>every</strong> value of ${NV}?`,
+            s3Yes: `Yes, it is equivalent`,
+            s3No: `No, it is not equivalent`,
+            s3NLabel: `A value of <em>n</em> that shows it:`,
+            s3Pick: `First choose an answer.`,
+            s3SayYes: `Try other values of ${NV} in the table. Do the two expressions always give the same number?`,
+            s3NeedN: `Give a value of ${NV} that shows your answer.`,
+            s3BadN: `Write a whole number from 1 to 1000.`,
+            s3Same: n => `For ${NV} = ${n}, Alex's expression also gives ${4 * n + 4} tiles. Look for a value of ${NV} where it is wrong.`,
+            s3Ok: (n, a, b) => `✅ Well done! For ${NV} = ${n}, Alex's expression gives ${a}, but the pool has ${b} tiles. ` +
+                `One value is enough to show that two expressions are not equivalent. Being equal for ${NV} = 3 is not enough.`,
+            s4Title: `Back to 4n + 4`,
+            s4Intro: `Simplify each expression step by step until you get 4${NV} + 4. Tap a line to see the tiles it counts.`,
+            s4Next: `Next step`,
+            s4Done: `✅ We get 4<em>n</em> + 4 again!`,
+            s4NotEq: (n, a, b) => `For ${NV} = ${n}, the starting expression is ${a}, but yours is ${b}. Check this step again.`,
+            s4OnlyFirst: k => `The ${k} in front of the parentheses multiplies ${NV} and also 2: in the drawing, each whole side has ${NV} + 2 tiles.`,
+            s4Forgot4: `Where did the ${M} 4 go? The four corners were counted twice: one count must be removed.`,
+            s4Paren: `That is equivalent, but there are still parentheses. What does the multiplication by the number in front give?`,
+            s4Same: `This is the same expression as the line before. Now group the like terms.`,
+            s4Order: `That's right! We usually write the ${NV} term before the number: 4${NV} + 4.`,
+            leg: {
+                rows2: `2 whole rows of ${NV} + 2`,
+                sides2: `2 sides of ${NV}`,
+                mids2a: `2 sides of ${NV} (top and bottom)`,
+                mids2b: `2 sides of ${NV} (left and right)`,
+                corners4: `4 corners`,
+                mids4: `4 sides of ${NV}`,
+                full4: `4 whole sides of ${NV} + 2`,
+                twice: `corners counted twice`,
+                corners8: `8: the corners, counted twice`,
+                minus4: `${M} 4: one count less per corner`,
+            },
+            s5Title: `The water surface`,
+            s5Intro: `The border counts the tiles <strong>around</strong> the water. The water surface counts the tiles <strong>inside</strong>, in m².`,
+            s5SquareCap: n => `Square pool ${NV} by ${NV}: surface ${NV}(${NV}) = ${NV}² = ${n * n} m²`,
+            s5RectCap: `Rectangular pool 2${NV} by ${NV}: surface = ?`,
+            s5AnsLabel: `Surface of the rectangular pool:`,
+            s5Ok: `✅ Well done! 2${NV}(${NV}) = 2${NV}²: two squares ${NV} by ${NV}.`,
+            s5OkProduct: `✅ That's right! 2${NV}(${NV}) is also written 2${NV}².`,
+            s5Sum: `You added the sides. The surface counts the tiles inside: how many rows, and how many tiles in each row?`,
+            s5Linear: `This expression counts tiles in a line. The surface has ${NV} rows of 2${NV} tiles.`,
+            s5Bad: (n, a, b) => `For ${NV} = ${n}, there are ${a} water tiles, but your expression gives ${b}.`,
+            s5Compare: `Compare with the slider`,
+            pairBorder: `Border 4n + 4 and surface n²`,
+            pairSide: `4n and n²`,
+            read: (n, la, a, lb, b) => `For ${NV} = ${n}: ${la} = <strong>${a}</strong>; ${lb} = <strong>${b}</strong>`,
+            insightBorder: `The border (4${NV} + 4) and the surface (${NV}²) do not count the same thing: the border goes around, the surface fills the inside. ` +
+                `For small pools, the border has more tiles; from ${NV} = 5 on, the water has more, and the gap grows quickly.`,
+            insightSide: `4${NV} and ${NV}² are equal for ${NV} = 4 only: they are not equivalent. ` +
+                `4${NV} is ${NV} + ${NV} + ${NV} + ${NV}, four sides of ${NV} tiles. ${NV}² is ${NV}(${NV}), ${NV} rows of ${NV} tiles.`,
+            graphX: `n`, graphY: `tiles`,
+            fbEmpty: `First write your answer.`,
+            fbParse: `I don't recognize this. Use numbers, ${NV}, ${NV}², +, ${M} and parentheses.`,
+            fbTimes: `To multiply, only write parentheses, as in 4(${NV}): no ×, asterisk or dot.`,
+        },
+    };
+
+    const state = {
+        lang: Langue.lang,          // shared language, see commun/langue.js
+        n: 5,
+        // Step 1: colour groups of each border tile (arrays of colour numbers 1–6)
+        paint: null,
+        color: 1,                   // 0 = eraser
+        cur: 0,                     // keyboard position around the border
+        found: [false, false, false, false],
+        lastKey: '',
+        hintIdx: 0,
+        s1Msg: null,
+        // Step 2
+        s2: {},                     // n → { fb, counted }
+        // Step 3
+        s3n: ['', '', '', ''],
+        s3Fb: null,
+        // Step 4
+        s4: [],
+        // Step 5
+        s5Fb: null,
+        pair: 'border',
+    };
+
+    const $ = id => document.getElementById(id);
+    const s = () => STR[state.lang];
+    const fmtNum = v => v.toLocaleString(state.lang === 'fr' ? 'fr-CA' : 'en-CA');
+
+    // ── Polynômes en n : [c0, c1, c2] ──
+    const coef = (p, d) => p[d] || 0;
+    function padd(p, q) { const r = []; for (let d = 0; d < Math.max(p.length, q.length); d++) r[d] = coef(p, d) + coef(q, d); return r; }
+    function pmul(p, q) { const r = []; p.forEach((a, i) => q.forEach((b, j) => { r[i + j] = (r[i + j] || 0) + a * b; })); return r; }
+    const pscale = (p, k) => p.map(c => c * k);
+    function peq(p, q) { for (let d = 0; d < Math.max(p.length, q.length, 3); d++) if (coef(p, d) !== coef(q, d)) return false; return true; }
+    const pval = (p, n) => p.reduce((acc, c, d) => acc + c * Math.pow(n, d), 0);
+
+    // Reads 4n + 4, 4(n + 1), 2(n + 2) + 2n, 4(7) + 4, n², n^2, 2n(n)…
+    // Products only as a number or a monomial in front of parentheses (no × sign).
+    function parse(raw) {
+        const str = raw.replace(/\s+/g, '').replace(/[−–—]/g, '-').replace(/N/g, 'n').replace(/\^2/g, '²');
+        if (!str) return { err: 'empty' };
+        if (/[*×·•∙x]/i.test(str)) return { err: 'times' };
+        let i = 0, paren = false, hasN = false;
+        function expr() {
+            const terms = [];
+            while (i < str.length && str[i] !== ')') {
+                let sign = 1;
+                if (str[i] === '+' || str[i] === '-') { sign = str[i] === '-' ? -1 : 1; i++; }
+                else if (terms.length) throw 0;
+                terms.push(pscale(product(), sign));
+            }
+            if (!terms.length) throw 0;
+            return terms;
+        }
+        function product() {
+            let p = [1], k = 0;
+            while (i < str.length) {
+                const ch = str[i];
+                if (/\d/.test(ch)) {
+                    if (k > 0) throw 0;
+                    const j = i;
+                    while (/\d/.test(str[i] || '')) i++;
+                    p = pmul(p, [Number(str.slice(j, i))]);
+                } else if (ch === 'n') {
+                    i++; hasN = true;
+                    let d = 1;
+                    if (str[i] === '²') { i++; d = 2; }
+                    p = pmul(p, d === 1 ? [0, 1] : [0, 0, 1]);
+                } else if (ch === '(') {
+                    i++; paren = true;
+                    const inner = expr();
+                    if (str[i] !== ')') throw 0;
+                    i++;
+                    p = pmul(p, inner.reduce(padd, [0]));
+                } else break;
+                k++;
+            }
+            if (!k) throw 0;
+            return p;
+        }
+        try {
+            const terms = expr();
+            if (i !== str.length) throw 0;
+            const poly = terms.reduce(padd, [0]);
+            if (poly.slice(3).some(c => c)) return { err: 'parse' };
+            const degs = terms.map(t => {
+                const nz = t.map((c, d) => c ? d : -1).filter(d => d >= 0);
+                return nz.length === 1 ? nz[0] : (nz.length === 0 ? 0 : -1);
+            });
+            const reduced = !paren && degs.every(d => d >= 0) && new Set(degs).size === degs.length;
+            const ordered = degs.every((d, k) => k === 0 || d < degs[k - 1]);
+            return { poly, paren, hasN, reduced, ordered };
+        } catch (e) {
+            return { err: 'parse' };
+        }
+    }
+    function parseError(r) { return r.err === 'empty' ? s().fbEmpty : r.err === 'times' ? s().fbTimes : s().fbParse; }
+
+    // ── Géométrie de la piscine : grille (n + 2) × (n + 2), eau au centre ──
+    const isBorder = (r, c, n) => r === 0 || c === 0 || r === n + 1 || c === n + 1;
+    const isCorner = (r, c, n) => (r === 0 || r === n + 1) && (c === 0 || c === n + 1);
+    // Border tiles in order, clockwise from the top-left corner
+    function ring(n) {
+        const out = [];
+        for (let c = 0; c <= n + 1; c++) out.push([0, c]);
+        for (let r = 1; r <= n + 1; r++) out.push([r, n + 1]);
+        for (let c = n; c >= 0; c--) out.push([n + 1, c]);
+        for (let r = n; r >= 1; r--) out.push([r, 0]);
+        return out;
+    }
+    function onLine(line, r, c, n) {
+        return line === 'top' ? r === 0 : line === 'bottom' ? r === n + 1 : line === 'left' ? c === 0 : c === n + 1;
+    }
+
+    // fill(r, c) → [] | [colour] | [colour, colour] for border tiles
+    function poolSvg(n, fill, o = {}) {
+        const N = n + 2, S = 10;
+        let h = `<svg class="pool ${o.cls || ''}" viewBox="-1 -1 ${N * S + 2} ${N * S + 2}" ${o.attrs || ''}>`;
+        // Water
+        h += `<rect x="${S}" y="${S}" width="${n * S}" height="${n * S}" fill="${COL.water}"/>`;
+        if (n <= 30) {
+            for (let k = 1; k < n; k++) {
+                h += `<line x1="${S + k * S}" y1="${S}" x2="${S + k * S}" y2="${S + n * S}" stroke="${COL.waterLine}" stroke-width="0.5"/>`;
+                h += `<line x1="${S}" y1="${S + k * S}" x2="${S + n * S}" y2="${S + k * S}" stroke="${COL.waterLine}" stroke-width="0.5"/>`;
+            }
+        }
+        // Border tiles
+        const pad = n > 40 ? 0.15 : 0.5, w = S - 2 * pad;
+        ring(n).forEach(([r, c], k) => {
+            const x = c * S + pad, y = r * S + pad;
+            const cols = fill(r, c, k) || [];
+            const data = o.paint ? ` class="b" data-r="${r}" data-c="${c}"` : '';
+            if (cols.length < 2) {
+                h += `<rect${data} x="${x}" y="${y}" width="${w}" height="${w}" rx="1" fill="${cols[0] || COL.free}" stroke="${cols[0] ? 'none' : COL.freeLine}" stroke-width="0.6"/>`;
+            } else {
+                // Counted twice: split in two triangles
+                h += `<rect${data} x="${x}" y="${y}" width="${w}" height="${w}" rx="1" fill="${cols[0]}"/>`;
+                h += `<polygon points="${x + w},${y} ${x + w},${y + w} ${x},${y + w}" fill="${cols[1]}" pointer-events="none"/>`;
+            }
+            if (o.labels && cols.length === 1 && o.labels[cols[0]]) {
+                h += `<text x="${x + w / 2}" y="${y + w / 2 + 2.2}" text-anchor="middle" font-size="5.5" fill="white">${o.labels[cols[0]]}</text>`;
+            }
+            if (o.cursor === k) h += `<rect x="${x - 0.4}" y="${y - 0.4}" width="${w + 0.8}" height="${w + 0.8}" fill="none" stroke="#f2b705" stroke-width="1.6" pointer-events="none"/>`;
+        });
+        if (o.label) h += `<text x="${N * S / 2}" y="${N * S / 2 + 3}" text-anchor="middle" font-size="${Math.min(9, n * 2.2)}" fill="${COL.hl1}">${o.label}</text>`;
+        return h + '</svg>';
+    }
+
+    // ── Étape 1 : colorier par groupes ──
+    function emptyPaint(n) {
+        const side = () => Array.from({ length: n }, () => []);
+        return { n, corners: { tl: [], tr: [], bl: [], br: [] }, top: side(), bottom: side(), left: side(), right: side() };
+    }
+    function cellRef(p, r, c) {
+        const n = p.n;
+        if (isCorner(r, c, n)) return p.corners[(r === 0 ? 't' : 'b') + (c === 0 ? 'l' : 'r')];
+        if (r === 0) return p.top[c - 1];
+        if (r === n + 1) return p.bottom[c - 1];
+        if (c === 0) return p.left[r - 1];
+        return p.right[r - 1];
+    }
+    // New n: keep the colouring of each side (a whole side stays a whole side)
+    function resizePaint(p, n) {
+        const q = emptyPaint(n);
+        q.corners = p.corners;
+        ['top', 'bottom', 'left', 'right'].forEach(side => {
+            q[side] = q[side].map((_, i) => [...p[side][Math.floor(i * p.n / n)]]);
+        });
+        return q;
+    }
+
+    function analyse() {
+        const n = state.n, p = state.paint;
+        const groups = {};
+        let left = 0, twice = 0;
+        ring(n).forEach(([r, c]) => {
+            const g = cellRef(p, r, c);
+            if (!g.length) left++;
+            twice += Math.max(0, g.length - 1);
+            g.forEach(k => (groups[k] = groups[k] || []).push([r, c]));
+        });
+        if (!Object.keys(groups).length) return { empty: true };
+        const cnt = [0, 0, 0];          // sides counted as n, n + 1, n + 2
+        let K = 0;
+        const SIDES = ['top', 'right', 'bottom', 'left'];
+        // Sides touching each corner
+        const CORNER_SIDES = { '0,0': ['top', 'left'], [`0,${n + 1}`]: ['top', 'right'], [`${n + 1},0`]: ['bottom', 'left'], [`${n + 1},${n + 1}`]: ['bottom', 'right'] };
+        for (const [k, cells] of Object.entries(groups)) {
+            const inGroup = new Set(cells.map(([r, c]) => `${r},${c}`));
+            const extra = {};             // side → corners attached to it
+            const sides = [];
+            for (const side of SIDES) {
+                const mids = cells.filter(([r, c]) => !isCorner(r, c, n) && onLine(side, r, c, n)).length;
+                if (mids && mids !== n) return { bad: 'partial', k: Number(k) };
+                if (mids) { sides.push(side); extra[side] = 0; }
+            }
+            for (const [key, touch] of Object.entries(CORNER_SIDES)) {
+                if (!inGroup.has(key)) continue;
+                const own = touch.filter(sd => sides.includes(sd));
+                if (own.length === 2) return { bad: 'corner', k: Number(k) };
+                if (own.length === 1) extra[own[0]]++;
+                else K++;
+            }
+            sides.forEach(sd => cnt[extra[sd]]++);
+        }
+        if (left) return { left };
+        // Expression, in the order n + 2, n + 1, n, constants, minus the tiles counted twice
+        const parts = [], subs = [];
+        [2, 1].forEach(c => {
+            const k = cnt[c];
+            if (!k) return;
+            parts.push(k === 1 ? `(${NV} + ${c})` : `${k}(${NV} + ${c})`);
+            subs.push(k === 1 ? `(${n} + ${c})` : `${k}(${n} + ${c})`);
+        });
+        if (cnt[0]) { parts.push(cnt[0] === 1 ? NV : `${cnt[0]}${NV}`); subs.push(cnt[0] === 1 ? `${n}` : `${cnt[0]}(${n})`); }
+        if (K) { parts.push(`${K}`); subs.push(`${K}`); }
+        let html = parts.join(' + '), sub = subs.join(' + ');
+        if (twice) { html += ` ${M} ${twice}`; sub += ` ${M} ${twice}`; }
+        const value = cnt[2] * (n + 2) + cnt[1] * (n + 1) + cnt[0] * n + K - twice;
+        return { html, sub, value, key: `${cnt[2]},${cnt[1]},${cnt[0]}|${K}|${twice}` };
+    }
+
+    function renderS1() {
+        const t = s();
+        const n = state.n;
+        $('swatches').innerHTML = GROUP_COLORS.map((col, i) =>
+            `<button type="button" class="swatch${state.color === i + 1 ? ' active' : ''}" data-color="${i + 1}" style="background:${col}" aria-label="${t.color(i + 1)}" aria-pressed="${state.color === i + 1}">${i + 1}</button>`).join('') +
+            `<button type="button" class="swatch eraser${state.color === 0 ? ' active' : ''}" data-color="0" aria-label="${t.eraser}" aria-pressed="${state.color === 0}">⌫</button>`;
+        const labels = n <= 12 ? Object.fromEntries(GROUP_COLORS.map((c, i) => [c, i + 1])) : null;
+        const focused = document.activeElement && document.activeElement.id === 's1Svg';
+        const showCursor = focused && state.kbd;
+        $('s1Draw').innerHTML = poolSvg(n, (r, c) => cellRef(state.paint, r, c).map(k => GROUP_COLORS[k - 1]), {
+            paint: true, labels, cursor: showCursor ? state.cur : -1, cls: 'paintable',
+            attrs: `id="s1Svg" tabindex="0" role="application" aria-label="${t.drawAria}"`,
+        });
+        if (focused) $('s1Svg').focus();
+
+        const a = analyse();
+        const fb = $('s1Fb');
+        fb.hidden = true;
+        $('s1Expr').innerHTML = '';
+        $('s1Sub').innerHTML = '';
+        if (a.empty) $('s1Sub').innerHTML = t.s1Empty;
+        else if (a.bad) { fb.hidden = false; fb.className = 'feedback hint'; fb.innerHTML = a.bad === 'corner' ? t.s1Corner(a.k) : t.s1Partial(a.k); }
+        else if (a.left) $('s1Sub').innerHTML = t.s1Left(a.left);
+        else {
+            $('s1Expr').innerHTML = a.html;
+            $('s1Sub').innerHTML = t.s1Sub(a.sub, a.value);
+            const w = WAYS.findIndex(w => w.key === a.key);
+            fb.hidden = false;
+            if (w >= 0 && !state.found[w]) { state.found[w] = true; state.lastKey = a.key; fb.className = 'feedback ok'; fb.innerHTML = t.s1New; }
+            else if (w >= 0) { fb.className = 'feedback ok'; fb.innerHTML = state.lastKey === a.key ? t.s1New : t.s1Already; }
+            else { fb.className = 'feedback info'; fb.innerHTML = t.s1Other; }
+        }
+        $('ways').innerHTML = WAYS.map((w, i) =>
+            `<div class="way${state.found[i] ? ' found' : ''}">${t.way(i + 1)}<br><span class="big">${state.found[i] ? w.html : '?'}</span></div>`).join('');
+    }
+
+    function applyPaint(r, c, mode) {
+        const g = cellRef(state.paint, r, c);
+        if (mode === 'erase') g.length = 0;
+        else if (mode === 'add') { if (!g.includes(state.color)) { g.push(state.color); g.sort((a, b) => a - b); } }
+        else if (mode === 'remove') { const i = g.indexOf(state.color); if (i >= 0) g.splice(i, 1); }
+    }
+    function modeFor(r, c) {
+        if (state.color === 0) return 'erase';
+        return cellRef(state.paint, r, c).includes(state.color) ? 'remove' : 'add';
+    }
+
+    let painting = null;
+    $('s1Draw').addEventListener('pointerdown', e => {
+        const el = e.target.closest('rect.b');
+        if (!el || e.button > 0) return;
+        e.preventDefault();
+        const r = Number(el.dataset.r), c = Number(el.dataset.c);
+        state.kbd = false;
+        painting = { mode: modeFor(r, c), last: `${r},${c}` };
+        applyPaint(r, c, painting.mode);
+        state.cur = ring(state.n).findIndex(([a, b]) => a === r && b === c);
+        renderS1();
+    });
+    window.addEventListener('pointermove', e => {
+        if (!painting) return;
+        const el = document.elementFromPoint(e.clientX, e.clientY);
+        const cell = el && el.closest && el.closest('#s1Draw rect.b');
+        if (!cell) return;
+        const key = `${cell.dataset.r},${cell.dataset.c}`;
+        if (key === painting.last) return;
+        painting.last = key;
+        applyPaint(Number(cell.dataset.r), Number(cell.dataset.c), painting.mode);
+        renderS1();
+    });
+    window.addEventListener('pointerup', () => { painting = null; });
+    window.addEventListener('pointercancel', () => { painting = null; });
+
+    $('s1Draw').addEventListener('keydown', e => {
+        if (e.target.id !== 's1Svg') return;
+        state.kbd = true;
+        const R = ring(state.n), L = R.length;
+        if (['ArrowRight', 'ArrowDown'].includes(e.key)) state.cur = (state.cur + 1) % L;
+        else if (['ArrowLeft', 'ArrowUp'].includes(e.key)) state.cur = (state.cur - 1 + L) % L;
+        else if (e.key === ' ' || e.key === 'Enter') { const [r, c] = R[state.cur]; applyPaint(r, c, modeFor(r, c)); }
+        else return;
+        e.preventDefault();
+        renderS1();
+        const [r, c] = R[state.cur];
+        $('s1Live').textContent = s().cellState(state.cur + 1, L, cellRef(state.paint, r, c));
+    });
+
+    $('swatches').addEventListener('click', e => {
+        const b = e.target.closest('[data-color]');
+        if (!b) return;
+        state.color = Number(b.dataset.color);
+        renderS1();
+        $('swatches').querySelector(`[data-color="${state.color}"]`).focus();
+    });
+    $('clearBtn').addEventListener('click', () => { state.paint = emptyPaint(state.n); state.lastKey = ''; renderS1(); });
+    $('s1HintBtn').addEventListener('click', () => {
+        const t = s();
+        const missing = state.found.map((f, i) => f ? -1 : i).filter(i => i >= 0);
+        const box = $('s1Hint');
+        box.hidden = false;
+        if (!missing.length) { box.innerHTML = t.s1AllFound; return; }
+        const i = missing[state.hintIdx % missing.length];
+        state.hintIdx++;
+        box.innerHTML = t.s1Hints[i];
+    });
+
+    // ── Étape 2 : n = 5, 10, 100 ──
+    const S2N = [5, 10, 100];
+    function renderS2() {
+        const t = s();
+        $('s2Cards').innerHTML = S2N.map(n => {
+            const st = state.s2[n] || {};
+            return `<div class="card" data-n="${n}">
+                <h3>${t.s2Card(n)}</h3>
+                <div class="draw" data-draw="${n}"></div>
+                <div class="counter" data-counter="${n}"></div>
+                <div class="row"><label for="calc${n}">${t.s2Calc}</label><input class="text-input" id="calc${n}" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="${(st.calc || '').replace(/"/g, '&quot;')}"></div>
+                <div class="row"><label for="res${n}">${t.s2Res}</label><input class="num-input" id="res${n}" type="text" inputmode="numeric" autocomplete="off" value="${st.res || ''}"></div>
+                <div class="row"><button type="button" class="btn" data-check="${n}">${t.check}</button><button type="button" class="btn light" data-count="${n}">${t.s2Count}</button></div>
+                <div class="feedback" data-fb="${n}" hidden></div>
+            </div>`;
+        }).join('');
+        S2N.forEach(n => {
+            const st = state.s2[n] || {};
+            drawS2(n, st.counted ? 4 * n + 4 : 0);
+            if (st.counted) $('s2Cards').querySelector(`[data-counter="${n}"]`).textContent = t.s2CountDone(fmtNum(4 * n + 4));
+            if (st.fb) showS2Fb(n, st.fb.cls, st.fb.html);
+        });
+    }
+    function drawS2(n, k) {
+        // The first k border tiles are coloured (counting in progress)
+        $('s2Cards').querySelector(`[data-draw="${n}"]`).innerHTML =
+            poolSvg(n, (r, c, i) => i < k ? [COL.hl1] : [], { cls: 'small', attrs: 'aria-hidden="true"' });
+    }
+    function showS2Fb(n, cls, html) {
+        const el = $('s2Cards').querySelector(`[data-fb="${n}"]`);
+        el.hidden = false;
+        el.className = 'feedback ' + cls;
+        el.innerHTML = html;
+        (state.s2[n] = state.s2[n] || {}).fb = { cls, html };
+    }
+    function countTiles(n, then) {
+        const total = 4 * n + 4, counter = $('s2Cards').querySelector(`[data-counter="${n}"]`);
+        const t0 = performance.now(), dur = 1600;
+        (function step(now) {
+            const k = Math.min(total, Math.round(total * (now - t0) / dur));
+            drawS2(n, k);
+            counter.textContent = s().s2Counting(fmtNum(k));
+            if (k < total) requestAnimationFrame(step);
+            else {
+                counter.textContent = s().s2CountDone(fmtNum(total));
+                (state.s2[n] = state.s2[n] || {}).counted = true;
+                then && then();
+            }
+        })(t0);
+    }
+    $('s2Cards').addEventListener('input', e => {
+        const card = e.target.closest('[data-n]');
+        if (!card) return;
+        const st = state.s2[card.dataset.n] = state.s2[card.dataset.n] || {};
+        if (e.target.id.startsWith('calc')) st.calc = e.target.value;
+        else st.res = e.target.value;
+    });
+    $('s2Cards').addEventListener('keydown', e => {
+        if (e.key !== 'Enter' || !e.target.matches('input')) return;
+        const n = e.target.closest('[data-n]').dataset.n;
+        $('s2Cards').querySelector(`[data-check="${n}"]`).click();
+    });
+    $('s2Cards').addEventListener('click', e => {
+        const t = s();
+        const cb = e.target.closest('[data-check]'), cnt = e.target.closest('[data-count]');
+        if (cnt) return countTiles(Number(cnt.dataset.count));
+        if (!cb) return;
+        const n = Number(cb.dataset.check), truth = 4 * n + 4;
+        const calc = $('calc' + n).value, resRaw = $('res' + n).value.replace(/[\s  ]/g, '');
+        if (!resRaw) return showS2Fb(n, 'hint', t.s2NeedRes);
+        if (!calc.trim()) return showS2Fb(n, 'hint', t.s2NeedCalc);
+        const r = parse(calc);
+        if (r.err) return showS2Fb(n, 'hint', parseError(r));
+        const v = pval(r.poly, n);
+        if (v !== truth) return showS2Fb(n, 'hint', r.hasN && !peq(r.poly, [4, 4]) ? t.s2BadExpr : t.s2BadSub(n));
+        if (!/^\d+$/.test(resRaw) || Number(resRaw) !== truth) return showS2Fb(n, 'hint', t.s2BadRes);
+        showS2Fb(n, 'ok', t.s2Ok(fmtNum(truth)));
+        countTiles(n);
+    });
+
+    // ── Étape 3 : tableau de valeurs ──
+    const validN = v => /^\d+$/.test(v) && Number(v) >= 1 && Number(v) <= 1000;
+    function renderS3() {
+        const t = s();
+        const ns = state.s3n;
+        const head = `<tr><th>${t.s3Values}</th>${ns.map((v, i) =>
+            `<td><input class="num-input" data-s3="${i}" type="text" inputmode="numeric" autocomplete="off" aria-label="${t.s3Values.replace(/<[^>]+>/g, '')} ${i + 1}" placeholder="${t.s3NPlaceholder}" value="${v}"></td>`).join('')}</tr>`;
+        const rows = [{ label: t.s3Counted, poly: [4, 4], counted: true }]
+            .concat(WAYS.map(w => ({ label: w.html, poly: w.poly })))
+            .concat([{ label: t.s3TrapRow(TRAP.html), poly: TRAP.poly, trap: true }]);
+        const body = rows.map(row => `<tr class="${row.trap ? 'trap' : ''}"><th>${row.label}</th>${ns.map(v => {
+            if (!validN(v)) return '<td class="v"></td>';
+            const n = Number(v), val = pval(row.poly, n);
+            const cls = row.counted ? '' : (val === 4 * n + 4 ? 'same' : 'diff');
+            return `<td class="v ${cls}" data-val>${fmtNum(val)}</td>`;
+        }).join('')}</tr>`).join('');
+        $('s3Table').innerHTML = head + body;
+    }
+    function updateS3Cells() {
+        // Update only the values, so the input being typed in keeps the focus
+        const ns = state.s3n;
+        const rowsPoly = [[4, 4], ...WAYS.map(w => w.poly), TRAP.poly];
+        [...$('s3Table').rows].slice(1).forEach((tr, ri) => {
+            [...tr.cells].slice(1).forEach((td, ci) => {
+                const v = ns[ci];
+                if (!validN(v)) { td.textContent = ''; td.className = 'v'; return; }
+                const n = Number(v), val = pval(rowsPoly[ri], n);
+                td.textContent = fmtNum(val);
+                td.className = 'v ' + (ri === 0 ? '' : val === 4 * n + 4 ? 'same' : 'diff');
+            });
+        });
+    }
+    $('s3Table').addEventListener('input', e => {
+        const i = e.target.dataset.s3;
+        if (i === undefined) return;
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
+        state.s3n[i] = e.target.value;
+        updateS3Cells();
+    });
+    function setFb(id, fb) {
+        const el = $(id);
+        el.hidden = !fb;
+        if (fb) { el.className = 'feedback ' + fb.cls; el.innerHTML = fb.html; }
+    }
+    $('s3Check').addEventListener('click', () => {
+        const t = s();
+        const choice = document.querySelector('input[name="s3eq"]:checked');
+        const v = $('s3N').value.trim();
+        let fb;
+        if (!choice) fb = { cls: 'hint', html: t.s3Pick };
+        else if (choice.value === 'yes') fb = { cls: 'hint', html: t.s3SayYes };
+        else if (!v) fb = { cls: 'hint', html: t.s3NeedN };
+        else if (!validN(v)) fb = { cls: 'hint', html: t.s3BadN };
+        else {
+            const n = Number(v), a = pval(TRAP.poly, n), b = 4 * n + 4;
+            fb = a === b ? { cls: 'hint', html: t.s3Same(n) } : { cls: 'ok', html: t.s3Ok(n, fmtNum(a), fmtNum(b)) };
+        }
+        state.s3Fb = fb;
+        setFb('s3Fb', fb);
+    });
+    $('s3N').addEventListener('keydown', e => { if (e.key === 'Enter') $('s3Check').click(); });
+
+    // ── Étape 4 : réduire étape par étape, avec les carreaux surlignés ──
+    // Highlight schemes: tile colours + legend
+    function scheme(name, n) {
+        const L = s().leg, H = COL;
+        const top = r => r === 0 || r === n + 1;
+        const corner = (r, c) => isCorner(r, c, n);
+        const S = {
+            C:  { fill: (r, c) => top(r) ? [H.hl1] : [H.hl2], legend: [[[H.hl1], L.rows2], [[H.hl2], L.sides2]] },
+            C2: { fill: (r, c) => corner(r, c) ? [H.hl3] : top(r) ? [H.hl1] : [H.hl2], legend: [[[H.hl1], L.mids2a], [[H.hl3], L.corners4], [[H.hl2], L.mids2b]] },
+            A:  { fill: (r, c) => corner(r, c) ? [H.hl3] : [H.hl1], legend: [[[H.hl1], L.mids4], [[H.hl3], L.corners4]] },
+            D:  { fill: (r, c) => corner(r, c) ? [H.hl1, H.hl4] : [H.hl1], legend: [[[H.hl1], L.full4], [[H.hl1, H.hl4], L.twice]] },
+            D2: { fill: (r, c) => corner(r, c) ? [H.hl3, H.hl4] : [H.hl1], legend: [[[H.hl1], L.mids4], [[H.hl3, H.hl4], L.corners8], [[H.hl4], L.minus4]] },
+        };
+        return S[name];
+    }
+    const DERIVS = [
+        { start: `2(${NV} + 2) + 2${NV}`, poly: [4, 4], schemes: ['C', 'C2', 'A'], onlyFirst: [2, 4], k: 2 },
+        { start: `4(${NV} + 2) ${M} 4`, poly: [4, 4], schemes: ['D', 'D2', 'A'], onlyFirst: [-2, 4], k: 4, forgot: [8, 4] },
+    ];
+    function resetS4() {
+        state.s4 = DERIVS.map(() => ({ lines: [], active: 0, fb: null, input: '' }));
+    }
+    function renderS4() {
+        const t = s();
+        $('s4').innerHTML = DERIVS.map((d, di) => {
+            const st = state.s4[di];
+            const all = [{ html: d.start, scheme: d.schemes[0] }, ...st.lines];
+            const done = st.lines.length && st.lines[st.lines.length - 1].final;
+            const sc = scheme(all[Math.min(st.active, all.length - 1)].scheme, state.n);
+            const lines = all.map((l, li) =>
+                `<div class="line"><span class="eq">${li ? '=' : ''}</span><button type="button" class="show${li === st.active ? ' active' : ''}" data-d="${di}" data-line="${li}" aria-pressed="${li === st.active}">${l.html}</button></div>`).join('');
+            const input = done ? `<div class="done-badge">${t.s4Done}</div>` :
+                `<div class="line"><span class="eq">=</span><input class="text-input" data-in="${di}" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="${t.s4Next}" value="${st.input.replace(/"/g, '&quot;')}">` +
+                `<button type="button" class="btn" data-go="${di}">${t.check}</button></div>`;
+            const legend = sc.legend.map(([cols, txt]) =>
+                `<span><span class="sw" style="background:${cols.length > 1 ? `linear-gradient(135deg, ${cols[0]} 50%, ${cols[1]} 50%)` : cols[0]}"></span>${txt}</span>`).join('');
+            return `<div class="card">
+                <div class="draw">${poolSvg(state.n, sc.fill, { cls: 'small', attrs: 'aria-hidden="true"' })}</div>
+                <div class="legend">${legend}</div>
+                <div class="lines">${lines}${input}</div>
+                <div class="feedback" data-s4fb="${di}" ${st.fb ? '' : 'hidden'}></div>
+            </div>`;
+        }).join('');
+        state.s4.forEach((st, di) => {
+            if (!st.fb) return;
+            const el = $('s4').querySelector(`[data-s4fb="${di}"]`);
+            el.className = 'feedback ' + st.fb.cls;
+            el.innerHTML = st.fb.html;
+        });
+    }
+    function checkS4(di) {
+        const t = s();
+        const d = DERIVS[di], st = state.s4[di];
+        const raw = st.input;
+        const r = parse(raw);
+        const prev = st.lines[st.lines.length - 1];
+        if (r.err) st.fb = { cls: 'hint', html: parseError(r) };
+        else if (!peq(r.poly, d.poly)) {
+            let msg;
+            if (peq(r.poly, d.onlyFirst)) msg = t.s4OnlyFirst(d.k);
+            else if (d.forgot && peq(r.poly, d.forgot)) msg = t.s4Forgot4;
+            else {
+                let n = state.n;
+                if (pval(r.poly, n) === pval(d.poly, n)) n = [1, 2, 3, 5, 10].find(m => pval(r.poly, m) !== pval(d.poly, m));
+                msg = t.s4NotEq(n, pval(d.poly, n), pval(r.poly, n));
+            }
+            st.fb = { cls: 'hint', html: msg };
+        } else if (r.paren) st.fb = { cls: 'hint', html: t.s4Paren };
+        else if (!r.reduced) {
+            if (prev && !prev.final) st.fb = { cls: 'hint', html: t.s4Same };
+            else {
+                st.lines.push({ html: pretty(raw), scheme: d.schemes[1] });
+                st.active = st.lines.length;
+                st.input = '';
+                st.fb = null;
+            }
+        } else {
+            st.lines.push({ html: `4${NV} + 4`, scheme: d.schemes[2], final: true });
+            st.active = st.lines.length;
+            st.input = '';
+            st.fb = r.ordered ? null : { cls: 'ok', html: t.s4Order };
+        }
+        renderS4();
+        const again = $('s4').querySelector(`[data-in="${di}"]`);
+        if (again) again.focus();
+        else { const b = $('s4').querySelector(`[data-d="${di}"][data-line="${st.active}"]`); b && b.focus(); }
+    }
+    // Student's line, rewritten neatly: spaces around + and −, true minus, italic n
+    function pretty(raw) {
+        return raw.replace(/\s+/g, '').replace(/[−–—-]/g, ' − ').replace(/\+/g, ' + ').replace(/\^2/g, '²')
+            .replace(/^ − /, M).replace(/\( − /g, '(' + M).replace(/[nN]/g, NV).trim();
+    }
+    $('s4').addEventListener('click', e => {
+        const show = e.target.closest('[data-line]'), go = e.target.closest('[data-go]');
+        if (show) {
+            state.s4[show.dataset.d].active = Number(show.dataset.line);
+            renderS4();
+            $('s4').querySelector(`[data-d="${show.dataset.d}"][data-line="${show.dataset.line}"]`).focus();
+        } else if (go) checkS4(Number(go.dataset.go));
+    });
+    $('s4').addEventListener('input', e => { if (e.target.dataset.in !== undefined) state.s4[e.target.dataset.in].input = e.target.value; });
+    $('s4').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.dataset.in !== undefined) checkS4(Number(e.target.dataset.in)); });
+
+    // ── Étape 5 : surface de l'eau ──
+    // unit: on-screen size of one tile, the same for both pools (true scale)
+    function waterSvg(w, h, labelW, labelH, unit) {
+        // Labels scaled to the drawing, so they look the same size on screen
+        const S = 10, fs = Math.max(9, (2 * state.n * S) / 11), P = fs * 1.6;
+        const vw = w * S + P + 2;
+        let g = `<svg class="pool small" viewBox="0 0 ${vw} ${h * S + P + 2}" style="max-width:${Math.round(vw * unit)}px" aria-hidden="true">`;
+        g += `<rect x="${P}" y="${P}" width="${w * S}" height="${h * S}" fill="${COL.water}" stroke="${COL.hl1}" stroke-width="1"/>`;
+        for (let k = 1; k < w; k++) g += `<line x1="${P + k * S}" y1="${P}" x2="${P + k * S}" y2="${P + h * S}" stroke="${COL.waterLine}" stroke-width="0.5"/>`;
+        for (let k = 1; k < h; k++) g += `<line x1="${P}" y1="${P + k * S}" x2="${P + w * S}" y2="${P + k * S}" stroke="${COL.waterLine}" stroke-width="0.5"/>`;
+        g += `<text x="${P + w * S / 2}" y="${P - fs * 0.4}" text-anchor="middle" font-size="${fs}" fill="${COL.hl1}" font-style="italic">${labelW}</text>`;
+        g += `<text x="${P - fs * 0.4}" y="${P + h * S / 2 + fs * 0.35}" text-anchor="end" font-size="${fs}" fill="${COL.hl1}" font-style="italic">${labelH}</text>`;
+        return g + '</svg>';
+    }
+    function renderS5() {
+        const t = s(), n = state.n;
+        const unit = 300 / (2 * n * 10 + Math.max(9, 2 * n * 10 / 11) * 1.6 + 2);
+        $('s5Square').innerHTML = waterSvg(n, n, 'n', 'n', unit);
+        $('s5Rect').innerHTML = waterSvg(2 * n, n, '2n', 'n', unit);
+        $('s5SquareCap').innerHTML = t.s5SquareCap(n);
+        $('s5RectCap').innerHTML = t.s5RectCap;
+        renderGraph();
+    }
+    $('s5Check').addEventListener('click', () => {
+        const t = s();
+        const r = parse($('s5Ans').value);
+        let fb;
+        if (r.err) fb = { cls: 'hint', html: parseError(r) };
+        else if (peq(r.poly, [0, 0, 2])) fb = { cls: 'ok', html: r.paren ? t.s5OkProduct : t.s5Ok };
+        else if (peq(r.poly, [0, 3]) || peq(r.poly, [0, 6])) fb = { cls: 'hint', html: t.s5Sum };
+        else if (!coef(r.poly, 2)) fb = { cls: 'hint', html: t.s5Linear };
+        else {
+            const n = state.n === 1 ? 3 : state.n;
+            fb = { cls: 'hint', html: t.s5Bad(n, 2 * n * n, pval(r.poly, n)) };
+        }
+        state.s5Fb = fb;
+        setFb('s5Fb', fb);
+    });
+    $('s5Ans').addEventListener('keydown', e => { if (e.key === 'Enter') $('s5Check').click(); });
+    $('s5Sq').addEventListener('click', () => {
+        const inp = $('s5Ans');
+        const a = inp.selectionStart ?? inp.value.length, b = inp.selectionEnd ?? inp.value.length;
+        inp.value = inp.value.slice(0, a) + 'n²' + inp.value.slice(b);
+        inp.focus();
+        inp.setSelectionRange(a + 2, a + 2);
+    });
+
+    function renderGraph() {
+        const t = s(), n = state.n;
+        const pairs = {
+            border: [{ f: k => 4 * k + 4, label: `4${NV} + 4`, svg: '4n + 4', col: COL.hl2 }, { f: k => k * k, label: `${NV}²`, svg: 'n²', col: COL.hl1 }],
+            side: [{ f: k => 4 * k, label: `4${NV}`, svg: '4n', col: COL.hl2 }, { f: k => k * k, label: `${NV}²`, svg: 'n²', col: COL.hl1 }],
+        }[state.pair];
+        document.querySelectorAll('#s5Pair button').forEach(b => {
+            b.classList.toggle('active', b.dataset.pair === state.pair);
+            b.setAttribute('aria-pressed', b.dataset.pair === state.pair);
+            b.textContent = b.dataset.pair === 'border' ? t.pairBorder : t.pairSide;
+        });
+        const W = 600, H = 340, L = 50, R = 20, T = 20, B = 40;
+        const xMax = 20, yMax = state.pair === 'border' ? 400 : 400;
+        const X = k => L + (k / xMax) * (W - L - R), Y = v => H - B - (v / yMax) * (H - T - B);
+        let g = '';
+        for (let v = 0; v <= yMax; v += 50) g += `<line x1="${L}" y1="${Y(v)}" x2="${W - R}" y2="${Y(v)}" stroke="#ecf0f5"/><text class="tick" x="${L - 6}" y="${Y(v) + 4}" text-anchor="end">${v}</text>`;
+        for (let k = 0; k <= xMax; k += 2) g += `<text class="tick" x="${X(k)}" y="${H - B + 16}" text-anchor="middle">${k}</text>`;
+        g += `<line x1="${L}" y1="${H - B}" x2="${W - R}" y2="${H - B}" stroke="#1f2d4d" stroke-width="2"/><line x1="${L}" y1="${T}" x2="${L}" y2="${H - B}" stroke="#1f2d4d" stroke-width="2"/>`;
+        g += `<text class="axis-label" x="${W - R}" y="${H - 6}" text-anchor="end" font-style="italic">${t.graphX}</text>`;
+        g += `<text class="axis-label" x="${L}" y="${T - 6}" text-anchor="start">${t.graphY}</text>`;
+        // Current n
+        g += `<line x1="${X(n)}" y1="${T}" x2="${X(n)}" y2="${H - B}" stroke="#f2b705" stroke-width="2" stroke-dasharray="5 4"/>`;
+        pairs.forEach(p => {
+            const pts = [];
+            for (let k = 1; k <= xMax; k++) pts.push(`${X(k)},${Y(p.f(k))}`);
+            g += `<polyline points="${pts.join(' ')}" fill="none" stroke="${p.col}" stroke-width="2.5"/>`;
+            for (let k = 1; k <= xMax; k++) g += `<circle cx="${X(k)}" cy="${Y(p.f(k))}" r="${k === n ? 6 : 3}" fill="${p.col}"/>`;
+            g += `<text x="${X(xMax) - 4}" y="${Y(p.f(xMax)) - 8}" text-anchor="end" font-size="14" font-weight="800" font-style="italic" fill="${p.col}">${p.svg}</text>`;
+        });
+        $('s5Graph').innerHTML = g;
+        $('s5Graph').setAttribute('aria-label', `${pairs[0].svg} / ${pairs[1].svg}`);
+        $('s5Read').innerHTML = t.read(n, pairs[0].label, fmtNum(pairs[0].f(n)), pairs[1].label, fmtNum(pairs[1].f(n)));
+        $('s5Insight').innerHTML = state.pair === 'border' ? t.insightBorder : t.insightSide;
+    }
+    $('s5Pair').addEventListener('click', e => {
+        const b = e.target.closest('[data-pair]');
+        if (!b) return;
+        state.pair = b.dataset.pair;
+        renderGraph();
+    });
+
+    // ── Curseur n ──
+    function renderN() {
+        $('nVal').innerHTML = s().nVal(state.n);
+        $('nRange').setAttribute('aria-valuetext', `n = ${state.n}`);
+    }
+    $('nRange').addEventListener('input', e => {
+        const n = Number(e.target.value);
+        state.paint = resizePaint(state.paint, n);
+        state.n = n;
+        state.cur = Math.min(state.cur, 4 * n + 3);
+        renderN(); renderS1(); renderS4(); renderS5();
+    });
+
+    function applyLang() {
+        const t = s();
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const v = t[el.dataset.i18n];
+            if (typeof v === 'string') el.innerHTML = v;
+        });
+        document.title = t.title.replace(/^\S+\s/, '') + ' – LaboMath';
+        $('context').innerHTML = t.context;
+        $('stepNav').innerHTML = t.stepNav.map((x, i) => `<a href="#etape${i + 1}">${x}</a>`).join('');
+        $('nLabel').innerHTML = t.nLabel;
+        $('s1Intro').innerHTML = t.s1Intro;
+        $('s2Intro').innerHTML = t.s2Intro;
+        $('s3Intro').innerHTML = t.s3Intro;
+        $('s3Trap').innerHTML = t.s3Trap;
+        $('s3NLabel').innerHTML = t.s3NLabel;
+        $('s4Intro').innerHTML = t.s4Intro;
+        $('s5Intro').innerHTML = t.s5Intro;
+        $('s5AnsLabel').innerHTML = t.s5AnsLabel;
+        $('s1Hint').hidden = true;
+        // Feedback already shown stays in the previous language: hide it
+        ['s3Fb', 's5Fb'].forEach(id => { $(id).hidden = true; });
+        state.s3Fb = state.s5Fb = null;
+        Object.values(state.s2).forEach(st => { st.fb = null; });
+        state.s4.forEach(st => { st.fb = null; });
+        renderN(); renderS1(); renderS2(); renderS3(); renderS4(); renderS5();
+    }
+
+    // The header's FR/EN button is handled by commun/langue.js
+    Langue.onChange(lang => { state.lang = lang; applyLang(); });
+    state.paint = emptyPaint(state.n);
+    resetS4();
+    applyLang();
+</script>
+
+</body>
+</html>
