@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Les mots de l'algèbre – LaboMath</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../commun/style.css">
+    <script src="../commun/langue.js"></script>
+    <style>
+        /* Styles propres à cette activité (le reste vient de commun/style.css) */
+        [hidden] { display: none !important; }
+        :root {
+            --navy: #1f2d4d;
+            --blue: #1f5fa8;
+            --orange: #c84a16;
+            --pale: #eef3fa;
+            --line: #c9d4e5;
+            --ok: #1e7d45;
+            --muted: #4a5878;
+        }
+        .container {
+            color: var(--navy);
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h1 { color: var(--navy); font-weight: 900; line-height: 1.2; border-bottom: 2px solid var(--pale); padding-bottom: 10px; }
+        h2.step {
+            font-size: 1.15em;
+            font-weight: 900;
+            margin: 34px 0 10px;
+            padding-top: 14px;
+            border-top: 2px solid var(--pale);
+            color: var(--navy);
+            scroll-margin-top: 80px;
+        }
+        h2.step .num {
+            display: inline-flex;
+            width: 28px; height: 28px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: var(--blue);
+            color: white;
+            font-size: 0.85em;
+            margin-right: 8px;
+        }
+        h3 { font-size: 1em; font-weight: 900; margin: 16px 0 8px; }
+        em { font-family: Georgia, 'Times New Roman', serif; font-style: italic; }
+        p { line-height: 1.6; }
+        .intro { margin: 6px 0 10px; }
+        .concept-box {
+            background: var(--pale);
+            padding: 15px;
+            border-left: 5px solid var(--blue);
+            margin: 16px 0;
+            border-radius: 4px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        .word { font-weight: 900; color: var(--blue); }
+
+        .step-nav { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 8px; }
+        .step-nav a { text-decoration: none; background: var(--pale); color: var(--blue); font-weight: 800; font-size: 0.85em; border-radius: 18px; padding: 5px 12px; }
+        .step-nav a:hover { background: #dde7f5; }
+
+        .panel {
+            background: var(--pale);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8px 14px;
+            font-weight: 700;
+        }
+        .row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; font-weight: 700; margin: 8px 0; }
+        .text-input, .num-input, select {
+            padding: 6px 10px;
+            border: 2px solid var(--line);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1.05em;
+            font-weight: 800;
+            color: var(--navy);
+            background: white;
+            outline: none;
+        }
+        .text-input { width: 220px; }
+        .num-input { width: 80px; text-align: center; }
+        select { font-size: 0.95em; max-width: 100%; }
+        .text-input:focus, .num-input:focus, select:focus { border-color: var(--blue); }
+        .ok-field { border-color: var(--ok) !important; background: #e7f4ec; }
+        .btn {
+            border: none;
+            background: var(--blue);
+            color: white;
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 0.95em;
+            border-radius: 20px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        .btn:hover { background: #184d8a; }
+        .btn.light { background: var(--pale); color: var(--blue); }
+        .btn.light:hover { background: #dde7f5; }
+        .btn.small { padding: 5px 12px; font-size: 0.85em; }
+        .center { text-align: center; margin-top: 10px; }
+        .feedback { border-radius: 10px; padding: 10px 14px; line-height: 1.6; margin-top: 10px; text-align: center; }
+        .feedback.hint { background: #fbeee7; color: #84300d; }
+        .feedback.ok { background: #e7f4ec; color: var(--ok); }
+        .feedback.info { background: var(--pale); color: var(--navy); }
+        .choice { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; margin: 6px 0; line-height: 1.5; }
+        .choice input { accent-color: var(--blue); width: 18px; height: 18px; margin-top: 3px; flex: none; }
+        .card { border: 2px solid var(--pale); border-radius: 12px; padding: 12px 14px; margin: 10px 0; }
+        .card.done { border-color: #bfe3cc; }
+
+        /* Partie 1 : la piscine */
+        .n-row { display: flex; align-items: center; gap: 12px; font-weight: 800; max-width: 520px; margin: 0 auto 10px; }
+        .n-row input[type=range] { flex: 1; accent-color: var(--blue); min-width: 0; }
+        .n-row .n-val { font-size: 1.2em; min-width: 64px; }
+        .pool-wrap { display: flex; flex-wrap: wrap; gap: 16px 28px; justify-content: center; align-items: center; }
+        svg.pool { width: 100%; max-width: 300px; height: auto; display: block; }
+        .big-expr { font-size: 2em; font-weight: 900; text-align: center; }
+        .term-btn {
+            border: 3px solid transparent;
+            background: none;
+            font: inherit;
+            color: inherit;
+            border-radius: 10px;
+            padding: 0 6px;
+            cursor: pointer;
+        }
+        .term-btn.t-side { color: var(--blue); }
+        .term-btn.t-corner { color: var(--orange); }
+        .term-btn.active { border-color: currentColor; background: var(--pale); }
+        .term-btn:focus-visible, .chip-term:focus-visible, .bin:focus-visible, .tag:focus-visible { outline: 3px solid #f2b705; outline-offset: 2px; }
+        .readout { line-height: 1.8; font-weight: 700; text-align: center; }
+        .readout .side { color: var(--blue); }
+        .readout .corner { color: var(--orange); }
+
+        /* Partie 2 : décortiquer */
+        .expr-line { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; font-size: 1.5em; font-weight: 900; margin: 6px 0; }
+        .chip-term {
+            border: 2px solid var(--line);
+            background: white;
+            color: var(--navy);
+            font: inherit;
+            border-radius: 10px;
+            padding: 2px 10px;
+            cursor: pointer;
+        }
+        .chip-term:hover { border-color: var(--blue); }
+        .chip-term.active { border-color: var(--blue); background: var(--pale); }
+        .chip-term.done { border-color: var(--ok); background: #e7f4ec; }
+        .expr-label { font-size: 0.75em; color: var(--muted); font-weight: 800; min-width: 28px; }
+        .term-panel { background: var(--pale); border-radius: 12px; padding: 12px 14px; margin-top: 10px; }
+        .term-panel .big { font-size: 1.4em; font-weight: 900; text-align: center; }
+
+        /* Partie 3 : trier */
+        .tags-pool, .bins { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .tags-pool {
+            min-height: 64px;
+            padding: 12px;
+            border: 2px dashed var(--line);
+            border-radius: 12px;
+            align-items: center;
+        }
+        .tag {
+            border: 2px solid var(--navy);
+            background: white;
+            color: var(--navy);
+            font-family: inherit;
+            font-size: 1.2em;
+            font-weight: 900;
+            border-radius: 8px;
+            padding: 4px 12px;
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .tag.sel { background: var(--navy); color: white; }
+        .tag.dragging { opacity: 0.3; }
+        .ghost { position: fixed; z-index: 1000; pointer-events: none; opacity: 0.85; transform: translate(-50%, -50%); }
+        .bins { margin-top: 12px; }
+        .bin {
+            min-width: 120px;
+            min-height: 84px;
+            border: 2px solid var(--blue);
+            border-radius: 12px;
+            background: white;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+            color: var(--navy);
+            cursor: pointer;
+        }
+        .bin .bin-title { font-size: 0.8em; font-weight: 800; color: var(--muted); }
+        .bin .bin-tags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+        .bin.new { border-style: dashed; color: var(--blue); font-weight: 800; justify-content: center; }
+        .bin.over, .tags-pool.over { background: #fff4ec; }
+        .pool-label { font-size: 0.85em; font-weight: 800; color: var(--muted); text-align: center; margin-top: 6px; }
+
+        /* Parties 4 à 6 */
+        .grid-table { width: 100%; border-collapse: collapse; }
+        .grid-table th, .grid-table td { border: 1px solid var(--line); padding: 8px; text-align: center; }
+        .grid-table th { background: var(--pale); }
+        .grid-table td.ex { font-size: 1.2em; font-weight: 900; white-space: nowrap; }
+        .conds { list-style: none; padding: 0; margin: 8px 0 0; text-align: left; display: inline-block; }
+        .conds li { margin: 3px 0; font-weight: 700; }
+        .conds li.yes { color: var(--ok); }
+        .conds li.no { color: var(--orange); }
+
+        /* Lexique */
+        .lex-btn {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 200;
+            border: none;
+            background: var(--navy);
+            color: white;
+            font-family: inherit;
+            font-weight: 900;
+            font-size: 0.95em;
+            border-radius: 24px;
+            padding: 10px 16px;
+            box-shadow: 0 4px 14px rgba(31,45,77,0.3);
+            cursor: pointer;
+        }
+        dialog.lexicon {
+            max-width: 640px;
+            width: calc(100% - 32px);
+            max-height: 85vh;
+            border: none;
+            border-radius: 14px;
+            padding: 0;
+            color: var(--navy);
+            font-family: var(--font);
+        }
+        dialog.lexicon::backdrop { background: rgba(31,45,77,0.45); }
+        .lex-head { position: sticky; top: 0; background: white; display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 2px solid var(--pale); }
+        .lex-head h2 { font-size: 1.2em; font-weight: 900; }
+        .lex-body { padding: 8px 18px 18px; }
+        .lex-body dt { font-weight: 900; color: var(--blue); margin-top: 12px; font-size: 1.05em; }
+        .lex-body dd { margin: 2px 0 0; line-height: 1.55; }
+        .lex-body dd .ex { color: var(--muted); font-size: 0.92em; }
+
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px 14px; }
+            h1 { font-size: 1.4em; }
+            .big-expr { font-size: 1.6em; }
+            .expr-line { font-size: 1.25em; }
+            .text-input { width: 180px; }
+            .grid-table th, .grid-table td { padding: 6px 4px; }
+            .grid-table td.ex { font-size: 1em; }
+            .lex-btn { right: 10px; bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="app-header">
+    <div class="header-inner">
+        <a class="back-btn" href="index.html">← <span data-en="Introduction to algebra">Introduction à l'algèbre</span></a>
+        <a class="logo" href="../index.html">
+            <div class="logo-icon">∑</div>
+            <span class="logo-text">Labo<span class="logo-accent">Math</span></span>
+        </a>
+        <button class="lang-btn" id="langBtn">EN</button>
+    </div>
+</header>
+
+<main class="page">
+<div class="container">
+    <h1 data-i18n="title">📖 Les mots de l'algèbre</h1>
+    <div class="concept-box" id="concept"></div>
+    <nav class="step-nav" id="stepNav"></nav>
+
+    <h2 class="step" id="partie1"><span class="num">1</span><span data-i18n="p1Title"></span></h2>
+    <div id="p1"></div>
+
+    <h2 class="step" id="partie2"><span class="num">2</span><span data-i18n="p2Title"></span></h2>
+    <div id="p2"></div>
+
+    <h2 class="step" id="partie3"><span class="num">3</span><span data-i18n="p3Title"></span></h2>
+    <div id="p3"></div>
+
+    <h2 class="step" id="partie4"><span class="num">4</span><span data-i18n="p4Title"></span></h2>
+    <div id="p4"></div>
+
+    <h2 class="step" id="partie5"><span class="num">5</span><span data-i18n="p5Title"></span></h2>
+    <div id="p5"></div>
+
+    <h2 class="step" id="partie6"><span class="num">6</span><span data-i18n="p6Title"></span></h2>
+    <div id="p6"></div>
+</div>
+</main>
+
+<button type="button" class="lex-btn" id="lexBtn" aria-haspopup="dialog"></button>
+<dialog class="lexicon" id="lexicon" aria-labelledby="lexTitle">
+    <div class="lex-head">
+        <h2 id="lexTitle"></h2>
+        <button type="button" class="btn light small" id="lexClose"></button>
+    </div>
+    <dl class="lex-body" id="lexBody"></dl>
+</dialog>
+<div class="sr-only" id="live" aria-live="polite"></div>
+
+<footer class="app-footer">
+    <span data-en="Designed by Carlos Pinango, engineer and high school math teacher">Conçu par Carlos Pinango, ingénieur et enseignant de mathématiques au secondaire</span>
+</footer>
+
+<script>
+    const M = '−';      // true minus sign
+
+    // ── Termes ──
+    // A term is { c: coefficient, v: { x: 2 } } ; degree = sum of the exponents
+    const T = (c, v = {}) => ({ c, v });
+    const degree = t => Object.values(t.v).reduce((a, b) => a + b, 0);
+    const keyOf = t => Object.keys(t.v).sort().map(l => l + (t.v[l] > 1 ? t.v[l] : '')).join('');
+    const isConst = t => degree(t) === 0;
+    // Written as in algebra, sign included: 3x², −x, 2xy, −8
+    function fmtTerm(t, first = true) {
+        const a = Math.abs(t.c);
+        const letters = Object.keys(t.v).sort().map(l => `<em>${l}</em>` + (t.v[l] === 2 ? '²' : '')).join('');
+        const body = letters ? (a === 1 ? '' : a) + letters : String(a);
+        if (first) return (t.c < 0 ? M : '') + body;
+        return (t.c < 0 ? ` ${M} ` : ' + ') + body;
+    }
+    const fmtTermAlone = t => fmtTerm(t, true);
+    const fmtExpr = terms => terms.map((t, i) => fmtTerm(t, i === 0)).join('');
+    const plain = html => html.replace(/<[^>]+>/g, '');
+
+    // Reads a reduced expression written by the student: 2x − 3, x² + x + 5, −3x², 3x + 3y…
+    function parseExpr(raw) {
+        const str = raw.replace(/\s+/g, '').replace(/[−–—]/g, '-').replace(/\^2/g, '²').replace(/[A-Z]/g, c => c.toLowerCase());
+        if (!str) return { err: 'empty' };
+        if (/[*×·•∙.]/.test(str)) return { err: 'times' };
+        if (/[()]/.test(str)) return { err: 'paren' };
+        if (/[oli]/.test(str)) return { err: 'badLetter' };
+        const terms = [];
+        let i = 0;
+        while (i < str.length) {
+            const m = str.slice(i).match(/^([+-]?)(\d*)((?:[a-z]²?)*)/);
+            if (!m || (!m[2] && !m[3]) || (i > 0 && !m[1])) return { err: 'parse' };
+            const v = {};
+            (m[3].match(/[a-z]²?/g) || []).forEach(tok => { v[tok[0]] = (v[tok[0]] || 0) + (tok[1] ? 2 : 1); });
+            const c = (m[1] === '-' ? -1 : 1) * (m[2] ? Number(m[2]) : 1);
+            if (c === 0) return { err: 'parse' };
+            terms.push(T(c, v));
+            i += m[0].length;
+        }
+        if (terms.some(t => degree(t) > 2)) return { err: 'deg' };
+        const keys = terms.map(keyOf);
+        const reduced = new Set(keys).size === keys.length;
+        const ordered = terms.every((t, k) => k === 0 || degree(t) <= degree(terms[k - 1]));
+        return { terms, reduced, ordered };
+    }
+
+    // ── Données ──
+    const P2_EXPRS = [
+        [T(5, { a: 1 }), T(12)],
+        [T(4, { t: 1 }), T(-8)],
+        [T(3, { y: 2 }), T(2, { y: 1 }), T(-7)],
+        [T(-1, { x: 2 }), T(1, { x: 1 })],
+        [T(6)],
+        [T(2, { x: 1, y: 1 }), T(5)],
+    ];
+    const P3_TAGS = ['3a', '-5a', 'a', '4a²', '-a²', '3b', '7', '-2', '2ab', '-ab'].map(s => parseExpr(s).terms[0]);
+    const P4_EXPRS = [
+        { terms: [T(7, { k: 1 })], kind: 1, deg: 1 },
+        { terms: [T(1, { y: 2 }), T(-9)], kind: 2, deg: 2 },
+        { terms: [T(2, { x: 2 }), T(3, { x: 1 }), T(-1)], kind: 3, deg: 2 },
+        { terms: [T(15)], kind: 1, deg: 0 },
+        { terms: [T(-4, { t: 1 }), T(10)], kind: 2, deg: 1 },
+        { terms: [T(5, { a: 1, b: 1 })], kind: 1, deg: 2 },
+    ];
+    // Part 5: each challenge = list of conditions, each checked separately
+    const P5 = ['a', 'b', 'c', 'd'];
+    // Part 6: statements, true/false, index of the right justification
+    const P6 = [
+        { truth: false, good: 0 },
+        { truth: false, good: 1 },
+        { truth: false, good: 1 },
+        { truth: true, good: 0 },
+        { truth: false, good: 0 },
+        { truth: true, good: 0 },
+    ];
+
+    const STR = {
+        fr: {
+            title: `📖 Les mots de l'algèbre`,
+            concept: `Les mots de l'algèbre servent à parler des expressions que tu as déjà construites. ` +
+                `Chaque mot est présenté à partir de ce qu'il veut dire. Le panneau <strong>📎 Les mots de l'algèbre</strong>, en bas de l'écran, les rassemble tous.`,
+            nav: [`1. Ce qui change`, `2. Je décortique`, `3. Je trie`, `4. Je classe`, `5. Je construis`, `6. Vrai ou faux ?`],
+            check: `Vérifier`, reveal: `Voir la réponse`,
+            lexBtn: `📎 Les mots de l'algèbre`, lexClose: `Fermer`,
+            // Part 1
+            p1Title: `Ce qui change, ce qui ne change pas`,
+            p1Intro: `Voici la piscine : ${'<em>n</em>'} carreaux de côté, entourée d'une bordure. Le nombre de carreaux de la bordure est 4<em>n</em> + 4. Déplace le curseur et touche chaque partie de l'expression.`,
+            nVal: n => `<em>n</em> = ${n}`,
+            nLabel: `Valeur de <em>n</em>`,
+            side: (n) => `4<em>n</em> = 4(${n}) = ${4 * n} carreaux : les 4 côtés de ${n} carreaux. <strong>Ça change</strong> quand <em>n</em> change.`,
+            corner: `4 = 4 carreaux : les coins. <strong>Ça ne change pas</strong> quand <em>n</em> change.`,
+            p1Words: `<span class="word">Terme</span> : chaque partie d'une expression séparée par + ou ${M}. Dans 4<em>n</em> + 4, il y a deux termes : 4<em>n</em> et 4.<br>` +
+                `<span class="word">Terme constant</span> : le terme qui ne change pas quand <em>n</em> change. Ici, c'est 4, les quatre coins.<br>` +
+                `<span class="word">Coefficient</span> : dans 4<em>n</em>, le nombre 4 dit combien de fois on prend <em>n</em> : 4 côtés de <em>n</em> carreaux.`,
+            p1Q: `Dans 4<em>n</em> + 4, les deux 4 veulent-ils dire la même chose ?`,
+            p1Choices: [
+                `Oui : c'est le même nombre, écrit deux fois.`,
+                `Non : le premier 4 dit combien de côtés de <em>n</em> carreaux on compte ; le second compte les 4 carreaux des coins.`,
+                `Non : le premier 4 est plus grand que le second, parce qu'il est collé à <em>n</em>.`,
+            ],
+            p1Hints: [
+                `Déplace le curseur : que devient la partie 4<em>n</em> ? Et la partie 4 ? Si elles voulaient dire la même chose, elles changeraient de la même façon.`,
+                ``,
+                `Les deux 4 valent 4. Regarde plutôt ce que chacun compte dans le dessin.`,
+            ],
+            p1Ok: `✅ Oui ! Le 4 de 4<em>n</em> est un <strong>coefficient</strong> : il multiplie <em>n</em>. Le 4 seul est un <strong>terme constant</strong> : 4 carreaux, toujours.`,
+            pickOne: `Choisis d'abord une réponse.`,
+            // Part 2
+            p2Title: `Je décortique`,
+            p2Intro: `Touche un terme d'une expression. Dans le panneau, dis s'il contient une lettre ou si c'est un terme constant, puis donne son coefficient et son degré.`,
+            p2Pick: `Touche un terme pour commencer.`,
+            p2Term: `Terme choisi :`,
+            p2Type: `Ce terme…`,
+            p2HasLetter: `contient une lettre`,
+            p2IsConst: `est un terme constant`,
+            p2Coef: `Coefficient :`,
+            p2Deg: `Degré :`,
+            p2Degree: `<span class="word">Degré d'un terme</span> : le nombre de lettres multipliées dans le terme, en comptant les exposants. <em>x</em> est de degré 1, <em>x</em>² est de degré 2.`,
+            p2NeedType: `Dis d'abord si ce terme contient une lettre.`,
+            p2TypeWrong: `Regarde ce terme : y a-t-il une lettre ? Si la lettre changeait de valeur, ce terme changerait-il ?`,
+            p2CoefEmpty: `Écris le coefficient.`,
+            p2CoefOne: `Quand il n'y a pas de nombre devant la lettre, on prend la lettre combien de fois ? <em>x</em>, c'est une fois <em>x</em>.`,
+            p2CoefMinusOne: `Le signe fait partie du terme : ${M}<em>x</em>, c'est l'opposé d'une fois <em>x</em>.`,
+            p2CoefSign: `Le signe devant le nombre fait partie du terme : regarde s'il y a un ${M}.`,
+            p2CoefOther: `Le coefficient est le nombre qui multiplie la ou les lettres, avec son signe.`,
+            p2ConstSign: `Le signe fait partie du terme : regarde ce qui est écrit juste avant le nombre.`,
+            p2ConstVal: `Écris le terme constant avec son signe.`,
+            p2DegEmpty: `Écris le degré.`,
+            p2DegConst: `Un terme constant ne contient aucune lettre. Combien de lettres sont multipliées ? Ce nombre est son degré.`,
+            p2DegXY: (u, v) => `Compte toutes les lettres du terme : <em>${u}</em> et aussi <em>${v}</em>.`,
+            p2DegSq: l => `<em>${l}</em>², c'est <em>${l}</em>(<em>${l}</em>) : combien de fois la lettre est-elle multipliée ?`,
+            p2DegOther: `Compte les lettres multipliées dans le terme, en tenant compte des exposants.`,
+            p2Const: `Terme constant`,
+            p2Value: `Valeur :`,
+            p2OkLetter: (c, d) => `✅ Coefficient ${c} ; degré ${d}.`,
+            p2OkConst: (d) => `✅ Terme constant ; degré ${d}.`,
+            p2Answer: (t, info) => `Réponse : ${t} — ${info}`,
+            p2Progress: (k, n) => `${k} terme${k > 1 ? 's' : ''} sur ${n} décortiqué${k > 1 ? 's' : ''}`,
+            // Part 3
+            p3Title: `Je trie`,
+            p3Intro: `Regroupe les termes de la même sorte dans des bacs. Glisse une étiquette sur « Nouveau bac » pour créer un bac, ou sur un bac existant. ` +
+                `Sans glisser : touche une étiquette, puis un bac. Pour retirer une étiquette d'un bac, touche-la, puis la zone des étiquettes.`,
+            p3Pool: `Étiquettes à trier`,
+            p3New: `+ Nouveau bac`,
+            p3Bin: i => `Bac ${i}`,
+            p3Sel: t => `Étiquette ${t} choisie : touche un bac.`,
+            p3Left: k => `Il reste ${k} étiquette${k > 1 ? 's' : ''} à placer.`,
+            p3SameCoef: (a, b, u, v) => `Le bac avec ${a} et ${b} : ils ont le même coefficient, mais pas les mêmes lettres. Si <em>${u}</em> vaut 1 et <em>${v}</em> vaut 10, valent-ils la même chose ?`,
+            p3SameLetter: (a, b) => `Le bac avec ${a} et ${b} : même lettre, mais pas le même degré. Dans la piscine, <em>n</em> compte les carreaux d'un côté et <em>n</em>² compte la surface de l'eau : ce n'est pas la même sorte de quantité.`,
+            p3Mixed: (a, b) => `Le bac avec ${a} et ${b} : ces termes n'ont pas les mêmes lettres avec les mêmes exposants.`,
+            p3Split: (a, b) => `${a} et ${b} sont dans deux bacs différents. Ne sont-ils pas de la même sorte ?`,
+            p3SplitConst: `Deux bacs contiennent des termes constants. Les termes constants ne sont-ils pas de la même sorte ?`,
+            p3Ok: `✅ Bravo ! Chaque bac contient des <span class="word">termes semblables</span> : les mêmes lettres, avec les mêmes exposants. Le coefficient et le signe peuvent changer. ` +
+                `Comme dans la piscine, <em>n</em> (un côté) et <em>n</em>² (la surface de l'eau) ne comptent pas la même sorte de quantité.`,
+            p3Answer: groups => `Réponse : ${groups}`,
+            p3Reset: `Tout remettre`,
+            // Part 4
+            p4Title: `Je classe`,
+            p4Intro: `Pour chaque expression, choisis si c'est un monôme, un binôme ou un trinôme, puis donne son degré.<br>` +
+                `<span class="word">Monôme</span> : un seul terme. <span class="word">Binôme</span> : deux termes. <span class="word">Trinôme</span> : trois termes.<br>` +
+                `<span class="word">Degré d'une expression</span> : le plus grand degré parmi ses termes.`,
+            p4Expr: `Expression`, p4Kind: `Sorte`, p4Deg: `Degré`,
+            kinds: [``, `monôme`, `binôme`, `trinôme`],
+            choose: `Choisis…`,
+            p4KindWrong: e => `${e} : compte les termes. Chaque terme est séparé du suivant par + ou ${M}.`,
+            p4DegConst: e => `${e} : ce terme ne contient aucune lettre. Quel est son degré ?`,
+            p4DegXY: (e, u, v) => `${e} : compte toutes les lettres du terme, <em>${u}</em> et <em>${v}</em>.`,
+            p4DegWrong: e => `${e} : trouve le degré de chaque terme ; le degré de l'expression est le plus grand.`,
+            p4Missing: `Remplis chaque ligne.`,
+            p4Ok: `✅ Tout est juste !`,
+            p4Answer: list => `Réponse : ${list}`,
+            // Part 5
+            p5Title: `Je construis`,
+            p5Intro: `Écris une expression réduite qui respecte toutes les conditions. Il y a plusieurs bonnes réponses. Choisis ta lettre (sauf o, l et i, qu'on confond avec 0 et 1). L'app vérifie chaque condition séparément.`,
+            p5: {
+                a: `Un binôme de degré 1 dont le terme constant est ${M}3`,
+                b: `Un trinôme de degré 2 dont le coefficient du terme de degré 1 est 1`,
+                c: `Un monôme de degré 2 dont le coefficient est négatif`,
+                d: `Un binôme dont les deux termes ont le même coefficient, mais ne sont pas semblables`,
+            },
+            c: {
+                mono: `C'est un monôme (un seul terme)`,
+                bi: `C'est un binôme (deux termes)`,
+                tri: `C'est un trinôme (trois termes)`,
+                deg1: `Le degré de l'expression est 1`,
+                deg2: `Le degré de l'expression est 2`,
+                constM3: `Le terme constant est ${M}3`,
+                coef1: `Le terme de degré 1 a le coefficient 1`,
+                neg: `Le coefficient est négatif`,
+                sameCoef: `Les deux termes ont le même coefficient`,
+                notLike: `Les deux termes ne sont pas semblables`,
+            },
+            p5Times: `Pour multiplier, on écrit les lettres côte à côte (2<em>xy</em>) : pas de ×, d'astérisque ni de point.`,
+            p5Paren: `Écris une expression sans parenthèses : seulement des termes séparés par + ou ${M}.`,
+            p5Deg: `Ici, on reste au degré 2 ou moins.`,
+            p5BadLetter: `Évite les lettres o, l et i : on les confond avec 0 et 1. Choisis une autre lettre.`,
+            p5Parse: `Je ne reconnais pas cette écriture. Exemple d'écriture : 5<em>x</em>² ${M} <em>y</em> + 2.`,
+            p5NotReduced: `Ton expression contient des termes semblables : elle n'est pas réduite. Écris-la avec un seul terme de chaque sorte.`,
+            p5Order: `C'est juste ! On écrit habituellement les termes en ordre décroissant de degré.`,
+            p5Ok: `✅ Toutes les conditions sont respectées.`,
+            p5Example: e => `Un exemple de réponse : ${e}`,
+            // Part 6
+            p6Title: `Vrai ou faux ? Justifie`,
+            p6Intro: `Pour chaque énoncé, choisis vrai ou faux, puis la justification qui convient.`,
+            p6S: [
+                `Dans ${M}<em>x</em> + 7, le coefficient de <em>x</em> est 1.`,
+                `3<em>x</em>² et 3<em>x</em> sont des termes semblables.`,
+                `Le degré de 2<em>x</em>² + 5<em>x</em> est 3.`,
+                `5 est un monôme.`,
+                `Dans 4<em>x</em> ${M} 8, le terme constant est 8.`,
+                `3<em>a</em> + 5 et 3<em>t</em> + 5 décrivent la même relation.`,
+            ],
+            p6J: [
+                [`Le terme est ${M}<em>x</em> : on prend <em>x</em> une fois, avec le signe moins, donc le coefficient est ${M}1.`,
+                 `Il n'y a pas de nombre devant <em>x</em>, donc il n'y a pas de coefficient.`,
+                 `Le coefficient est 7, le seul nombre écrit dans l'expression.`],
+                [`Ils ont le même coefficient, donc ils sont semblables.`,
+                 `Ils n'ont pas le même degré : <em>x</em>² et <em>x</em> ne comptent pas la même sorte de quantité.`,
+                 `Ils contiennent la même lettre, donc ils sont semblables.`],
+                [`On additionne les degrés des termes : 2 + 1 = 3.`,
+                 `Le degré de l'expression est le plus grand degré de ses termes : celui de 2<em>x</em>², soit 2.`,
+                 `Le degré est le nombre de termes, soit 2.`],
+                [`Un monôme est une expression d'un seul terme ; 5 est un terme constant.`,
+                 `5 n'a pas de lettre, donc ce n'est pas une expression algébrique.`,
+                 `5 est un monôme parce que son coefficient est 1.`],
+                [`Le signe fait partie du terme : le terme constant est ${M}8.`,
+                 `Le terme constant est 4, le nombre devant <em>x</em>.`,
+                 `Il n'y a pas de terme constant, car on soustrait 8.`],
+                [`Seule la lettre change : ce qui compte, c'est le nombre qu'elle représente. Dans les deux cas, on prend 3 fois ce nombre, puis on ajoute 5.`,
+                 `La relation change, car <em>a</em> et <em>t</em> ne sont pas la même lettre.`,
+                 `Les deux expressions sont égales parce que <em>a</em> et <em>t</em> valent toujours 5.`],
+            ],
+            tru: `Vrai`, fal: `Faux`,
+            just: `Justification :`,
+            p6NeedTF: `Choisis vrai ou faux.`,
+            p6NeedJ: `Choisis une justification.`,
+            p6TFWrong: [
+                `Relis le terme : ${M}<em>x</em>. Le signe fait-il partie du terme ?`,
+                `Les termes semblables ont les mêmes lettres avec les mêmes exposants. Est-ce le cas ici ?`,
+                `Trouve le degré de chaque terme. Le degré de l'expression est-il une somme ?`,
+                `Combien de termes l'expression 5 contient-elle ?`,
+                `Relis ce qui est écrit juste avant le 8.`,
+                `Si <em>a</em> et <em>t</em> représentent le même nombre, par exemple 10, que donnent 3<em>a</em> + 5 et 3<em>t</em> + 5 ?`,
+            ],
+            p6JWrong: `Ta réponse vrai ou faux est juste, mais cette justification ne l'explique pas. Relis les autres choix.`,
+            p6Ok: `✅ Juste, et bien justifié !`,
+            p6Answer: (tf, j) => `Réponse : ${tf}. ${j}`,
+            // Lexicon
+            lexTitle: `📎 Les mots de l'algèbre`,
+            lex: [
+                [`Terme`, `Chaque partie d'une expression séparée par + ou ${M}, avec son signe.`, `Dans 4<em>n</em> + 4 (la piscine), les termes sont 4<em>n</em> et 4.`],
+                [`Coefficient`, `Le nombre qui multiplie la ou les lettres d'un terme : combien de fois on prend la lettre, avec le signe.`, `Dans 4<em>n</em>, le coefficient est 4 : 4 côtés de <em>n</em> carreaux. Dans ${M}<em>x</em>, c'est ${M}1.`],
+                [`Terme constant`, `Un terme sans lettre : sa valeur ne change pas quand la lettre change.`, `Les 4 coins de la piscine : toujours 4 carreaux. Dans 4<em>t</em> ${M} 8 (les autocollants), c'est ${M}8.`],
+                [`Degré d'un terme`, `Le nombre de lettres multipliées dans le terme, en comptant les exposants.`, `<em>n</em> (un côté de la piscine) est de degré 1 ; <em>n</em>² (la surface de l'eau) est de degré 2 ; 4 est de degré 0.`],
+                [`Degré d'une expression`, `Le plus grand degré parmi ses termes.`, `4<em>n</em> + 4 est de degré 1 ; <em>n</em>² + 4<em>n</em> + 4 (l'eau et la bordure) est de degré 2.`],
+                [`Termes semblables`, `Des termes qui ont les mêmes lettres avec les mêmes exposants : ils comptent la même sorte de quantité.`, `Dans 2<em>n</em> + 4 + 2<em>n</em> (la piscine), les deux 2<em>n</em> sont semblables ; <em>n</em> et <em>n</em>² ne le sont pas.`],
+                [`Monôme`, `Une expression d'un seul terme.`, `3<em>a</em> (les canettes de Léa) ; <em>n</em>² (la surface de l'eau).`],
+                [`Binôme`, `Une expression de deux termes.`, `4<em>n</em> + 4 (la bordure) ; 5<em>a</em> + 12 (les canettes).`],
+                [`Trinôme`, `Une expression de trois termes.`, `<em>n</em>² + 4<em>n</em> + 4 : les carreaux d'eau et ceux de la bordure, ensemble.`],
+            ],
+        },
+        en: {
+            title: `📖 The words of algebra`,
+            concept: `The words of algebra are for talking about the expressions you have already built. ` +
+                `Each word comes from what it means. The <strong>📎 The words of algebra</strong> panel, at the bottom of the screen, gathers them all.`,
+            nav: [`1. What changes`, `2. Take apart`, `3. Sort`, `4. Classify`, `5. Build`, `6. True or false?`],
+            check: `Check`, reveal: `Show the answer`,
+            lexBtn: `📎 The words of algebra`, lexClose: `Close`,
+            p1Title: `What changes, what does not`,
+            p1Intro: `Here is the pool: <em>n</em> tiles on each side, with a border around it. The number of border tiles is 4<em>n</em> + 4. Move the slider and tap each part of the expression.`,
+            nVal: n => `<em>n</em> = ${n}`,
+            nLabel: `Value of <em>n</em>`,
+            side: (n) => `4<em>n</em> = 4(${n}) = ${4 * n} tiles: the 4 sides of ${n} tiles. <strong>It changes</strong> when <em>n</em> changes.`,
+            corner: `4 = 4 tiles: the corners. <strong>It does not change</strong> when <em>n</em> changes.`,
+            p1Words: `<span class="word">Term</span>: each part of an expression separated by + or ${M}. In 4<em>n</em> + 4, there are two terms: 4<em>n</em> and 4.<br>` +
+                `<span class="word">Constant term</span>: the term that does not change when <em>n</em> changes. Here it is 4, the four corners.<br>` +
+                `<span class="word">Coefficient</span>: in 4<em>n</em>, the number 4 tells how many times we take <em>n</em>: 4 sides of <em>n</em> tiles.`,
+            p1Q: `In 4<em>n</em> + 4, do the two 4s mean the same thing?`,
+            p1Choices: [
+                `Yes: it is the same number, written twice.`,
+                `No: the first 4 tells how many sides of <em>n</em> tiles we count; the second counts the 4 corner tiles.`,
+                `No: the first 4 is bigger than the second, because it is next to <em>n</em>.`,
+            ],
+            p1Hints: [
+                `Move the slider: what happens to the 4<em>n</em> part? And to the 4 part? If they meant the same thing, they would change in the same way.`,
+                ``,
+                `Both 4s are worth 4. Look instead at what each one counts in the drawing.`,
+            ],
+            p1Ok: `✅ Yes! The 4 in 4<em>n</em> is a <strong>coefficient</strong>: it multiplies <em>n</em>. The 4 on its own is a <strong>constant term</strong>: 4 tiles, always.`,
+            pickOne: `First choose an answer.`,
+            p2Title: `I take apart`,
+            p2Intro: `Tap a term of an expression. In the panel, say whether it contains a letter or is a constant term, then give its coefficient and its degree.`,
+            p2Pick: `Tap a term to start.`,
+            p2Term: `Chosen term:`,
+            p2Type: `This term…`,
+            p2HasLetter: `contains a letter`,
+            p2IsConst: `is a constant term`,
+            p2Coef: `Coefficient:`,
+            p2Deg: `Degree:`,
+            p2Degree: `<span class="word">Degree of a term</span>: the number of letters multiplied in the term, counting the exponents. <em>x</em> has degree 1, <em>x</em>² has degree 2.`,
+            p2NeedType: `First say whether this term contains a letter.`,
+            p2TypeWrong: `Look at this term: is there a letter? If the letter changed value, would this term change?`,
+            p2CoefEmpty: `Write the coefficient.`,
+            p2CoefOne: `When there is no number in front of the letter, how many times do we take the letter? <em>x</em> is one <em>x</em>.`,
+            p2CoefMinusOne: `The sign is part of the term: ${M}<em>x</em> is the opposite of one <em>x</em>.`,
+            p2CoefSign: `The sign in front of the number is part of the term: check whether there is a ${M}.`,
+            p2CoefOther: `The coefficient is the number that multiplies the letter or letters, with its sign.`,
+            p2ConstSign: `The sign is part of the term: look at what is written just before the number.`,
+            p2ConstVal: `Write the constant term with its sign.`,
+            p2DegEmpty: `Write the degree.`,
+            p2DegConst: `A constant term contains no letter. How many letters are multiplied? That number is its degree.`,
+            p2DegXY: (u, v) => `Count all the letters in the term: <em>${u}</em> and also <em>${v}</em>.`,
+            p2DegSq: l => `<em>${l}</em>² is <em>${l}</em>(<em>${l}</em>): how many times is the letter multiplied?`,
+            p2DegOther: `Count the letters multiplied in the term, taking the exponents into account.`,
+            p2Const: `Constant term`,
+            p2Value: `Value:`,
+            p2OkLetter: (c, d) => `✅ Coefficient ${c}; degree ${d}.`,
+            p2OkConst: (d) => `✅ Constant term; degree ${d}.`,
+            p2Answer: (t, info) => `Answer: ${t} — ${info}`,
+            p2Progress: (k, n) => `${k} of ${n} terms taken apart`,
+            p3Title: `I sort`,
+            p3Intro: `Group the terms of the same kind in bins. Drag a label onto “New bin” to create a bin, or onto an existing bin. ` +
+                `Without dragging: tap a label, then a bin. To take a label out of a bin, tap it, then the label area.`,
+            p3Pool: `Labels to sort`,
+            p3New: `+ New bin`,
+            p3Bin: i => `Bin ${i}`,
+            p3Sel: t => `Label ${t} selected: tap a bin.`,
+            p3Left: k => `${k} label${k > 1 ? 's' : ''} left to place.`,
+            p3SameCoef: (a, b, u, v) => `The bin with ${a} and ${b}: same coefficient, but not the same letters. If <em>${u}</em> is 1 and <em>${v}</em> is 10, are they worth the same?`,
+            p3SameLetter: (a, b) => `The bin with ${a} and ${b}: same letter, but not the same degree. In the pool, <em>n</em> counts the tiles of one side and <em>n</em>² counts the water surface: not the same kind of quantity.`,
+            p3Mixed: (a, b) => `The bin with ${a} and ${b}: these terms do not have the same letters with the same exponents.`,
+            p3Split: (a, b) => `${a} and ${b} are in two different bins. Aren't they of the same kind?`,
+            p3SplitConst: `Two bins contain constant terms. Aren't constant terms of the same kind?`,
+            p3Ok: `✅ Well done! Each bin contains <span class="word">like terms</span>: the same letters, with the same exponents. The coefficient and the sign can change. ` +
+                `As in the pool, <em>n</em> (one side) and <em>n</em>² (the water surface) do not count the same kind of quantity.`,
+            p3Answer: groups => `Answer: ${groups}`,
+            p3Reset: `Put everything back`,
+            p4Title: `I classify`,
+            p4Intro: `For each expression, choose whether it is a monomial, a binomial or a trinomial, then give its degree.<br>` +
+                `<span class="word">Monomial</span>: one term. <span class="word">Binomial</span>: two terms. <span class="word">Trinomial</span>: three terms.<br>` +
+                `<span class="word">Degree of an expression</span>: the highest degree among its terms.`,
+            p4Expr: `Expression`, p4Kind: `Kind`, p4Deg: `Degree`,
+            kinds: [``, `monomial`, `binomial`, `trinomial`],
+            choose: `Choose…`,
+            p4KindWrong: e => `${e}: count the terms. Each term is separated from the next by + or ${M}.`,
+            p4DegConst: e => `${e}: this term contains no letter. What is its degree?`,
+            p4DegXY: (e, u, v) => `${e}: count all the letters in the term, <em>${u}</em> and <em>${v}</em>.`,
+            p4DegWrong: e => `${e}: find the degree of each term; the degree of the expression is the highest.`,
+            p4Missing: `Fill in every row.`,
+            p4Ok: `✅ Everything is right!`,
+            p4Answer: list => `Answer: ${list}`,
+            p5Title: `I build`,
+            p5Intro: `Write a simplified expression that meets every condition. There are several right answers. Choose your letter (except o, l and i, which look like 0 and 1). The app checks each condition separately.`,
+            p5: {
+                a: `A binomial of degree 1 whose constant term is ${M}3`,
+                b: `A trinomial of degree 2 whose degree-1 term has coefficient 1`,
+                c: `A monomial of degree 2 whose coefficient is negative`,
+                d: `A binomial whose two terms have the same coefficient, but are not like terms`,
+            },
+            c: {
+                mono: `It is a monomial (one term)`,
+                bi: `It is a binomial (two terms)`,
+                tri: `It is a trinomial (three terms)`,
+                deg1: `The degree of the expression is 1`,
+                deg2: `The degree of the expression is 2`,
+                constM3: `The constant term is ${M}3`,
+                coef1: `The degree-1 term has coefficient 1`,
+                neg: `The coefficient is negative`,
+                sameCoef: `The two terms have the same coefficient`,
+                notLike: `The two terms are not like terms`,
+            },
+            p5Times: `To multiply, write the letters side by side (2<em>xy</em>): no ×, asterisk or dot.`,
+            p5Paren: `Write an expression without parentheses: only terms separated by + or ${M}.`,
+            p5Deg: `Here we stay at degree 2 or less.`,
+            p5BadLetter: `Avoid the letters o, l and i: they look like 0 and 1. Choose another letter.`,
+            p5Parse: `I don't recognize this. Example of writing: 5<em>x</em>² ${M} <em>y</em> + 2.`,
+            p5NotReduced: `Your expression contains like terms: it is not simplified. Write it with only one term of each kind.`,
+            p5Order: `That's right! We usually write the terms in decreasing order of degree.`,
+            p5Ok: `✅ Every condition is met.`,
+            p5Example: e => `An example of an answer: ${e}`,
+            p6Title: `True or false? Justify`,
+            p6Intro: `For each statement, choose true or false, then the right justification.`,
+            p6S: [
+                `In ${M}<em>x</em> + 7, the coefficient of <em>x</em> is 1.`,
+                `3<em>x</em>² and 3<em>x</em> are like terms.`,
+                `The degree of 2<em>x</em>² + 5<em>x</em> is 3.`,
+                `5 is a monomial.`,
+                `In 4<em>x</em> ${M} 8, the constant term is 8.`,
+                `3<em>a</em> + 5 and 3<em>t</em> + 5 describe the same relation.`,
+            ],
+            p6J: [
+                [`The term is ${M}<em>x</em>: we take <em>x</em> once, with the minus sign, so the coefficient is ${M}1.`,
+                 `There is no number in front of <em>x</em>, so there is no coefficient.`,
+                 `The coefficient is 7, the only number written in the expression.`],
+                [`They have the same coefficient, so they are like terms.`,
+                 `They do not have the same degree: <em>x</em>² and <em>x</em> do not count the same kind of quantity.`,
+                 `They contain the same letter, so they are like terms.`],
+                [`We add the degrees of the terms: 2 + 1 = 3.`,
+                 `The degree of the expression is the highest degree of its terms: that of 2<em>x</em>², which is 2.`,
+                 `The degree is the number of terms, which is 2.`],
+                [`A monomial is an expression with one term; 5 is a constant term.`,
+                 `5 has no letter, so it is not an algebraic expression.`,
+                 `5 is a monomial because its coefficient is 1.`],
+                [`The sign is part of the term: the constant term is ${M}8.`,
+                 `The constant term is 4, the number in front of <em>x</em>.`,
+                 `There is no constant term, because 8 is subtracted.`],
+                [`Only the letter changes: what matters is the number it stands for. In both cases, we take 3 times that number, then add 5.`,
+                 `The relation changes, because <em>a</em> and <em>t</em> are not the same letter.`,
+                 `The two expressions are equal because <em>a</em> and <em>t</em> are always 5.`],
+            ],
+            tru: `True`, fal: `False`,
+            just: `Justification:`,
+            p6NeedTF: `Choose true or false.`,
+            p6NeedJ: `Choose a justification.`,
+            p6TFWrong: [
+                `Read the term again: ${M}<em>x</em>. Is the sign part of the term?`,
+                `Like terms have the same letters with the same exponents. Is that the case here?`,
+                `Find the degree of each term. Is the degree of the expression a sum?`,
+                `How many terms does the expression 5 contain?`,
+                `Read what is written just before the 8.`,
+                `If <em>a</em> and <em>t</em> stand for the same number, for example 10, what do 3<em>a</em> + 5 and 3<em>t</em> + 5 give?`,
+            ],
+            p6JWrong: `Your true or false answer is right, but this justification does not explain it. Read the other choices again.`,
+            p6Ok: `✅ Right, and well justified!`,
+            p6Answer: (tf, j) => `Answer: ${tf}. ${j}`,
+            lexTitle: `📎 The words of algebra`,
+            lex: [
+                [`Term`, `Each part of an expression separated by + or ${M}, with its sign.`, `In 4<em>n</em> + 4 (the pool), the terms are 4<em>n</em> and 4.`],
+                [`Coefficient`, `The number that multiplies the letter or letters of a term: how many times we take the letter, with the sign.`, `In 4<em>n</em>, the coefficient is 4: 4 sides of <em>n</em> tiles. In ${M}<em>x</em>, it is ${M}1.`],
+                [`Constant term`, `A term with no letter: its value does not change when the letter changes.`, `The 4 corners of the pool: always 4 tiles. In 4<em>t</em> ${M} 8 (the stickers), it is ${M}8.`],
+                [`Degree of a term`, `The number of letters multiplied in the term, counting the exponents.`, `<em>n</em> (one side of the pool) has degree 1; <em>n</em>² (the water surface) has degree 2; 4 has degree 0.`],
+                [`Degree of an expression`, `The highest degree among its terms.`, `4<em>n</em> + 4 has degree 1; <em>n</em>² + 4<em>n</em> + 4 (the water and the border) has degree 2.`],
+                [`Like terms`, `Terms with the same letters and the same exponents: they count the same kind of quantity.`, `In 2<em>n</em> + 4 + 2<em>n</em> (the pool), the two 2<em>n</em> are like terms; <em>n</em> and <em>n</em>² are not.`],
+                [`Monomial`, `An expression with one term.`, `3<em>a</em> (Léa's cans); <em>n</em>² (the water surface).`],
+                [`Binomial`, `An expression with two terms.`, `4<em>n</em> + 4 (the border); 5<em>a</em> + 12 (the cans).`],
+                [`Trinomial`, `An expression with three terms.`, `<em>n</em>² + 4<em>n</em> + 4: the water tiles and the border tiles, together.`],
+            ],
+        },
+    };
+
+    const state = {
+        lang: Langue.lang,          // shared language, see commun/langue.js
+        n: 5, p1Sel: null, p1Choice: null, p1Fb: null,
+        p2Sel: null,                // [expression index, term index]
+        p2: {},                     // "e,t" → { type, coef, deg, done, revealed, fb }
+        p3Pool: P3_TAGS.map((_, i) => i), p3Bins: [], p3Sel: null, p3Fb: null,
+        p4: P4_EXPRS.map(() => ({ kind: '', deg: '' })), p4Fb: null,
+        p5: Object.fromEntries(P5.map(k => [k, { text: '', res: null, fb: null }])),
+        p6: P6.map(() => ({ tf: null, j: '', fb: null })),
+    };
+
+    const $ = id => document.getElementById(id);
+    const s = () => STR[state.lang];
+    const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const fb = f => f ? `<div class="feedback ${f.cls}">${f.html}</div>` : '';
+    const intVal = v => /^\s*[−-]?\d+\s*$/.test(v) ? Number(v.replace('−', '-')) : NaN;
+
+    // Re-render a part, then give the focus back to the same control
+    function rerender(fn) {
+        const a = document.activeElement;
+        const key = a && (a.id || a.dataset.key);
+        fn();
+        if (!key) return;
+        const el = $(key) || document.querySelector(`[data-key="${CSS.escape(key)}"]`);
+        if (el) el.focus();
+    }
+
+    // ── Partie 1 ──
+    function poolSvg(n) {
+        const N = n + 2, S = 10, sel = state.p1Sel;
+        let h = `<svg class="pool" viewBox="-1 -1 ${N * S + 2} ${N * S + 2}" role="img" aria-label="4n + 4">`;
+        h += `<rect x="${S}" y="${S}" width="${n * S}" height="${n * S}" fill="#d7e8f7"/>`;
+        for (let r = 0; r < N; r++) for (let c = 0; c < N; c++) {
+            if (r > 0 && r < N - 1 && c > 0 && c < N - 1) continue;
+            const corner = (r === 0 || r === N - 1) && (c === 0 || c === N - 1);
+            const part = corner ? 'corner' : 'side';
+            const col = corner ? '#c84a16' : '#1f5fa8';
+            const faded = sel && sel !== part;
+            h += `<rect x="${c * S + 0.5}" y="${r * S + 0.5}" width="9" height="9" rx="1" fill="${faded ? '#e3e8f0' : col}"/>`;
+        }
+        return h + '</svg>';
+    }
+    function renderP1() {
+        const t = s(), n = state.n, st = state;
+        const btn = (part, html) => `<button type="button" class="term-btn t-${part}${st.p1Sel === part ? ' active' : ''}" data-key="p1-${part}" data-p1="${part}" aria-pressed="${st.p1Sel === part}">${html}</button>`;
+        $('p1').innerHTML =
+            `<p class="intro">${t.p1Intro}</p>` +
+            `<div class="n-row"><label for="nRange">${t.nLabel}</label><input type="range" id="nRange" min="1" max="20" value="${n}"><span class="n-val">${t.nVal(n)}</span></div>` +
+            `<div class="pool-wrap"><div>${poolSvg(n)}</div><div>` +
+            `<div class="big-expr">${btn('side', '4<em>n</em>')} + ${btn('corner', '4')}</div>` +
+            `<div class="readout" aria-live="polite">` +
+            (st.p1Sel !== 'corner' ? `<div class="side">${t.side(n)}</div>` : '') +
+            (st.p1Sel !== 'side' ? `<div class="corner">${t.corner}</div>` : '') +
+            `</div></div></div>` +
+            `<div class="concept-box">${t.p1Words}</div>` +
+            `<h3>${t.p1Q}</h3>` +
+            t.p1Choices.map((c, i) => `<label class="choice"><input type="radio" name="p1q" value="${i}"${st.p1Choice === i ? ' checked' : ''}> <span>${c}</span></label>`).join('') +
+            `<div class="center"><button type="button" class="btn" id="p1Check">${t.check}</button></div>` + fb(st.p1Fb);
+    }
+
+    // ── Partie 2 ──
+    function termInfo(tm) {
+        const t = s();
+        return isConst(tm) ? `${t.p2Const} ; ${t.p2Deg.replace(/ ?:$/, '')} 0` :
+            `${t.p2Coef.replace(/ ?:$/, '')} ${fmtNum(tm.c)} ; ${t.p2Deg.replace(/ ?:$/, '')} ${degree(tm)}`;
+    }
+    const fmtNum = v => (v < 0 ? M : '') + Math.abs(v);
+    function renderP2() {
+        const t = s();
+        const total = P2_EXPRS.reduce((a, e) => a + e.length, 0);
+        const done = Object.values(state.p2).filter(x => x.done).length;
+        let h = `<p class="intro">${t.p2Intro}</p><div class="concept-box">${t.p2Degree}</div>`;
+        P2_EXPRS.forEach((ex, ei) => {
+            h += `<div class="expr-line"><span class="expr-label">${ei + 1}.</span>` + ex.map((tm, ti) => {
+                const k = `${ei},${ti}`, st = state.p2[k] || {};
+                const active = state.p2Sel === k;
+                const sep = ti === 0 ? '' : `<span aria-hidden="true">${tm.c < 0 ? '' : '+'}</span>`;
+                return `${sep}<button type="button" class="chip-term${active ? ' active' : ''}${st.done ? ' done' : ''}" data-key="t-${k}" data-term="${k}" aria-pressed="${active}">${fmtTermAlone(tm)}</button>`;
+            }).join(' ') + `</div>`;
+        });
+        h += `<p class="center note" style="font-weight:800">${t.p2Progress(done, total)}</p>`;
+        h += `<div class="term-panel" id="p2Panel">${panelHtml()}</div>`;
+        $('p2').innerHTML = h;
+    }
+    function panelHtml() {
+        const t = s();
+        if (!state.p2Sel) return `<p class="center">${t.p2Pick}</p>`;
+        const [ei, ti] = state.p2Sel.split(',').map(Number);
+        const tm = P2_EXPRS[ei][ti];
+        const st = state.p2[state.p2Sel] = state.p2[state.p2Sel] || { type: '', coef: '', deg: '' };
+        let h = `<div class="big">${t.p2Term} ${fmtTermAlone(tm)}</div>`;
+        h += `<div class="row" role="radiogroup" aria-label="${plain(t.p2Type)}"><span>${t.p2Type}</span>` +
+            `<label class="choice"><input type="radio" name="p2type" value="letter"${st.type === 'letter' ? ' checked' : ''}> <span>${t.p2HasLetter}</span></label>` +
+            `<label class="choice"><input type="radio" name="p2type" value="const"${st.type === 'const' ? ' checked' : ''}> <span>${t.p2IsConst}</span></label></div>`;
+        h += `<div class="row">` +
+            (st.type === 'const'
+                ? `<label for="p2Coef">${t.p2Value}</label>`
+                : `<label for="p2Coef">${t.p2Coef}</label>`) +
+            `<input class="num-input${st.done ? ' ok-field' : ''}" id="p2Coef" type="text" inputmode="numeric" autocomplete="off" value="${esc(st.coef)}">` +
+            `<label for="p2Deg">${t.p2Deg}</label><input class="num-input${st.done ? ' ok-field' : ''}" id="p2Deg" type="text" inputmode="numeric" autocomplete="off" value="${esc(st.deg)}">` +
+            `<button type="button" class="btn" id="p2Check">${t.check}</button>` +
+            `<button type="button" class="btn light" id="p2Reveal">${t.reveal}</button></div>`;
+        return h + fb(st.fb);
+    }
+    function checkP2() {
+        const t = s(), k = state.p2Sel, st = state.p2[k];
+        const [ei, ti] = k.split(',').map(Number);
+        const tm = P2_EXPRS[ei][ti];
+        const c = intVal(st.coef), d = intVal(st.deg);
+        const konst = isConst(tm);
+        let msg = null;
+        if (!st.type) msg = t.p2NeedType;
+        else if ((st.type === 'const') !== konst) msg = t.p2TypeWrong;
+        else if (isNaN(c)) msg = konst ? t.p2ConstVal : t.p2CoefEmpty;
+        else if (c !== tm.c) {
+            if (konst) msg = c === -tm.c ? t.p2ConstSign : t.p2ConstVal;
+            else if (tm.c === 1) msg = t.p2CoefOne;
+            else if (tm.c === -1) msg = (c === 1 || c === 0) ? t.p2CoefMinusOne : t.p2CoefOther;
+            else msg = c === -tm.c ? t.p2CoefSign : t.p2CoefOther;
+        }
+        else if (isNaN(d)) msg = t.p2DegEmpty;
+        else if (d !== degree(tm)) {
+            if (konst) msg = t.p2DegConst;
+            else if (Object.keys(tm.v).length === 2) msg = t.p2DegXY(...Object.keys(tm.v).sort());
+            else if (Object.values(tm.v).includes(2)) msg = t.p2DegSq(Object.keys(tm.v)[0]);
+            else msg = t.p2DegOther;
+        }
+        if (msg) st.fb = { cls: 'hint', html: msg };
+        else { st.done = true; st.fb = { cls: 'ok', html: konst ? t.p2OkConst(0) : t.p2OkLetter(fmtNum(tm.c), degree(tm)) }; }
+        rerender(renderP2);
+    }
+
+    // ── Partie 3 : trier ──
+    function tagHtml(i) {
+        const sel = state.p3Sel === i;
+        return `<button type="button" class="tag${sel ? ' sel' : ''}" data-tag="${i}" data-key="tag-${i}" data-drag="1" aria-pressed="${sel}">${fmtTermAlone(P3_TAGS[i])}</button>`;
+    }
+    function renderP3() {
+        const t = s();
+        let h = `<p class="intro">${t.p3Intro}</p>`;
+        h += `<div class="tags-pool" data-drop="pool" data-key="pool" tabindex="-1" aria-label="${t.p3Pool}">${state.p3Pool.map(tagHtml).join('')}</div>`;
+        h += `<div class="pool-label">${t.p3Pool}</div>`;
+        h += `<div class="bins">` + state.p3Bins.map((bin, b) =>
+            `<div class="bin" role="button" tabindex="0" data-drop="bin" data-bin="${b}" data-key="bin-${b}" aria-label="${t.p3Bin(b + 1)}"><span class="bin-title">${t.p3Bin(b + 1)}</span><span class="bin-tags">${bin.map(tagHtml).join('')}</span></div>`).join('') +
+            `<button type="button" class="bin new" data-drop="new" data-key="bin-new">${t.p3New}</button></div>`;
+        h += `<div class="row"><button type="button" class="btn" id="p3Check">${t.check}</button><button type="button" class="btn light" id="p3Reset">${t.p3Reset}</button><button type="button" class="btn light" id="p3Reveal">${t.reveal}</button></div>`;
+        h += fb(state.p3Fb);
+        $('p3').innerHTML = h;
+    }
+    function moveTag(i, target) {
+        // target: 'pool' | 'new' | bin index
+        state.p3Pool = state.p3Pool.filter(x => x !== i);
+        state.p3Bins = state.p3Bins.map(b => b.filter(x => x !== i));
+        if (target === 'pool') state.p3Pool.push(i);
+        else if (target === 'new') state.p3Bins.push([i]);
+        else state.p3Bins[target].push(i);
+        state.p3Bins = state.p3Bins.filter(b => b.length);
+        state.p3Sel = null;
+        state.p3Fb = null;
+    }
+    function checkP3() {
+        const t = s();
+        const name = i => fmtTermAlone(P3_TAGS[i]);
+        let msg = null;
+        if (state.p3Pool.length) msg = t.p3Left(state.p3Pool.length);
+        // A bin mixing different kinds
+        for (const bin of state.p3Bins) {
+            if (msg) break;
+            for (let a = 0; a < bin.length && !msg; a++) for (let b = a + 1; b < bin.length && !msg; b++) {
+                const A = P3_TAGS[bin[a]], B = P3_TAGS[bin[b]];
+                if (keyOf(A) === keyOf(B)) continue;
+                const la = Object.keys(A.v).join(''), lb = Object.keys(B.v).join('');
+                if (A.c === B.c) msg = t.p3SameCoef(name(bin[a]), name(bin[b]), Object.keys(A.v)[0] || 'a', Object.keys(B.v)[0] || 'b');
+                else if (la && la === lb) msg = t.p3SameLetter(name(bin[a]), name(bin[b]));
+                else msg = t.p3Mixed(name(bin[a]), name(bin[b]));
+            }
+        }
+        // One kind split over several bins
+        if (!msg) {
+            const where = {};
+            state.p3Bins.forEach((bin, b) => bin.forEach(i => { (where[keyOf(P3_TAGS[i])] = where[keyOf(P3_TAGS[i])] || []).push([b, i]); }));
+            for (const [k, list] of Object.entries(where)) {
+                const bins = new Set(list.map(x => x[0]));
+                if (bins.size > 1) {
+                    if (k === '') msg = t.p3SplitConst;
+                    else { const [x, y] = list.filter((v, j) => j === 0 || v[0] !== list[0][0]).slice(0, 2); msg = t.p3Split(name(x[1]), name(y[1])); }
+                    break;
+                }
+            }
+        }
+        state.p3Fb = msg ? { cls: 'hint', html: msg } : { cls: 'ok', html: t.p3Ok };
+        rerender(renderP3);
+    }
+    function revealP3() {
+        const groups = {};
+        P3_TAGS.forEach((tm, i) => { (groups[keyOf(tm)] = groups[keyOf(tm)] || []).push(i); });
+        state.p3Fb = { cls: 'info', html: s().p3Answer(Object.values(groups).map(g => `{ ${g.map(i => fmtTermAlone(P3_TAGS[i])).join(' ; ')} }`).join(' ')) };
+        rerender(renderP3);
+    }
+
+    // Drag and drop (mouse, finger, pen) ; click and keyboard do the same thing
+    let drag = null, suppressClick = false;
+    document.addEventListener('pointerdown', e => {
+        const el = e.target.closest('#p3 [data-drag]');
+        if (!el || e.button > 0) return;
+        drag = { el, i: Number(el.dataset.tag), x0: e.clientX, y0: e.clientY, on: false, over: null };
+    });
+    window.addEventListener('pointermove', e => {
+        if (!drag) return;
+        if (!drag.on) {
+            if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) < 6) return;
+            drag.on = true;
+            drag.ghost = drag.el.cloneNode(true);
+            drag.ghost.classList.add('ghost');
+            drag.ghost.removeAttribute('data-tag');
+            document.body.appendChild(drag.ghost);
+            drag.el.classList.add('dragging');
+        }
+        e.preventDefault();
+        drag.ghost.style.left = e.clientX + 'px';
+        drag.ghost.style.top = e.clientY + 'px';
+        const t = document.elementFromPoint(e.clientX, e.clientY);
+        const over = t && t.closest('#p3 [data-drop]');
+        if (over !== drag.over) { drag.over && drag.over.classList.remove('over'); over && over.classList.add('over'); drag.over = over; }
+    }, { passive: false });
+    function endDrag(e, cancel) {
+        if (!drag) return;
+        const d = drag; drag = null;
+        if (!d.on) return;
+        d.ghost.remove();
+        d.el.classList.remove('dragging');
+        suppressClick = true;
+        setTimeout(() => { suppressClick = false; }, 50);
+        if (cancel || !d.over) { d.over && d.over.classList.remove('over'); return; }
+        const tg = d.over.dataset.drop === 'bin' ? Number(d.over.dataset.bin) : d.over.dataset.drop;
+        moveTag(d.i, tg);
+        renderP3();
+    }
+    window.addEventListener('pointerup', e => endDrag(e, false));
+    window.addEventListener('pointercancel', e => endDrag(e, true));
+
+    // ── Partie 4 ──
+    function renderP4() {
+        const t = s();
+        let h = `<div class="concept-box">${t.p4Intro}</div><div style="overflow-x:auto"><table class="grid-table"><tr><th>${t.p4Expr}</th><th>${t.p4Kind}</th><th>${t.p4Deg}</th></tr>`;
+        P4_EXPRS.forEach((ex, i) => {
+            const st = state.p4[i];
+            h += `<tr><td class="ex">${fmtExpr(ex.terms)}</td>` +
+                `<td><select id="p4k${i}" data-p4="${i}" data-field="kind" aria-label="${t.p4Kind} : ${plain(fmtExpr(ex.terms))}"><option value="">${t.choose}</option>` +
+                [1, 2, 3].map(k => `<option value="${k}"${String(st.kind) === String(k) ? ' selected' : ''}>${t.kinds[k]}</option>`).join('') + `</select></td>` +
+                `<td><select id="p4d${i}" data-p4="${i}" data-field="deg" aria-label="${t.p4Deg} : ${plain(fmtExpr(ex.terms))}"><option value="">${t.choose}</option>` +
+                [0, 1, 2].map(k => `<option value="${k}"${String(st.deg) === String(k) ? ' selected' : ''}>${k}</option>`).join('') + `</select></td></tr>`;
+        });
+        h += `</table></div><div class="row"><button type="button" class="btn" id="p4Check">${t.check}</button><button type="button" class="btn light" id="p4Reveal">${t.reveal}</button></div>` + fb(state.p4Fb);
+        $('p4').innerHTML = h;
+    }
+    function checkP4() {
+        const t = s();
+        let msg = null;
+        for (let i = 0; i < P4_EXPRS.length && !msg; i++) {
+            const ex = P4_EXPRS[i], st = state.p4[i], e = fmtExpr(ex.terms);
+            if (st.kind === '' || st.deg === '') msg = t.p4Missing;
+            else if (Number(st.kind) !== ex.kind) msg = t.p4KindWrong(e);
+            else if (Number(st.deg) !== ex.deg) {
+                if (ex.deg === 0) msg = t.p4DegConst(e);
+                else if (ex.terms.some(tm => Object.keys(tm.v).length === 2)) msg = t.p4DegXY(e, ...Object.keys(ex.terms.find(tm => Object.keys(tm.v).length === 2).v).sort());
+                else msg = t.p4DegWrong(e);
+            }
+        }
+        state.p4Fb = msg ? { cls: 'hint', html: msg } : { cls: 'ok', html: t.p4Ok };
+        rerender(renderP4);
+    }
+
+    // ── Partie 5 : conditions vérifiées une par une ──
+    function conditions(k, terms) {
+        const deg = Math.max(...terms.map(degree));
+        const n = terms.length;
+        const C = s().c;
+        if (k === 'a') return [
+            [C.bi, n === 2],
+            [C.deg1, deg === 1],
+            [C.constM3, terms.some(tm => isConst(tm) && tm.c === -3)],
+        ];
+        if (k === 'b') {
+            const d1 = terms.filter(tm => degree(tm) === 1);
+            return [[C.tri, n === 3], [C.deg2, deg === 2], [C.coef1, d1.length === 1 && d1[0].c === 1]];
+        }
+        if (k === 'c') return [[C.mono, n === 1], [C.deg2, deg === 2], [C.neg, n === 1 ? terms[0].c < 0 : terms.every(tm => tm.c < 0)]];
+        return [
+            [C.bi, n === 2],
+            [C.sameCoef, n === 2 && terms[0].c === terms[1].c],
+            [C.notLike, n === 2 && keyOf(terms[0]) !== keyOf(terms[1])],
+        ];
+    }
+    // Examples shown on request; the student may use any allowed letter
+    const P5_EXAMPLE = { a: '2a - 3', b: 'y² + y + 5', c: '-3k²', d: '4x + 4' };
+    function renderP5() {
+        const t = s();
+        let h = `<p class="intro">${t.p5Intro}</p>`;
+        P5.forEach(k => {
+            const st = state.p5[k];
+            let list = '';
+            if (st.res) list = `<ul class="conds">` + st.res.map(([lbl, okk]) => `<li class="${okk ? 'yes' : 'no'}">${okk ? '✓' : '✗'} ${lbl}</li>`).join('') + `</ul>`;
+            const allOk = st.res && st.res.every(r => r[1]);
+            h += `<div class="card${allOk ? ' done' : ''}"><h3>${k}) ${t.p5[k]}</h3>` +
+                `<div class="row"><input class="text-input${allOk ? ' ok-field' : ''}" id="p5${k}" data-p5="${k}" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="${plain(t.p5[k])}" value="${esc(st.text)}">` +
+                `<button type="button" class="btn light small" data-sq="${k}" aria-label="x²">x²</button>` +
+                `<button type="button" class="btn" data-p5check="${k}" data-key="p5c-${k}">${t.check}</button>` +
+                `<button type="button" class="btn light" data-p5reveal="${k}" data-key="p5r-${k}">${t.reveal}</button></div>` +
+                `<div class="center">${list}</div>${fb(st.fb)}</div>`;
+        });
+        $('p5').innerHTML = h;
+    }
+    function checkP5(k) {
+        const t = s(), st = state.p5[k];
+        const r = parseExpr(st.text);
+        st.res = null;
+        if (r.err) st.fb = { cls: 'hint', html: { empty: t.p5Parse, times: t.p5Times, paren: t.p5Paren, deg: t.p5Deg, parse: t.p5Parse, badLetter: t.p5BadLetter }[r.err] };
+        else if (!r.reduced) st.fb = { cls: 'hint', html: t.p5NotReduced };
+        else {
+            st.res = conditions(k, r.terms);
+            const ok = st.res.every(x => x[1]);
+            st.fb = ok ? { cls: 'ok', html: r.ordered ? t.p5Ok : `${t.p5Ok} ${t.p5Order}` } : null;
+        }
+        rerender(renderP5);
+    }
+
+    // ── Partie 6 ──
+    function renderP6() {
+        const t = s();
+        let h = `<p class="intro">${t.p6Intro}</p>`;
+        P6.forEach((q, i) => {
+            const st = state.p6[i];
+            h += `<div class="card${st.fb && st.fb.cls === 'ok' ? ' done' : ''}"><h3>${i + 1}. « ${t.p6S[i]} »</h3>` +
+                `<div class="row" role="radiogroup" aria-label="${plain(t.p6S[i])}">` +
+                `<label class="choice"><input type="radio" name="p6tf${i}" value="1"${st.tf === true ? ' checked' : ''}> <span>${t.tru}</span></label>` +
+                `<label class="choice"><input type="radio" name="p6tf${i}" value="0"${st.tf === false ? ' checked' : ''}> <span>${t.fal}</span></label></div>` +
+                `<div><strong>${t.just}</strong>` + t.p6J[i].map((j, k) =>
+                    `<label class="choice"><input type="radio" name="p6j${i}" value="${k}"${st.j === k ? ' checked' : ''}> <span>${j}</span></label>`).join('') + `</div>` +
+                `<div class="row"><button type="button" class="btn" data-p6check="${i}" data-key="p6c-${i}">${t.check}</button>` +
+                `<button type="button" class="btn light" data-p6reveal="${i}" data-key="p6r-${i}">${t.reveal}</button></div>${fb(st.fb)}</div>`;
+        });
+        $('p6').innerHTML = h;
+    }
+    function checkP6(i) {
+        const t = s(), st = state.p6[i], q = P6[i];
+        let f;
+        if (st.tf === null) f = { cls: 'hint', html: t.p6NeedTF };
+        else if (st.tf !== q.truth) f = { cls: 'hint', html: t.p6TFWrong[i] };
+        else if (st.j === '') f = { cls: 'hint', html: t.p6NeedJ };
+        else if (st.j !== q.good) f = { cls: 'hint', html: t.p6JWrong };
+        else f = { cls: 'ok', html: t.p6Ok };
+        st.fb = f;
+        rerender(renderP6);
+    }
+
+    // ── Lexique ──
+    function renderLex() {
+        const t = s();
+        $('lexBtn').textContent = t.lexBtn;
+        $('lexTitle').textContent = t.lexTitle;
+        $('lexClose').textContent = t.lexClose;
+        $('lexBody').innerHTML = t.lex.map(([w, sense, ex]) => `<dt>${w}</dt><dd>${sense}<br><span class="ex">${state.lang === 'fr' ? 'Exemple' : 'Example'} : ${ex}</span></dd>`).join('');
+    }
+    $('lexBtn').addEventListener('click', () => $('lexicon').showModal());
+    $('lexClose').addEventListener('click', () => $('lexicon').close());
+    $('lexicon').addEventListener('click', e => { if (e.target === $('lexicon')) $('lexicon').close(); });
+
+    // ── Événements ──
+    document.addEventListener('input', e => {
+        const el = e.target;
+        if (el.id === 'nRange') { state.n = Number(el.value); const a = document.activeElement; renderP1(); $('nRange').focus(); }
+        else if (el.id === 'p2Coef') state.p2[state.p2Sel].coef = el.value;
+        else if (el.id === 'p2Deg') state.p2[state.p2Sel].deg = el.value;
+        else if (el.dataset.p5) state.p5[el.dataset.p5].text = el.value;
+    });
+    document.addEventListener('change', e => {
+        const el = e.target;
+        if (el.name === 'p1q') state.p1Choice = Number(el.value);
+        else if (el.name === 'p2type') { state.p2[state.p2Sel].type = el.value; rerender(renderP2); document.querySelector(`input[name="p2type"][value="${el.value}"]`).focus(); }
+        else if (el.dataset.p4 !== undefined) state.p4[el.dataset.p4][el.dataset.field] = el.value;
+        else if (el.name && el.name.startsWith('p6tf')) state.p6[Number(el.name.slice(4))].tf = el.value === '1';
+        else if (el.name && el.name.startsWith('p6j')) state.p6[Number(el.name.slice(3))].j = Number(el.value);
+    });
+    document.addEventListener('click', e => {
+        if (suppressClick) return;
+        const el = e.target;
+        const p1 = el.closest('[data-p1]');
+        if (p1) { state.p1Sel = state.p1Sel === p1.dataset.p1 ? null : p1.dataset.p1; return rerender(renderP1); }
+        if (el.closest('#p1Check')) {
+            const t = s(), c = state.p1Choice;
+            state.p1Fb = c === null ? { cls: 'hint', html: t.pickOne } : c === 1 ? { cls: 'ok', html: t.p1Ok } : { cls: 'hint', html: t.p1Hints[c] };
+            return rerender(renderP1);
+        }
+        const term = el.closest('[data-term]');
+        if (term) { state.p2Sel = term.dataset.term; return rerender(renderP2); }
+        if (el.closest('#p2Check')) return checkP2();
+        if (el.closest('#p2Reveal')) {
+            const k = state.p2Sel, [ei, ti] = k.split(',').map(Number), tm = P2_EXPRS[ei][ti];
+            state.p2[k].fb = { cls: 'info', html: s().p2Answer(fmtTermAlone(tm), termInfo(tm)) };
+            return rerender(renderP2);
+        }
+        // Part 3: tags, bins
+        const tag = el.closest('#p3 [data-tag]');
+        // A label is already chosen and another label is touched: drop the chosen one where that label is
+        if (tag && state.p3Sel !== null && Number(tag.dataset.tag) !== state.p3Sel) {
+            const box = tag.closest('[data-drop]');
+            moveTag(state.p3Sel, box.dataset.drop === 'bin' ? Number(box.dataset.bin) : box.dataset.drop);
+            return rerender(renderP3);
+        }
+        if (tag) {
+            const i = Number(tag.dataset.tag);
+            state.p3Sel = state.p3Sel === i ? null : i;
+            $('live').innerHTML = state.p3Sel === null ? '' : s().p3Sel(plain(fmtTermAlone(P3_TAGS[i])));
+            return rerender(renderP3);
+        }
+        const drop = el.closest('#p3 [data-drop]');
+        if (drop && state.p3Sel !== null) {
+            const tg = drop.dataset.drop === 'bin' ? Number(drop.dataset.bin) : drop.dataset.drop;
+            moveTag(state.p3Sel, tg);
+            return rerender(renderP3);
+        }
+        if (el.closest('#p3Check')) return checkP3();
+        if (el.closest('#p3Reset')) { state.p3Pool = P3_TAGS.map((_, i) => i); state.p3Bins = []; state.p3Sel = null; state.p3Fb = null; return rerender(renderP3); }
+        if (el.closest('#p3Reveal')) return revealP3();
+        if (el.closest('#p4Check')) return checkP4();
+        if (el.closest('#p4Reveal')) {
+            const t = s();
+            state.p4Fb = { cls: 'info', html: t.p4Answer(P4_EXPRS.map(ex => `${fmtExpr(ex.terms)} : ${t.kinds[ex.kind]}, ${ex.deg}`).join(' ; ')) };
+            return rerender(renderP4);
+        }
+        const p5c = el.closest('[data-p5check]');
+        if (p5c) return checkP5(p5c.dataset.p5check);
+        const p5r = el.closest('[data-p5reveal]');
+        if (p5r) { state.p5[p5r.dataset.p5reveal].fb = { cls: 'info', html: s().p5Example(fmtExpr(parseExpr(P5_EXAMPLE[p5r.dataset.p5reveal]).terms)) }; return rerender(renderP5); }
+        const sq = el.closest('[data-sq]');
+        if (sq) {
+            const inp = $('p5' + sq.dataset.sq);
+            const a = inp.selectionStart ?? inp.value.length, b = inp.selectionEnd ?? inp.value.length;
+            inp.value = inp.value.slice(0, a) + 'x²' + inp.value.slice(b);
+            state.p5[sq.dataset.sq].text = inp.value;
+            inp.focus(); inp.setSelectionRange(a + 2, a + 2);
+            return;
+        }
+        const p6c = el.closest('[data-p6check]');
+        if (p6c) return checkP6(Number(p6c.dataset.p6check));
+        const p6r = el.closest('[data-p6reveal]');
+        if (p6r) {
+            const t = s(), i = Number(p6r.dataset.p6reveal), q = P6[i];
+            state.p6[i].fb = { cls: 'info', html: t.p6Answer(q.truth ? t.tru : t.fal, t.p6J[i][q.good]) };
+            return rerender(renderP6);
+        }
+    });
+    document.addEventListener('keydown', e => {
+        // Bins are role="button": Enter and Space act like a click
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.bin[role="button"]')) { e.preventDefault(); e.target.click(); }
+        if (e.key === 'Escape' && state.p3Sel !== null) { state.p3Sel = null; rerender(renderP3); }
+        if (e.key === 'Enter' && e.target.dataset && e.target.dataset.p5) checkP5(e.target.dataset.p5);
+        if (e.key === 'Enter' && (e.target.id === 'p2Coef' || e.target.id === 'p2Deg')) checkP2();
+    });
+
+    function applyLang() {
+        const t = s();
+        document.querySelectorAll('[data-i18n]').forEach(el => { const v = t[el.dataset.i18n]; if (typeof v === 'string') el.innerHTML = v; });
+        document.title = t.title.replace(/^\S+\s/, '') + ' – LaboMath';
+        $('concept').innerHTML = t.concept;
+        $('stepNav').innerHTML = t.nav.map((x, i) => `<a href="#partie${i + 1}">${x}</a>`).join('');
+        // Feedback already shown stays in the previous language: clear it
+        state.p1Fb = state.p3Fb = state.p4Fb = null;
+        Object.values(state.p2).forEach(x => { x.fb = null; });
+        Object.values(state.p5).forEach(x => { x.fb = null; x.res = null; });
+        state.p6.forEach(x => { x.fb = null; });
+        renderLex(); renderP1(); renderP2(); renderP3(); renderP4(); renderP5(); renderP6();
+    }
+
+    // The header's FR/EN button is handled by commun/langue.js
+    Langue.onChange(lang => { state.lang = lang; applyLang(); });
+    applyLang();
+</script>
+
+</body>
+</html>

@@ -20,6 +20,7 @@
 
   /* Couleur de chaque sujet */
   --rapports-a: #F7971E; --rapports-b: #E67E22;
+  --algebre:    #1F5FA8;
 }
 
 /* ── Base ─────────────────────────────────── */
@@ -199,6 +200,7 @@ a { color: var(--primary); }
 
 /* Couleurs des sujets */
 .sujet-rapports { background: linear-gradient(135deg, var(--rapports-a), var(--rapports-b)); }
+.sujet-algebre  { background: var(--algebre); }
 
 /* ── Cartes de sujets (accueil) ───────────── */
 .subjects-grid {
@@ -258,6 +260,22 @@ a { color: var(--primary); }
 .activity-card h2 { font-size: 1.15rem; font-weight: 900; }
 .activity-card p { font-size: 14px; color: var(--gray); flex: 1; }
 .activity-card .go { font-size: 14px; font-weight: 800; color: var(--primary); }
+
+/* Petite mention sur une carte d'activité (ex. « Vers les équations ») */
+.activity-card .tag {
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 800;
+  color: #c84a16;
+  background: #fbeee7;
+  border-radius: 20px;
+  padding: 2px 10px;
+}
+
+/* Activité pas encore faite : carte non cliquable */
+.activity-card.a-venir { opacity: 0.6; cursor: default; }
+.activity-card.a-venir:hover { transform: none; box-shadow: var(--card-shadow); }
+.activity-card.a-venir .go { color: var(--gray); }
 
 /* ── Mobile ───────────────────────────────── */
 @media (max-width: 600px) {

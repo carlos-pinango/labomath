@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Les expressions équivalentes – LaboMath</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../commun/style.css">
+    <script src="../commun/langue.js"></script>
+    <script src="../commun/expressions.js"></script>
+    <style>
+        /* Styles propres à cette activité (le reste vient de commun/style.css) */
+        [hidden] { display: none !important; }
+        :root { --navy: #1f2d4d; --blue: #1f5fa8; --orange: #c84a16; --pale: #eef3fa; --line: #c9d4e5; --ok: #1e7d45; --muted: #4a5878; }
+        .container { color: var(--navy); width: 100%; max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { color: var(--navy); font-weight: 900; line-height: 1.2; border-bottom: 2px solid var(--pale); padding-bottom: 10px; }
+        h2.step { font-size: 1.15em; font-weight: 900; margin: 34px 0 10px; padding-top: 14px; border-top: 2px solid var(--pale); color: var(--navy); }
+        h2.step .num { display: inline-flex; width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: 50%; background: var(--blue); color: white; font-size: 0.85em; margin-right: 8px; }
+        h3 { font-size: 1em; font-weight: 900; margin: 14px 0 8px; }
+        em { font-family: Georgia, 'Times New Roman', serif; font-style: italic; }
+        p { line-height: 1.6; }
+        .intro { margin: 6px 0 10px; }
+        .concept-box { background: var(--pale); padding: 15px; border-left: 5px solid var(--blue); margin: 16px 0; border-radius: 4px; font-size: 0.95em; line-height: 1.6; }
+        .panel { background: var(--pale); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 14px; font-weight: 700; }
+        .n-row { display: flex; align-items: center; gap: 12px; font-weight: 800; max-width: 560px; margin: 0 auto 10px; }
+        .n-row input[type=range] { flex: 1; accent-color: var(--blue); min-width: 0; }
+        .n-row .n-val { font-size: 1.2em; min-width: 64px; }
+        .swatches { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; }
+        .swatch { width: 36px; height: 36px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 2px var(--line); color: white; font-family: inherit; font-weight: 900; cursor: pointer; }
+        .swatch.active { box-shadow: 0 0 0 3px var(--navy); transform: scale(1.1); }
+        .swatch.eraser { background: white; color: var(--navy); }
+        .swatch:focus-visible { outline: 3px solid #f2b705; outline-offset: 2px; }
+        svg.sticks { width: 100%; height: auto; display: block; margin: 6px auto; touch-action: none; user-select: none; -webkit-user-select: none; }
+        svg.sticks:focus-visible { outline: 3px solid #f2b705; outline-offset: 4px; }
+        svg.sticks .hit { cursor: pointer; }
+        .expr-live { text-align: center; font-size: 1.4em; font-weight: 900; min-height: 1.6em; }
+        .expr-sub { text-align: center; color: var(--muted); font-weight: 700; min-height: 1.4em; }
+        .ways { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; margin-top: 12px; }
+        .way { border: 2px dashed var(--line); border-radius: 10px; padding: 8px 10px; text-align: center; font-weight: 800; color: var(--muted); }
+        .way.found { border-style: solid; border-color: var(--ok); background: #e7f4ec; color: var(--ok); }
+        .way .big { font-size: 1.1em; color: var(--navy); }
+        .row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; font-weight: 700; margin: 8px 0; }
+        .text-input, .num-input { padding: 6px 10px; border: 2px solid var(--line); border-radius: 8px; font-family: inherit; font-size: 1.05em; font-weight: 800; color: var(--navy); background: white; outline: none; }
+        .text-input { width: 190px; }
+        .num-input { width: 80px; text-align: center; }
+        .text-input:focus, .num-input:focus { border-color: var(--blue); }
+        .btn { border: none; background: var(--blue); color: white; font-family: inherit; font-weight: 800; font-size: 0.95em; border-radius: 20px; padding: 8px 16px; cursor: pointer; }
+        .btn:hover { background: #184d8a; }
+        .btn.light { background: var(--pale); color: var(--blue); }
+        .btn.light:hover { background: #dde7f5; }
+        .chip { border: none; background: white; color: var(--muted); font-family: inherit; font-weight: 800; font-size: 0.95em; border-radius: 18px; padding: 6px 12px; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .chip.active { background: var(--blue); color: white; }
+        .center { text-align: center; margin-top: 10px; }
+        .feedback { border-radius: 10px; padding: 10px 14px; line-height: 1.6; margin-top: 10px; text-align: center; }
+        .feedback.hint { background: #fbeee7; color: #84300d; }
+        .feedback.ok { background: #e7f4ec; color: var(--ok); }
+        .feedback.info { background: var(--pale); color: var(--navy); }
+        .table-wrap { overflow-x: auto; }
+        table.vals { border-collapse: collapse; margin: 8px auto; }
+        table.vals th, table.vals td { border: 1px solid var(--line); padding: 6px 10px; text-align: center; white-space: nowrap; font-weight: 800; }
+        table.vals th { background: var(--pale); }
+        table.vals td.cur, table.vals th.cur { outline: 3px solid #f2b705; outline-offset: -3px; }
+        td.same { color: var(--ok); background: #f1f9f4; }
+        td.diff { color: var(--orange); background: #fdf1eb; }
+        .card { border: 2px solid var(--pale); border-radius: 12px; padding: 12px 14px; margin: 12px 0; }
+        .card.done { border-color: #bfe3cc; }
+        .choice { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; margin: 6px 0; line-height: 1.5; }
+        .choice input { accent-color: var(--blue); width: 18px; height: 18px; margin-top: 3px; flex: none; }
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+        @media (max-width: 600px) {
+            .container { padding: 20px 14px; }
+            h1 { font-size: 1.4em; }
+            .expr-live { font-size: 1.2em; }
+            .swatch { width: 32px; height: 32px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="app-header">
+    <div class="header-inner">
+        <a class="back-btn" href="index.html">← <span data-en="Introduction to algebra">Introduction à l'algèbre</span></a>
+        <a class="logo" href="../index.html">
+            <div class="logo-icon">∑</div>
+            <span class="logo-text">Labo<span class="logo-accent">Math</span></span>
+        </a>
+        <button class="lang-btn" id="langBtn">EN</button>
+    </div>
+</header>
+
+<main class="page">
+<div class="container">
+    <h1 data-i18n="title">🟰 Les expressions équivalentes</h1>
+    <div class="concept-box" id="concept"></div>
+
+    <h2 class="step"><span class="num">1</span><span data-i18n="p1Title"></span></h2>
+    <div id="p1"></div>
+
+    <h2 class="step"><span class="num">2</span><span data-i18n="p2Title"></span></h2>
+    <div id="p2"></div>
+</div>
+</main>
+<div class="sr-only" id="live" aria-live="polite"></div>
+
+<footer class="app-footer">
+    <span data-en="Designed by Carlos Pinango, engineer and high school math teacher">Conçu par Carlos Pinango, ingénieur et enseignant de mathématiques au secondaire</span>
+</footer>
+
+<script>
+    const M = '−';
+    const NV = '<em>q</em>';   // q = the number of squares
+    const COLORS = ['#1f5fa8', '#c84a16', '#2e7d4f', '#7b4fa0', '#a8740f', '#1f2d4d'];
+    // The four ways of counting the matches
+    const WAYS = [
+        { html: `3${NV} + 1`, sub: n => `3(${n}) + 1` },
+        { html: `4 + 3(${NV} ${M} 1)`, sub: n => `4 + 3(${n} ${M} 1)` },
+        { html: `${NV} + ${NV} + (${NV} + 1)`, sub: n => `${n} + ${n} + (${n} + 1)` },
+        { html: `4${NV} ${M} (${NV} ${M} 1)`, sub: n => `4(${n}) ${M} (${n} ${M} 1)` },
+    ];
+    const PAIRS = [
+        { a: '3a + 1', b: 'a² + 3', eq: false },
+        { a: '2(t + 3)', b: '2t + 3', eq: false },
+        { a: 'y²', b: '2y', eq: false },
+        { a: '4(n + 1)', b: '4n + 4', eq: true },
+    ];
+
+    const STR = {
+        fr: {
+            title: `🟰 Les expressions équivalentes`,
+            concept: `Deux expressions sont <strong>équivalentes</strong> si elles donnent toujours la même valeur, <strong>peu importe la valeur de la lettre</strong>.`,
+            p1Title: `Les allumettes`,
+            p1Intro: `Une rangée de ${NV} carrés est faite d'allumettes. Choisis une couleur, puis touche ou glisse sur les allumettes pour montrer ta façon de compter. ` +
+                `Chaque groupe d'allumettes qui se touchent, d'une même couleur, est un groupe. Une allumette peut être comptée deux fois : colorie-la d'une deuxième couleur. ` +
+                `Au clavier : place-toi sur le dessin, puis utilise les flèches et la barre d'espacement.`,
+            nLabel: `Nombre de carrés <em>q</em>`,
+            nVal: n => `<em>q</em> = ${n}`,
+            def: `Soit <em>q</em>, le nombre de carrés de la rangée.`,
+            color: i => `Couleur ${i}`, eraser: `Gomme`, clear: `Tout effacer`, hintBtn: `💡 Un indice`,
+            drawAria: `Allumettes. Flèches pour passer d'une allumette à l'autre, espace pour colorier.`,
+            stickState: (i, total, cols) => `Allumette ${i} sur ${total} : ${cols.length ? 'couleur ' + cols.join(' et ') : 'sans couleur'}.`,
+            empty: `Colorie les allumettes pour montrer ta façon de compter.`,
+            left: k => `Il reste ${k} allumette${k > 1 ? 's' : ''} à colorier.`,
+            unknown: `Je ne reconnais pas cette façon de compter. Essaie de grouper les allumettes par carré, ou par rangée.`,
+            sub: (sub, v) => `Pour <em>q</em> = ${state.n} : ${sub} = ${v} allumettes`,
+            newWay: `✅ Nouvelle façon de compter trouvée !`,
+            way: i => `Façon ${i}`,
+            hints: [
+                `Colorie la première allumette seule, puis, pour chaque carré, les 3 allumettes qui le ferment : en haut, en bas et à droite. Alterne deux couleurs.`,
+                `Colorie le premier carré au complet (4 allumettes), puis, pour chaque autre carré, les 3 allumettes qui s'ajoutent. Alterne les couleurs.`,
+                `Colorie toutes les allumettes du haut d'une couleur, toutes celles du bas d'une autre, puis toutes les verticales d'une troisième.`,
+                `Colorie chaque carré au complet, en alternant deux couleurs : les allumettes entre deux carrés seront comptées deux fois.`,
+            ],
+            allFound: `Tu as trouvé les quatre façons !`,
+            tableTitle: `Toujours le même nombre ?`,
+            counted: `Allumettes comptées`,
+            tableNote: `Pour chaque valeur de ${NV}, toutes tes expressions donnent le même nombre : la figure montre qu'elles comptent les mêmes allumettes. Elles sont équivalentes.`,
+            p2Title: `Le testeur`,
+            p2Intro: `Écris deux expressions et choisis tes valeurs de la lettre : le tableau compare les résultats. Teste chacune des paires, puis conclus.`,
+            exprA: `Expression A :`, exprB: `Expression B :`,
+            values: `Valeurs de la lettre :`,
+            same: `égales`, diff: `différentes`,
+            rowA: `A`, rowB: `B`, rowCmp: `Comparaison`,
+            needExpr: `Écris deux expressions.`,
+            sameLetter: `Utilise la même lettre dans les deux expressions.`,
+            exprErr: `Une des expressions n'est pas reconnue.`,
+            times: `Pour multiplier, écris des parenthèses, comme dans 2(<em>t</em> + 3) : pas de ×, d'astérisque ni de point.`,
+            pairsTitle: `Mes conclusions`,
+            test: `Tester cette paire`,
+            verdictEq: `Elles sont équivalentes`, verdictNot: `Elles ne sont pas équivalentes`,
+            showValue: `Une valeur qui le montre :`,
+            justify: `Pourquoi ?`,
+            justif: [
+                `J'ai essayé plusieurs valeurs, et elles donnent toujours le même résultat.`,
+                `4(<em>n</em> + 1), ce sont 4 côtés de <em>n</em> + 1 carreaux autour de la piscine : on compte les mêmes carreaux que 4<em>n</em> + 4. On peut aussi transformer : 4(<em>n</em> + 1) = 4<em>n</em> + 4.`,
+                `Les deux expressions contiennent le nombre 4.`,
+            ],
+            check: `Vérifier`, reveal: `Voir la réponse`,
+            pickVerdict: `Choisis d'abord ta conclusion.`,
+            notEqWrong: `Essaie d'autres valeurs dans le testeur, dont des valeurs plus grandes, négatives ou décimales.`,
+            eqWrong: `Si elles n'étaient pas équivalentes, tu trouverais une valeur qui donne des résultats différents. En trouves-tu une ?`,
+            needValue: `Donne une valeur de la lettre qui montre ta conclusion.`,
+            badNum: `Écris un nombre.`,
+            valueSame: (v, r) => `Pour ${v}, les deux expressions donnent ${r} : cette valeur ne montre pas qu'elles sont différentes. Cherche une autre valeur.`,
+            notEqOk: (v, a, b) => `✅ Juste ! Pour ${v}, A donne ${a} et B donne ${b} : une seule valeur suffit.`,
+            pickJustif: `Choisis une justification.`,
+            justif0: `Plusieurs valeurs égales ne le prouvent pas : 3<em>a</em> + 1 et <em>a</em>² + 3 sont égales pour 1 et 2, et pourtant différentes pour 3. Il faut un raisonnement.`,
+            justif2: `Contenir le même nombre ne suffit pas : 2(<em>t</em> + 3) et 2<em>t</em> + 3 contiennent les mêmes nombres.`,
+            eqOk: `✅ Juste, et bien justifié : la figure, ou une transformation, montre que c'est vrai pour toutes les valeurs.`,
+            answerEq: `Réponse : équivalentes. 4(<em>n</em> + 1) = 4<em>n</em> + 4 : 4 côtés de <em>n</em> + 1 carreaux.`,
+            answerNot: (v, a, b) => `Réponse : pas équivalentes. Par exemple, pour ${v}, A donne ${a} et B donne ${b}.`,
+            conclTitle: `Ce que j'ai appris`,
+            q1: `Pour montrer que deux expressions ne sont pas équivalentes, il suffit de trouver…`,
+            q1c: [`une seule valeur de la lettre qui donne des résultats différents.`, `trois valeurs qui donnent des résultats différents.`, `des résultats différents pour toutes les valeurs.`],
+            q2: `3<em>a</em> + 1 et <em>a</em>² + 3 donnent le même résultat pour <em>a</em> = 1 et pour <em>a</em> = 2. Est-ce que ça prouve qu'elles sont équivalentes ?`,
+            q2c: [`Oui : deux valeurs égales suffisent.`, `Non : plusieurs valeurs égales ne le prouvent pas. Pour être sûr, il faut un raisonnement : la figure, ou des transformations.`, `Oui, parce que 1 et 2 sont de petites valeurs.`],
+            q1Hint: `Regarde tes conclusions : combien de valeurs as-tu dû donner pour montrer qu'une paire n'est pas équivalente ?`,
+            q2Hint: `Essaie <em>a</em> = 3 dans le testeur avec 3<em>a</em> + 1 et <em>a</em>² + 3.`,
+            qOk: `✅ Juste !`,
+        },
+        en: {
+            title: `🟰 Equivalent expressions`,
+            concept: `Two expressions are <strong>equivalent</strong> if they always give the same value, <strong>whatever the value of the letter</strong>.`,
+            p1Title: `The matches`,
+            p1Intro: `A row of ${NV} squares is made of matches. Choose a colour, then tap or drag over the matches to show your way of counting. ` +
+                `Each group of touching matches of the same colour is a group. A match can be counted twice: colour it with a second colour. ` +
+                `With the keyboard: move onto the drawing, then use the arrow keys and the space bar.`,
+            nLabel: `Number of squares <em>q</em>`,
+            nVal: n => `<em>q</em> = ${n}`,
+            def: `Let <em>q</em> be the number of squares in the row.`,
+            color: i => `Colour ${i}`, eraser: `Eraser`, clear: `Clear all`, hintBtn: `💡 A hint`,
+            drawAria: `Matches. Arrow keys to go from one match to the next, space to colour.`,
+            stickState: (i, total, cols) => `Match ${i} of ${total}: ${cols.length ? 'colour ' + cols.join(' and ') : 'no colour'}.`,
+            empty: `Colour the matches to show your way of counting.`,
+            left: k => `${k} match${k > 1 ? 'es' : ''} left to colour.`,
+            unknown: `I don't recognize this way of counting. Try grouping the matches by square, or by row.`,
+            sub: (sub, v) => `For <em>q</em> = ${state.n}: ${sub} = ${v} matches`,
+            newWay: `✅ New way of counting found!`,
+            way: i => `Way ${i}`,
+            hints: [
+                `Colour the first match alone, then, for each square, the 3 matches that close it: top, bottom and right. Alternate two colours.`,
+                `Colour the whole first square (4 matches), then, for each other square, the 3 matches that are added. Alternate the colours.`,
+                `Colour all the top matches in one colour, all the bottom ones in another, then all the vertical ones in a third.`,
+                `Colour each whole square, alternating two colours: the matches between two squares will be counted twice.`,
+            ],
+            allFound: `You found all four ways!`,
+            tableTitle: `Always the same number?`,
+            counted: `Matches counted`,
+            tableNote: `For each value of ${NV}, all your expressions give the same number: the figure shows that they count the same matches. They are equivalent.`,
+            p2Title: `The tester`,
+            p2Intro: `Write two expressions and choose your values of the letter: the table compares the results. Test each pair, then conclude.`,
+            exprA: `Expression A:`, exprB: `Expression B:`,
+            values: `Values of the letter:`,
+            same: `equal`, diff: `different`,
+            rowA: `A`, rowB: `B`, rowCmp: `Comparison`,
+            needExpr: `Write two expressions.`,
+            sameLetter: `Use the same letter in both expressions.`,
+            exprErr: `One of the expressions is not recognized.`,
+            times: `To multiply, write parentheses, as in 2(<em>t</em> + 3): no ×, asterisk or dot.`,
+            pairsTitle: `My conclusions`,
+            test: `Test this pair`,
+            verdictEq: `They are equivalent`, verdictNot: `They are not equivalent`,
+            showValue: `A value that shows it:`,
+            justify: `Why?`,
+            justif: [
+                `I tried several values, and they always give the same result.`,
+                `4(<em>n</em> + 1) is 4 sides of <em>n</em> + 1 tiles around the pool: we count the same tiles as 4<em>n</em> + 4. We can also transform: 4(<em>n</em> + 1) = 4<em>n</em> + 4.`,
+                `Both expressions contain the number 4.`,
+            ],
+            check: `Check`, reveal: `Show the answer`,
+            pickVerdict: `First choose your conclusion.`,
+            notEqWrong: `Try other values in the tester, including bigger, negative or decimal values.`,
+            eqWrong: `If they were not equivalent, you would find a value that gives different results. Can you find one?`,
+            needValue: `Give a value of the letter that shows your conclusion.`,
+            badNum: `Write a number.`,
+            valueSame: (v, r) => `For ${v}, both expressions give ${r}: this value does not show that they are different. Look for another value.`,
+            notEqOk: (v, a, b) => `✅ Right! For ${v}, A gives ${a} and B gives ${b}: one value is enough.`,
+            pickJustif: `Choose a justification.`,
+            justif0: `Several equal values do not prove it: 3<em>a</em> + 1 and <em>a</em>² + 3 are equal for 1 and 2, and yet different for 3. Reasoning is needed.`,
+            justif2: `Containing the same number is not enough: 2(<em>t</em> + 3) and 2<em>t</em> + 3 contain the same numbers.`,
+            eqOk: `✅ Right, and well justified: the figure, or a transformation, shows it is true for every value.`,
+            answerEq: `Answer: equivalent. 4(<em>n</em> + 1) = 4<em>n</em> + 4: 4 sides of <em>n</em> + 1 tiles.`,
+            answerNot: (v, a, b) => `Answer: not equivalent. For example, for ${v}, A gives ${a} and B gives ${b}.`,
+            conclTitle: `What I learned`,
+            q1: `To show that two expressions are not equivalent, it is enough to find…`,
+            q1c: [`a single value of the letter that gives different results.`, `three values that give different results.`, `different results for every value.`],
+            q2: `3<em>a</em> + 1 and <em>a</em>² + 3 give the same result for <em>a</em> = 1 and for <em>a</em> = 2. Does that prove they are equivalent?`,
+            q2c: [`Yes: two equal values are enough.`, `No: several equal values do not prove it. To be sure, reasoning is needed: the figure, or transformations.`, `Yes, because 1 and 2 are small values.`],
+            q1Hint: `Look at your conclusions: how many values did you have to give to show that a pair is not equivalent?`,
+            q2Hint: `Try <em>a</em> = 3 in the tester with 3<em>a</em> + 1 and <em>a</em>² + 3.`,
+            qOk: `✅ Right!`,
+        },
+    };
+
+    const state = {
+        lang: Langue.lang,
+        n: 4, color: 1, kbd: false, cur: 0,
+        paint: {},            // stick id → [colours]
+        found: [false, false, false, false], last: -1, hintIdx: 0,
+        A: '3a + 1', B: 'a² + 3', vals: ['1', '2', '3', ''],
+        pairs: PAIRS.map(() => ({ verdict: null, value: '', justif: null, fb: null })),
+        q: [null, null], qfb: [null, null],
+    };
+    const $ = id => document.getElementById(id);
+    const s = () => STR[state.lang];
+    const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const num = v => Expr.fmtNum(v, state.lang);
+    const fbHtml = f => f ? `<div class="feedback ${f.cls}">${f.html}</div>` : '';
+    const pretty = t => t.replace(/([a-z])/g, '<em>$1</em>').replace(/-/g, M);
+    function readNum(str) {
+        const t = String(str).replace(/\s+/g, '').replace(/[−–—]/g, '-').replace(',', '.');
+        return /^-?\d+(\.\d+)?$/.test(t) ? Number(t) : NaN;
+    }
+
+    // ── Allumettes : T0…, B0…, V0…Vn ; order for the keyboard: V0, T0, B0, V1, T1, B1, … ──
+    function sticks(n) {
+        const out = [];
+        for (let i = 0; i <= n; i++) {
+            out.push('V' + i);
+            if (i < n) out.push('T' + i, 'B' + i);
+        }
+        return out;
+    }
+    function ends(id) {
+        const k = Number(id.slice(1));
+        if (id[0] === 'T') return [`${k},0`, `${k + 1},0`];
+        if (id[0] === 'B') return [`${k},1`, `${k + 1},1`];
+        return [`${k},0`, `${k},1`];
+    }
+    // Groups = touching matches of the same colour
+    function components() {
+        const all = sticks(state.n), comps = [];
+        for (let c = 1; c <= COLORS.length; c++) {
+            const mine = all.filter(id => (state.paint[id] || []).includes(c));
+            const seen = new Set();
+            mine.forEach(start => {
+                if (seen.has(start)) return;
+                const comp = [], stack = [start];
+                seen.add(start);
+                while (stack.length) {
+                    const a = stack.pop(); comp.push(a);
+                    mine.forEach(b => { if (!seen.has(b) && ends(a).some(e => ends(b).includes(e))) { seen.add(b); stack.push(b); } });
+                }
+                comps.push(comp.sort().join(' '));
+            });
+        }
+        return comps.sort();
+    }
+    function colorClasses() {
+        const all = sticks(state.n), out = [];
+        for (let c = 1; c <= COLORS.length; c++) {
+            const mine = all.filter(id => (state.paint[id] || []).includes(c));
+            if (mine.length) out.push(mine.sort().join(' '));
+        }
+        return out.sort();
+    }
+    // Target groupings for each way of counting (and their mirror images)
+    function targets(n) {
+        const r = (a, b) => Array.from({ length: Math.max(0, b - a) }, (_, k) => a + k);
+        const g = list => list.sort().join(' ');
+        const T = [[], [], [], []];
+        // 3n + 1
+        T[0].push([g(['V0']), ...r(0, n).map(i => g([`T${i}`, `B${i}`, `V${i + 1}`]))]);
+        T[0].push([g([`V${n}`]), ...r(0, n).map(i => g([`T${i}`, `B${i}`, `V${i}`]))]);
+        // 4 + 3(n − 1)
+        T[1].push([g(['T0', 'B0', 'V0', 'V1']), ...r(1, n).map(i => g([`T${i}`, `B${i}`, `V${i + 1}`]))]);
+        T[1].push([g([`T${n - 1}`, `B${n - 1}`, `V${n - 1}`, `V${n}`]), ...r(0, n - 1).map(i => g([`T${i}`, `B${i}`, `V${i}`]))]);
+        // n + n + (n + 1)
+        T[2].push([g(r(0, n).map(i => `T${i}`)), g(r(0, n).map(i => `B${i}`)), g(r(0, n + 1).map(i => `V${i}`))]);
+        // 4n − (n − 1)
+        T[3].push(r(0, n).map(i => g([`T${i}`, `B${i}`, `V${i}`, `V${i + 1}`])));
+        return T.map(vs => vs.map(v => v.sort()));
+    }
+    function recognize() {
+        const all = sticks(state.n);
+        const left = all.filter(id => !(state.paint[id] || []).length).length;
+        if (left === all.length) return { empty: true };
+        if (left) return { left };
+        // Groups: touching matches of a colour, or all the matches of a colour (the verticals never touch)
+        const parts = [components(), colorClasses()];
+        const T = targets(state.n);
+        const w = T.findIndex(vs => vs.some(v => parts.some(p => v.length === p.length && v.every((x, k) => x === p[k]))));
+        return w >= 0 ? { way: w } : { unknown: true };
+    }
+    // Same way of counting, drawn again for a new n
+    function paintWay(w, n) {
+        const p = {};
+        const add = (id, c) => { (p[id] = p[id] || []).includes(c) || p[id].push(c); };
+        for (let i = 0; i < n; i++) {
+            const c = i % 2 ? 2 : 1;
+            if (w === 0) { add('T' + i, c); add('B' + i, c); add('V' + (i + 1), c); }
+            if (w === 1) { const cc = i === 0 ? 3 : c; add('T' + i, cc); add('B' + i, cc); add('V' + (i + 1), cc); if (i === 0) add('V0', 3); }
+            if (w === 2) { add('T' + i, 1); add('B' + i, 2); }
+            if (w === 3) { add('T' + i, c); add('B' + i, c); add('V' + i, c); add('V' + (i + 1), c); }
+        }
+        if (w === 0) add('V0', 3);
+        if (w === 2) for (let i = 0; i <= n; i++) add('V' + i, 3);
+        Object.values(p).forEach(a => a.sort((x, y) => x - y));
+        return p;
+    }
+
+    function sticksSvg() {
+        const n = state.n, S = 40, P = 8;
+        const W = n * S + 2 * P, H = S + 2 * P;
+        const list = sticks(n);
+        let h = `<svg class="sticks" id="stickSvg" viewBox="0 0 ${W} ${H}" style="max-width:${Math.min(820, W * 2.2)}px" tabindex="0" role="application" aria-label="${s().drawAria}">`;
+        list.forEach((id, k) => {
+            const kk = Number(id.slice(1));
+            let x1, y1, x2, y2;
+            if (id[0] === 'T') { x1 = P + kk * S; y1 = P; x2 = x1 + S; y2 = P; }
+            else if (id[0] === 'B') { x1 = P + kk * S; y1 = P + S; x2 = x1 + S; y2 = y1; }
+            else { x1 = x2 = P + kk * S; y1 = P; y2 = P + S; }
+            const cols = (state.paint[id] || []).map(c => COLORS[c - 1]);
+            const sh = 3;  // shorten so matches don't overlap at the corners
+            const dx = x2 === x1 ? 0 : sh, dy = y2 === y1 ? 0 : sh;
+            const seg = (col, off, w) => `<line x1="${x1 + dx + (dx ? 0 : off)}" y1="${y1 + dy + (dy ? 0 : off)}" x2="${x2 - dx + (dx ? 0 : off)}" y2="${y2 - dy + (dy ? 0 : off)}" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/>`;
+            if (!cols.length) h += seg('#c9b48a', 0, 4);
+            else if (cols.length === 1) h += seg(cols[0], 0, 5);
+            else { h += seg(cols[0], -2.2, 3.2) + seg(cols[1], 2.2, 3.2); }
+            if (state.kbd && k === state.cur && document.activeElement && document.activeElement.id === 'stickSvg') h += seg('none', 0, 0) + `<rect x="${Math.min(x1, x2) - 5}" y="${Math.min(y1, y2) - 5}" width="${Math.abs(x2 - x1) + 10}" height="${Math.abs(y2 - y1) + 10}" fill="none" stroke="#f2b705" stroke-width="2" rx="3"/>`;
+            h += `<line class="hit" data-stick="${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="transparent" stroke-width="14"/>`;
+        });
+        return h + '</svg>';
+    }
+
+    function renderP1() {
+        const t = s(), n = state.n;
+        const focused = document.activeElement && document.activeElement.id === 'stickSvg';
+        let h = `<p class="intro">${t.p1Intro}</p>` +
+            `<p class="center"><strong>${t.def}</strong></p>` +
+            `<div class="n-row"><label for="nRange">${t.nLabel}</label><input type="range" id="nRange" min="1" max="15" value="${n}"><span class="n-val">${t.nVal(n)}</span></div>` +
+            `<div class="panel"><div class="swatches">` + COLORS.map((c, i) =>
+                `<button type="button" class="swatch${state.color === i + 1 ? ' active' : ''}" data-color="${i + 1}" style="background:${c}" aria-label="${t.color(i + 1)}" aria-pressed="${state.color === i + 1}">${i + 1}</button>`).join('') +
+            `<button type="button" class="swatch eraser${state.color === 0 ? ' active' : ''}" data-color="0" aria-label="${t.eraser}" aria-pressed="${state.color === 0}">⌫</button></div>` +
+            `<button type="button" class="btn light" id="clearBtn">${t.clear}</button></div>` +
+            `<div id="draw">${sticksSvg()}</div>`;
+        const r = recognize();
+        let expr = '', sub = '', fb = null;
+        if (r.empty) sub = t.empty;
+        else if (r.left) sub = t.left(r.left);
+        else if (r.unknown) fb = { cls: 'hint', html: t.unknown };
+        else {
+            expr = WAYS[r.way].html; sub = t.sub(WAYS[r.way].sub(n), 3 * n + 1);
+            if (!state.found[r.way]) { state.found[r.way] = true; state.last = r.way; }
+            if (state.last === r.way) fb = { cls: 'ok', html: t.newWay };
+        }
+        h += `<div class="expr-live" aria-live="polite">${expr}</div><div class="expr-sub">${sub}</div>${fbHtml(fb)}`;
+        h += `<div class="ways">` + WAYS.map((w, i) => `<div class="way${state.found[i] ? ' found' : ''}">${t.way(i + 1)}<br><span class="big">${state.found[i] ? w.html : '?'}</span></div>`).join('') + `</div>`;
+        h += `<div class="center"><button type="button" class="btn light" id="hintBtn">${t.hintBtn}</button></div><div id="hintBox"></div>`;
+        // Table: every expression found gives the same number
+        const cols = [1, 2, 3, 4, 5, 6];
+        if (!cols.includes(n)) cols.push(n);
+        const found = WAYS.map((w, i) => i).filter(i => state.found[i]);
+        h += `<h3>${t.tableTitle}</h3><div class="table-wrap"><table class="vals"><tr><th><em>q</em></th>${cols.map(c => `<th class="${c === n ? 'cur' : ''}">${c}</th>`).join('')}</tr>` +
+            `<tr><th>${t.counted}</th>${cols.map(c => `<td class="${c === n ? 'cur' : ''}">${3 * c + 1}</td>`).join('')}</tr>` +
+            found.map(i => `<tr><th>${WAYS[i].html}</th>${cols.map(c => `<td class="same${c === n ? ' cur' : ''}">${3 * c + 1}</td>`).join('')}</tr>`).join('') +
+            `</table></div>` + (found.length >= 2 ? `<p class="center">${t.tableNote}</p>` : '');
+        $('p1').innerHTML = h;
+        if (focused) $('stickSvg').focus();
+    }
+
+    function applyPaint(id, mode) {
+        const g = state.paint[id] = state.paint[id] || [];
+        if (mode === 'erase') g.length = 0;
+        else if (mode === 'add') { if (!g.includes(state.color)) { g.push(state.color); g.sort((a, b) => a - b); } }
+        else { const i = g.indexOf(state.color); if (i >= 0) g.splice(i, 1); }
+    }
+    const modeFor = id => state.color === 0 ? 'erase' : ((state.paint[id] || []).includes(state.color) ? 'remove' : 'add');
+    function redrawOnly() {
+        // Keep the page in place while painting: redraw the drawing and the result only
+        const y = window.scrollY;
+        renderP1();
+        window.scrollTo(0, y);
+    }
+
+    let painting = null;
+    document.addEventListener('pointerdown', e => {
+        const el = e.target.closest && e.target.closest('#stickSvg [data-stick]');
+        if (!el || e.button > 0) return;
+        e.preventDefault();
+        state.kbd = false;
+        const id = el.dataset.stick;
+        painting = { mode: modeFor(id), last: id };
+        applyPaint(id, painting.mode);
+        state.cur = sticks(state.n).indexOf(id);
+        redrawOnly();
+    });
+    window.addEventListener('pointermove', e => {
+        if (!painting) return;
+        const el = document.elementFromPoint(e.clientX, e.clientY);
+        const st = el && el.closest && el.closest('#stickSvg [data-stick]');
+        if (!st || st.dataset.stick === painting.last) return;
+        painting.last = st.dataset.stick;
+        applyPaint(st.dataset.stick, painting.mode);
+        redrawOnly();
+    });
+    window.addEventListener('pointerup', () => { painting = null; });
+    window.addEventListener('pointercancel', () => { painting = null; });
+    document.addEventListener('keydown', e => {
+        if (e.target.id !== 'stickSvg') return;
+        const list = sticks(state.n), L = list.length;
+        if (['ArrowRight', 'ArrowDown'].includes(e.key)) state.cur = (state.cur + 1) % L;
+        else if (['ArrowLeft', 'ArrowUp'].includes(e.key)) state.cur = (state.cur - 1 + L) % L;
+        else if (e.key === ' ' || e.key === 'Enter') applyPaint(list[state.cur], modeFor(list[state.cur]));
+        else return;
+        e.preventDefault();
+        state.kbd = true;
+        redrawOnly();
+        $('live').textContent = s().stickState(state.cur + 1, L, state.paint[list[state.cur]] || []);
+    });
+
+    // ── Partie 2 : le testeur ──
+    function testTable() {
+        const t = s();
+        const A = Expr.parse(state.A), B = Expr.parse(state.B);
+        if (A.err === 'times' || B.err === 'times') return `<div class="feedback hint">${t.times}</div>`;
+        if (A.err || B.err) return `<div class="feedback hint">${A.err === 'empty' || B.err === 'empty' ? t.needExpr : t.exprErr}</div>`;
+        const letters = [...new Set([...A.letters, ...B.letters])];
+        if (letters.length > 1) return `<div class="feedback hint">${t.sameLetter}</div>`;
+        const L = letters[0] || 'x';
+        const vals = state.vals.map(readNum);
+        const cell = v => isNaN(v) ? null : { a: Expr.value(A.ast, { [L]: v }), b: Expr.value(B.ast, { [L]: v }) };
+        const cells = vals.map(cell);
+        return `<div class="table-wrap"><table class="vals"><tr><th><em>${L}</em></th>${state.vals.map((v, i) =>
+                `<td><input class="num-input" data-val="${i}" type="text" inputmode="decimal" autocomplete="off" aria-label="${t.values} ${i + 1}" value="${esc(v)}"></td>`).join('')}</tr>` +
+            `<tr><th>${t.rowA} : ${pretty(state.A)}</th>${cells.map(c => `<td data-cell="a">${c ? num(c.a) : ''}</td>`).join('')}</tr>` +
+            `<tr><th>${t.rowB} : ${pretty(state.B)}</th>${cells.map(c => `<td data-cell="b">${c ? num(c.b) : ''}</td>`).join('')}</tr>` +
+            `<tr><th>${t.rowCmp}</th>${cells.map(c => c ? `<td class="${Math.abs(c.a - c.b) < 1e-9 ? 'same' : 'diff'}">${Math.abs(c.a - c.b) < 1e-9 ? t.same : t.diff}</td>` : '<td></td>').join('')}</tr></table></div>`;
+    }
+    function renderP2() {
+        const t = s();
+        let h = `<p class="intro">${t.p2Intro}</p>`;
+        h += `<div class="row"><label for="exA">${t.exprA}</label><input class="text-input" id="exA" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(state.A)}">` +
+            `<label for="exB">${t.exprB}</label><input class="text-input" id="exB" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(state.B)}"></div>`;
+        h += `<div id="tester">${testTable()}</div>`;
+        h += `<h3>${t.pairsTitle}</h3>`;
+        PAIRS.forEach((pr, i) => {
+            const st = state.pairs[i];
+            h += `<div class="card${st.fb && st.fb.cls === 'ok' ? ' done' : ''}"><div class="row"><strong>${pretty(pr.a)}</strong> &nbsp;?&nbsp; <strong>${pretty(pr.b)}</strong>` +
+                `<button type="button" class="btn light" data-test="${i}">${t.test}</button></div>` +
+                `<label class="choice"><input type="radio" name="v${i}" value="not"${st.verdict === 'not' ? ' checked' : ''}> <span>${t.verdictNot}</span></label>` +
+                `<label class="choice"><input type="radio" name="v${i}" value="eq"${st.verdict === 'eq' ? ' checked' : ''}> <span>${t.verdictEq}</span></label>`;
+            if (st.verdict === 'not') h += `<div class="row"><label for="pv${i}">${t.showValue}</label><input class="num-input" id="pv${i}" data-pv="${i}" type="text" inputmode="decimal" autocomplete="off" value="${esc(st.value)}"></div>`;
+            if (st.verdict === 'eq') h += `<div><strong>${t.justify}</strong>` + t.justif.map((j, k) =>
+                `<label class="choice"><input type="radio" name="j${i}" value="${k}"${st.justif === k ? ' checked' : ''}> <span>${j}</span></label>`).join('') + `</div>`;
+            h += `<div class="row"><button type="button" class="btn" data-pcheck="${i}">${t.check}</button><button type="button" class="btn light" data-preveal="${i}">${t.reveal}</button></div>${fbHtml(st.fb)}</div>`;
+        });
+        h += `<h3>${t.conclTitle}</h3>`;
+        [[t.q1, t.q1c], [t.q2, t.q2c]].forEach(([q, cs], i) => {
+            h += `<div class="card${state.qfb[i] && state.qfb[i].cls === 'ok' ? ' done' : ''}"><p><strong>${q}</strong></p>` + cs.map((c, k) =>
+                `<label class="choice"><input type="radio" name="q${i}" value="${k}"${state.q[i] === k ? ' checked' : ''}> <span>${c}</span></label>`).join('') +
+                `<div class="row"><button type="button" class="btn" data-qcheck="${i}">${t.check}</button></div>${fbHtml(state.qfb[i])}</div>`;
+        });
+        $('p2').innerHTML = h;
+    }
+    function checkPair(i) {
+        const t = s(), st = state.pairs[i], pr = PAIRS[i];
+        const A = Expr.parse(pr.a), B = Expr.parse(pr.b), L = A.letters[0];
+        if (!st.verdict) st.fb = { cls: 'hint', html: t.pickVerdict };
+        else if (st.verdict === 'eq' && !pr.eq) st.fb = { cls: 'hint', html: t.notEqWrong };
+        else if (st.verdict === 'not' && pr.eq) st.fb = { cls: 'hint', html: t.eqWrong };
+        else if (st.verdict === 'not') {
+            const v = readNum(st.value);
+            if (!st.value.trim()) st.fb = { cls: 'hint', html: t.needValue };
+            else if (isNaN(v)) st.fb = { cls: 'hint', html: t.badNum };
+            else {
+                const a = Expr.value(A.ast, { [L]: v }), b = Expr.value(B.ast, { [L]: v });
+                st.fb = Math.abs(a - b) < 1e-9 ? { cls: 'hint', html: t.valueSame(`${L} = ${num(v)}`, num(a)) } : { cls: 'ok', html: t.notEqOk(`${L} = ${num(v)}`, num(a), num(b)) };
+            }
+        } else {
+            if (st.justif === null) st.fb = { cls: 'hint', html: t.pickJustif };
+            else if (st.justif === 1) st.fb = { cls: 'ok', html: t.eqOk };
+            else st.fb = { cls: 'hint', html: st.justif === 0 ? t.justif0 : t.justif2 };
+        }
+        rerender(renderP2);
+    }
+
+    function rerender(fn) {
+        const a = document.activeElement, keep = a && a.id;
+        fn();
+        const el = keep && $(keep);
+        if (el) el.focus();
+    }
+
+    document.addEventListener('input', e => {
+        const el = e.target;
+        if (el.id === 'nRange') {
+            const n = Number(el.value);
+            const r = recognize();
+            state.n = n;
+            // A recognized way of counting is redrawn for the new n; otherwise start over
+            state.paint = r.way !== undefined ? paintWay(r.way, n) : {};
+            state.cur = 0;
+            renderP1(); $('nRange').focus();
+        }
+        else if (el.id === 'exA' || el.id === 'exB') { state[el.id === 'exA' ? 'A' : 'B'] = el.value; $('tester').innerHTML = testTable(); }
+        else if (el.dataset.val !== undefined) {
+            state.vals[el.dataset.val] = el.value;
+            const id = el.dataset.val;
+            $('tester').innerHTML = testTable();
+            const again = $('tester').querySelector(`[data-val="${id}"]`);
+            again.focus(); again.setSelectionRange(again.value.length, again.value.length);
+        }
+        else if (el.dataset.pv) state.pairs[el.dataset.pv].value = el.value;
+    });
+    document.addEventListener('change', e => {
+        const el = e.target;
+        if (/^v\d$/.test(el.name)) { state.pairs[el.name.slice(1)].verdict = el.value; state.pairs[el.name.slice(1)].fb = null; rerender(renderP2); }
+        else if (/^j\d$/.test(el.name)) state.pairs[el.name.slice(1)].justif = Number(el.value);
+        else if (/^q\d$/.test(el.name)) state.q[el.name.slice(1)] = Number(el.value);
+    });
+    document.addEventListener('click', e => {
+        const el = e.target, t = s();
+        const sw = el.closest('[data-color]');
+        if (sw) { state.color = Number(sw.dataset.color); renderP1(); $('p1').querySelector(`[data-color="${state.color}"]`).focus(); return; }
+        if (el.closest('#clearBtn')) { state.paint = {}; state.last = -1; state.cur = 0; return rerender(renderP1); }
+        if (el.closest('#hintBtn')) {
+            const missing = state.found.map((f, i) => f ? -1 : i).filter(i => i >= 0);
+            $('hintBox').innerHTML = `<div class="feedback info">${missing.length ? t.hints[missing[state.hintIdx++ % missing.length]] : t.allFound}</div>`;
+            return;
+        }
+        const tst = el.closest('[data-test]');
+        if (tst) {
+            const pr = PAIRS[tst.dataset.test];
+            state.A = pr.a; state.B = pr.b;
+            renderP2();
+            $('exA').scrollIntoView({ block: 'center' });
+            return;
+        }
+        const pc = el.closest('[data-pcheck]');
+        if (pc) return checkPair(Number(pc.dataset.pcheck));
+        const prv = el.closest('[data-preveal]');
+        if (prv) {
+            const i = Number(prv.dataset.preveal), pr = PAIRS[i];
+            if (pr.eq) state.pairs[i].fb = { cls: 'info', html: t.answerEq };
+            else {
+                const A = Expr.parse(pr.a), B = Expr.parse(pr.b), L = A.letters[0];
+                const v = [3, 1, 5].find(x => Math.abs(Expr.value(A.ast, { [L]: x }) - Expr.value(B.ast, { [L]: x })) > 1e-9);
+                state.pairs[i].fb = { cls: 'info', html: t.answerNot(`${L} = ${v}`, num(Expr.value(A.ast, { [L]: v })), num(Expr.value(B.ast, { [L]: v }))) };
+            }
+            return rerender(renderP2);
+        }
+        const qc = el.closest('[data-qcheck]');
+        if (qc) {
+            const i = Number(qc.dataset.qcheck), good = i === 0 ? 0 : 1;
+            state.qfb[i] = state.q[i] === null ? { cls: 'hint', html: t.pickVerdict } : state.q[i] === good ? { cls: 'ok', html: t.qOk } : { cls: 'hint', html: i === 0 ? t.q1Hint : t.q2Hint };
+            return rerender(renderP2);
+        }
+    });
+
+    function applyLang() {
+        const t = s();
+        document.querySelectorAll('[data-i18n]').forEach(el => { const v = t[el.dataset.i18n]; if (typeof v === 'string') el.innerHTML = v; });
+        document.title = t.title.replace(/^\S+\s/, '') + ' – LaboMath';
+        $('concept').innerHTML = t.concept;
+        state.pairs.forEach(x => { x.fb = null; });
+        state.qfb = [null, null];
+        renderP1(); renderP2();
+    }
+    Langue.onChange(lang => { state.lang = lang; applyLang(); });
+    applyLang();
+</script>
+
+</body>
+</html>

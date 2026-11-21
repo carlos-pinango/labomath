@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La valeur numérique – LaboMath</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../commun/style.css">
+    <script src="../commun/langue.js"></script>
+    <script src="../commun/expressions.js"></script>
+    <style>
+        /* Styles propres à cette activité (le reste vient de commun/style.css) */
+        [hidden] { display: none !important; }
+        :root { --navy: #1f2d4d; --blue: #1f5fa8; --orange: #c84a16; --pale: #eef3fa; --line: #c9d4e5; --ok: #1e7d45; --muted: #4a5878; }
+        .container { color: var(--navy); width: 100%; max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { color: var(--navy); font-weight: 900; line-height: 1.2; border-bottom: 2px solid var(--pale); padding-bottom: 10px; }
+        h2.step { font-size: 1.15em; font-weight: 900; margin: 34px 0 10px; padding-top: 14px; border-top: 2px solid var(--pale); color: var(--navy); }
+        h2.step .num { display: inline-flex; width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: 50%; background: var(--blue); color: white; font-size: 0.85em; margin-right: 8px; }
+        h3 { font-size: 1em; font-weight: 900; margin: 14px 0 8px; }
+        em { font-family: Georgia, 'Times New Roman', serif; font-style: italic; }
+        p { line-height: 1.6; }
+        .intro { margin: 6px 0 10px; }
+        .concept-box { background: var(--pale); padding: 15px; border-left: 5px solid var(--blue); margin: 16px 0; border-radius: 4px; font-size: 0.95em; line-height: 1.6; }
+        .panel { background: var(--pale); border-radius: 10px; padding: 12px 16px; margin-bottom: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 14px; font-weight: 700; }
+        .chips { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+        .chip { border: none; background: white; color: var(--muted); font-family: inherit; font-weight: 800; font-size: 1em; border-radius: 18px; padding: 6px 14px; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .chip.active { background: var(--blue); color: white; }
+        .row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 10px; font-weight: 700; margin: 8px 0; }
+        .text-input, .num-input { padding: 6px 10px; border: 2px solid var(--line); border-radius: 8px; font-family: inherit; font-size: 1.05em; font-weight: 800; color: var(--navy); background: white; outline: none; }
+        .text-input { width: 220px; }
+        .num-input { width: 90px; text-align: center; }
+        .text-input:focus, .num-input:focus { border-color: var(--blue); }
+        .ok-field { border-color: var(--ok) !important; background: #e7f4ec; }
+        .btn { border: none; background: var(--blue); color: white; font-family: inherit; font-weight: 800; font-size: 0.95em; border-radius: 20px; padding: 8px 16px; cursor: pointer; }
+        .btn:hover { background: #184d8a; }
+        .btn.light { background: var(--pale); color: var(--blue); }
+        .btn.light:hover { background: #dde7f5; }
+        .center { text-align: center; margin-top: 10px; }
+        .feedback { border-radius: 10px; padding: 10px 14px; line-height: 1.6; margin-top: 10px; text-align: center; }
+        .feedback.hint { background: #fbeee7; color: #84300d; }
+        .feedback.ok { background: #e7f4ec; color: var(--ok); }
+        .feedback.info { background: var(--pale); color: var(--navy); }
+        .card { border: 2px solid var(--pale); border-radius: 12px; padding: 12px 14px; margin: 12px 0; }
+        .card.done { border-color: #bfe3cc; }
+        .card h3 { margin-top: 0; font-size: 1.15em; }
+
+        /* La machine */
+        .machine { border: 3px solid var(--navy); border-radius: 16px; padding: 14px; text-align: center; }
+        .machine .q { font-size: 1.1em; font-weight: 800; }
+        .steps { font-size: 1.5em; font-weight: 900; line-height: 1.9; margin-top: 8px; }
+        .steps .val { color: var(--orange); }
+        .steps .line { display: block; }
+        .steps .line .eq { color: var(--muted); margin-right: 8px; }
+
+        svg.pool { width: 100%; max-width: 300px; height: auto; display: block; margin: 8px auto 0; }
+        .counter { text-align: center; font-weight: 900; font-size: 1.1em; min-height: 1.5em; }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px 14px; }
+            h1 { font-size: 1.4em; }
+            .steps { font-size: 1.2em; }
+            .text-input { width: 190px; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="app-header">
+    <div class="header-inner">
+        <a class="back-btn" href="index.html">← <span data-en="Introduction to algebra">Introduction à l'algèbre</span></a>
+        <a class="logo" href="../index.html">
+            <div class="logo-icon">∑</div>
+            <span class="logo-text">Labo<span class="logo-accent">Math</span></span>
+        </a>
+        <button class="lang-btn" id="langBtn">EN</button>
+    </div>
+</header>
+
+<main class="page">
+<div class="container">
+    <h1 data-i18n="title">🔢 La valeur numérique</h1>
+    <div class="concept-box" id="concept"></div>
+
+    <h2 class="step"><span class="num">1</span><span data-i18n="p1Title"></span></h2>
+    <div id="p1"></div>
+
+    <h2 class="step"><span class="num">2</span><span data-i18n="p2Title"></span></h2>
+    <div id="p2"></div>
+
+    <h2 class="step"><span class="num">3</span><span data-i18n="p3Title"></span></h2>
+    <div id="p3"></div>
+</div>
+</main>
+
+<footer class="app-footer">
+    <span data-en="Designed by Carlos Pinango, engineer and high school math teacher">Conçu par Carlos Pinango, ingénieur et enseignant de mathématiques au secondaire</span>
+</footer>
+
+<script>
+    const M = '−';
+    // An expression is a list of terms [coefficient, degree], in decreasing order of degree
+    // Machine: the student types any expression in one letter; these are models to start from
+    const MACHINE = ['3x² − 2x', '3a − 5', '2t²', 'y²', '−k + 7', '4b − 8'];
+    const ITEMS = [
+        { terms: [[3, 1], [-5, 0]], x: 4, letter: 'a' },
+        { terms: [[2, 2]], x: 3, letter: 't', trap: { value: 36, key: 'trapSq' } },
+        { terms: [[1, 2]], x: -2, letter: 'y', trap: { value: -4, key: 'trapNegSq' }, compare: true },
+        { terms: [[3, 2], [-2, 1]], x: -2, letter: 'x', trap: { value: 8, key: 'trapNegProd' } },
+        { terms: [[-1, 1], [7, 0]], x: -3, letter: 'k', trap: { value: 4, key: 'trapOpp' } },
+        { terms: [[4, 1], [-8, 0]], x: 0.5, letter: 'b' },
+    ];
+
+    const STR = {
+        fr: {
+            title: `🔢 La valeur numérique`,
+            concept: `Remplacer la lettre par un nombre, c'est se demander : « <strong>Combien ça vaut quand…</strong> ? ». ` +
+                `Dans 4<em>n</em> + 4, si <em>n</em> vaut 7, la bordure de la piscine a 4(7) + 4 carreaux. On écrit toujours la valeur <strong>entre parenthèses</strong> : elle prend la place de la lettre, sans se coller aux autres nombres.`,
+            p1Title: `La machine`,
+            p1Intro: `Écris une expression avec la lettre de ton choix (ou touche un modèle), puis une valeur. La machine montre le remplacement, étape par étape.`,
+            exprLbl: `Expression :`,
+            machineErr: `Écris une expression avec une seule lettre (sauf o, l et i, qu'on confond avec 0 et 1), de degré 2 au plus.`,
+            xIs: `<em>§</em> =`,
+            go: `Calculer`,
+            badNum: `Écris un nombre, par exemple 4, ${M}2 ou 0,5.`,
+            machineQ: (e, v) => `Combien vaut ${e} quand <em>§</em> = ${v} ?`,
+            p2Title: `À toi`,
+            p2Intro: `Pour chaque expression, écris d'abord le remplacement, la valeur entre parenthèses, puis le résultat.`,
+            itemQ: (e, v) => `${e} pour <em>§</em> = ${v}`,
+            sub: `Je remplace :`, res: `Je calcule :`,
+            check: `Vérifier`, reveal: `Voir la réponse`,
+            subEmpty: `Écris d'abord le remplacement.`,
+            subLetter: `Il reste une lettre : remplace chaque <em>§</em> par la valeur.`,
+            subParen: v => `Écris la valeur entre parenthèses à la place de <em>§</em> : (${v}).`,
+            subWrong: `Ton remplacement ne correspond pas à l'expression. Compare chaque terme : le nombre devant <em>§</em>, l'exposant, le signe.`,
+            subOk: `✅ Le remplacement est juste.`,
+            resEmpty: `Écris le résultat.`,
+            resWrong: `Reprends ton calcul : d'abord les exposants, puis les multiplications, puis les additions et les soustractions.`,
+            trapSq: `2<em>§</em>², c'est 2 fois <em>§</em>(<em>§</em>) : seul le <em>§</em> est au carré. Que vaut (3)² ? Ensuite, multiplie par 2.`,
+            trapNegSq: `(${M}2)², c'est (${M}2)(${M}2). Quel est le signe de ce produit ?`,
+            trapNegProd: `Regarde le terme ${M}2(${M}2) : c'est le produit de deux nombres négatifs. Quel est son signe ?`,
+            trapOpp: `${M}<em>§</em>, c'est l'opposé de <em>§</em>. Quand <em>§</em> = ${M}3, quel est l'opposé de (${M}3) ?`,
+            parse: `Je ne reconnais pas cette écriture. Exemple : 3(4) ${M} 5.`,
+            times: `Pour multiplier, écris des parenthèses, comme dans 3(4) : pas de ×, d'astérisque ni de point.`,
+            resOk: v => `✅ Bravo ! La valeur est ${v}.`,
+            answer: steps => `Réponse : ${steps}`,
+            cmpTitle: `Et sans parenthèses ?`,
+            cmpIntro: `Compare (${M}2)² et ${M}2². Calcule chacun.`,
+            cmpWrongA: `(${M}2)², c'est (${M}2)(${M}2).`,
+            cmpWrongB: `${M}2², c'est l'opposé de 2² : l'opposé de (2)(2).`,
+            cmpOk: `✅ (${M}2)² = (${M}2)(${M}2) = 4, mais ${M}2² = ${M}(2)(2) = ${M}4. Sans parenthèses, seul le 2 est au carré, et le signe moins s'applique au résultat. ` +
+                `C'est pourquoi on écrit la valeur ${M}2 entre parenthèses quand elle remplace <em>§</em>.`,
+            p3Title: `Je vérifie une expression`,
+            p3Intro: `Dans la piscine, la bordure compte 4<em>n</em> + 4 carreaux. Calcule sa valeur pour <em>n</em> = 7, puis compte les carreaux du dessin pour confirmer.`,
+            p3Q: `4<em>n</em> + 4 pour <em>n</em> = 7`,
+            p3SubLetter: `Il reste une lettre : remplace <em>n</em> par 7.`,
+            p3SubParen: `Écris la valeur entre parenthèses à la place de <em>n</em> : (7).`,
+            count: `Compter les carreaux`,
+            counting: k => `${k} carreaux comptés`,
+            counted: k => `Le compte donne ${k} carreaux.`,
+            confirm: `✅ Le compte confirme ta valeur : l'expression 4<em>n</em> + 4 compte bien les carreaux de la bordure.`,
+        },
+        en: {
+            title: `🔢 Numerical value`,
+            concept: `Replacing the letter with a number means asking: “<strong>How much is it worth when…</strong>?”. ` +
+                `In 4<em>n</em> + 4, if <em>n</em> is 7, the pool border has 4(7) + 4 tiles. We always write the value <strong>in parentheses</strong>: it takes the place of the letter without sticking to the other numbers.`,
+            p1Title: `The machine`,
+            p1Intro: `Write an expression with the letter of your choice (or tap a model), then a value. The machine shows the replacement, step by step.`,
+            exprLbl: `Expression:`,
+            machineErr: `Write an expression with a single letter (except o, l and i, which look like 0 and 1), of degree 2 at most.`,
+            xIs: `<em>§</em> =`,
+            go: `Calculate`,
+            badNum: `Write a number, for example 4, ${M}2 or 0.5.`,
+            machineQ: (e, v) => `How much is ${e} worth when <em>§</em> = ${v}?`,
+            p2Title: `Your turn`,
+            p2Intro: `For each expression, first write the replacement, with the value in parentheses, then the result.`,
+            itemQ: (e, v) => `${e} for <em>§</em> = ${v}`,
+            sub: `I replace:`, res: `I calculate:`,
+            check: `Check`, reveal: `Show the answer`,
+            subEmpty: `First write the replacement.`,
+            subLetter: `A letter is left: replace each <em>§</em> with the value.`,
+            subParen: v => `Write the value in parentheses in place of <em>§</em>: (${v}).`,
+            subWrong: `Your replacement does not match the expression. Compare each term: the number in front of <em>§</em>, the exponent, the sign.`,
+            subOk: `✅ The replacement is right.`,
+            resEmpty: `Write the result.`,
+            resWrong: `Go over your calculation again: first the exponents, then the multiplications, then the additions and subtractions.`,
+            trapSq: `2<em>§</em>² is 2 times <em>§</em>(<em>§</em>): only the <em>§</em> is squared. What is (3)²? Then multiply by 2.`,
+            trapNegSq: `(${M}2)² is (${M}2)(${M}2). What is the sign of this product?`,
+            trapNegProd: `Look at the term ${M}2(${M}2): it is the product of two negative numbers. What is its sign?`,
+            trapOpp: `${M}<em>§</em> is the opposite of <em>§</em>. When <em>§</em> = ${M}3, what is the opposite of (${M}3)?`,
+            parse: `I don't recognize this. Example: 3(4) ${M} 5.`,
+            times: `To multiply, write parentheses, as in 3(4): no ×, asterisk or dot.`,
+            resOk: v => `✅ Well done! The value is ${v}.`,
+            answer: steps => `Answer: ${steps}`,
+            cmpTitle: `And without parentheses?`,
+            cmpIntro: `Compare (${M}2)² and ${M}2². Calculate each one.`,
+            cmpWrongA: `(${M}2)² is (${M}2)(${M}2).`,
+            cmpWrongB: `${M}2² is the opposite of 2²: the opposite of (2)(2).`,
+            cmpOk: `✅ (${M}2)² = (${M}2)(${M}2) = 4, but ${M}2² = ${M}(2)(2) = ${M}4. Without parentheses, only the 2 is squared, and the minus sign applies to the result. ` +
+                `That is why we write the value ${M}2 in parentheses when it replaces <em>§</em>.`,
+            p3Title: `I check an expression`,
+            p3Intro: `In the pool, the border has 4<em>n</em> + 4 tiles. Calculate its value for <em>n</em> = 7, then count the tiles of the drawing to confirm.`,
+            p3Q: `4<em>n</em> + 4 for <em>n</em> = 7`,
+            p3SubLetter: `A letter is left: replace <em>n</em> with 7.`,
+            p3SubParen: `Write the value in parentheses in place of <em>n</em>: (7).`,
+            count: `Count the tiles`,
+            counting: k => `${k} tiles counted`,
+            counted: k => `The count gives ${k} tiles.`,
+            confirm: `✅ The count confirms your value: the expression 4<em>n</em> + 4 does count the border tiles.`,
+        },
+    };
+
+    const state = {
+        lang: Langue.lang,
+        mexpr: '3x² − 2x', mx: '-2',
+        items: ITEMS.map(() => ({ sub: '', res: '', subOk: false, resOk: false, fb: null })),
+        cmp: { a: '', b: '', fb: null },
+        p3: { sub: '', res: '', fb: null, counted: false, resOk: false },
+    };
+    const $ = id => document.getElementById(id);
+    const s = () => STR[state.lang];
+    const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const num = v => Expr.fmtNum(v, state.lang);
+    const fbHtml = f => f ? `<div class="feedback ${f.cls}">${f.html}</div>` : '';
+    const poly = terms => { const p = [0, 0, 0]; terms.forEach(([c, d]) => { p[d] += c; }); return p; };
+    const fmtE = (terms, letter = 'x') => Expr.fmtPoly(poly(terms), letter, state.lang);
+    const valueOf = (terms, x) => terms.reduce((a, [c, d]) => a + c * Math.pow(x, d), 0);
+    // A number typed by the student: 4, −2, 0,5 ; NaN otherwise
+    function readNum(str) {
+        const t = String(str).replace(/\s+/g, '').replace(/[−–—]/g, '-').replace(',', '.');
+        return /^-?\d+(\.\d+)?$/.test(t) ? Number(t) : NaN;
+    }
+
+    // The machine's steps: 3(−2)² − 2(−2), then 3(4) + 4, then 16
+    function steps(terms, x) {
+        const v = `(${num(x)})`;
+        const line1 = terms.map(([c, d], k) => {
+            const a = Math.abs(c);
+            const body = d === 0 ? num(a) : (a === 1 ? '' : num(a)) + `<span class="val">${v}</span>` + (d === 2 ? '²' : '');
+            return k === 0 ? (c < 0 ? M : '') + body : (c < 0 ? ` ${M} ` : ' + ') + body;
+        }).join('');
+        // Powers done; a degree-1 term becomes its product
+        const parts = terms.map(([c, d]) => {
+            if (d === 2 && Math.abs(c) !== 1) return { neg: c < 0, txt: `${num(Math.abs(c))}(${num(x * x)})` };
+            const val = c * Math.pow(x, d);
+            return { neg: val < 0, txt: num(Math.abs(val)) };
+        });
+        const line2 = parts.map((p, k) => k === 0 ? (p.neg ? M : '') + p.txt : (p.neg ? ` ${M} ` : ' + ') + p.txt).join('');
+        const line3 = num(valueOf(terms, x));
+        const lines = [line1];
+        if (line2.replace(/<[^>]+>/g, '') !== line1.replace(/<[^>]+>/g, '') && line2 !== line3) lines.push(line2);
+        lines.push(line3);
+        return lines;
+    }
+    const stepsText = (terms, x) => steps(terms, x).join(' = ');
+
+    // The machine's expression: terms and letter, or null
+    function machineExpr() {
+        const r = Expr.parse(state.mexpr);
+        if (r.err || r.letters.length !== 1 || /[oli]/.test(r.letters[0])) return null;
+        const p = Expr.poly(r.ast);
+        if (!p) return null;
+        const terms = [2, 1, 0].filter(d => Math.abs(p[d] || 0) > 1e-9).map(d => [p[d], d]);
+        return terms.length ? { terms, letter: r.letters[0] } : null;
+    }
+    function renderP1() {
+        const t = s();
+        const x = readNum(state.mx);
+        const me = machineExpr();
+        const L = me ? me.letter : 'x';
+        let h = `<p class="intro">${t.p1Intro}</p><div class="panel"><div class="chips">` +
+            MACHINE.map((e, i) => `<button type="button" class="chip${Expr.normalize(e) === Expr.normalize(state.mexpr) ? ' active' : ''}" data-m="${i}">${e.replace(/([a-z])/g, '<em>$1</em>')}</button>`).join('') + `</div></div>`;
+        h += `<div class="machine"><div class="row"><label for="mexpr">${t.exprLbl}</label><input class="text-input" id="mexpr" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(state.mexpr)}">` +
+            `<label for="mx">${t.xIs}</label><input class="num-input" id="mx" type="text" inputmode="decimal" autocomplete="off" value="${esc(state.mx)}"></div>`;
+        if (!me) h += `<div class="feedback hint">${t.machineErr}</div>`;
+        else if (isNaN(x)) h += `<div class="feedback hint">${t.badNum}</div>`;
+        else h += `<div class="q">${t.machineQ(fmtE(me.terms, L), num(x))}</div><div class="steps" aria-live="polite">` +
+            steps(me.terms, x).map((l, k) => `<span class="line">${k ? '<span class="eq">=</span>' : ''}${l}</span>`).join('') + `</div>`;
+        $('p1').innerHTML = (h + `</div>`).replace(/§/g, L);
+    }
+
+    // Is the value written in parentheses in the student's replacement?
+    function hasParenValue(raw, x, letterless = true) {
+        const n = Expr.normalize(raw);
+        const forms = [String(x), String(x).replace('.', ',')];
+        return forms.some(f => n.includes(`(${f})`));
+    }
+
+    function checkSub(raw, terms, x, t, letter = 'x') {
+        if (!raw.trim()) return { cls: 'hint', html: t.subEmpty };
+        const r = Expr.parse(raw);
+        if (r.err === 'times') return { cls: 'hint', html: t.times };
+        if (r.err) return { cls: 'hint', html: t.parse };
+        if (r.letters.length) return { cls: 'hint', html: t.subLetter };
+        if (!hasParenValue(raw, x)) return { cls: 'hint', html: t.subParen(num(x)) };
+        if (Math.abs(Expr.value(r.ast, {}) - valueOf(terms, x)) > 1e-9) return { cls: 'hint', html: t.subWrong };
+        return null;
+    }
+
+    function renderP2() {
+        const t = s();
+        let h = `<p class="intro">${t.p2Intro}</p>`;
+        ITEMS.forEach((it, i) => {
+            const st = state.items[i];
+            let c = `<div class="card${st.resOk ? ' done' : ''}"><h3>${i + 1}. ${t.itemQ(fmtE(it.terms, it.letter), num(it.x))}</h3>` +
+                `<div class="row"><label for="sub${i}">${t.sub}</label><input class="text-input${st.subOk ? ' ok-field' : ''}" id="sub${i}" data-sub="${i}" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(st.sub)}"></div>` +
+                `<div class="row"><label for="res${i}">${t.res}</label><input class="num-input${st.resOk ? ' ok-field' : ''}" id="res${i}" data-res="${i}" type="text" inputmode="decimal" autocomplete="off" value="${esc(st.res)}">` +
+                `<button type="button" class="btn" data-check="${i}">${t.check}</button><button type="button" class="btn light" data-reveal="${i}">${t.reveal}</button></div>` +
+                fbHtml(st.fb);
+            if (it.compare && st.resOk) {
+                const cm = state.cmp;
+                c += `<h3>${t.cmpTitle}</h3><p>${t.cmpIntro}</p>` +
+                    `<div class="row"><label for="cmpA">(${M}2)² =</label><input class="num-input" id="cmpA" type="text" inputmode="decimal" autocomplete="off" value="${esc(cm.a)}">` +
+                    `<label for="cmpB">${M}2² =</label><input class="num-input" id="cmpB" type="text" inputmode="decimal" autocomplete="off" value="${esc(cm.b)}">` +
+                    `<button type="button" class="btn" id="cmpCheck">${t.check}</button></div>` + fbHtml(cm.fb);
+            }
+            // Each card uses the letter of its own expression
+            h += (c + `</div>`).replace(/§/g, it.letter);
+        });
+        $('p2').innerHTML = h;
+    }
+
+    function checkItem(i) {
+        const t = s(), it = ITEMS[i], st = state.items[i];
+        const good = valueOf(it.terms, it.x);
+        const subFb = checkSub(st.sub, it.terms, it.x, t);
+        st.subOk = !subFb;
+        const v = readNum(st.res);
+        st.resOk = false;
+        if (subFb) st.fb = subFb;
+        else if (!st.res.trim()) st.fb = { cls: 'hint', html: t.resEmpty };
+        else if (isNaN(v)) st.fb = { cls: 'hint', html: t.badNum };
+        else if (Math.abs(v - good) > 1e-9) st.fb = { cls: 'hint', html: it.trap && Math.abs(v - it.trap.value) < 1e-9 ? t[it.trap.key] : t.resWrong };
+        else { st.resOk = true; st.fb = { cls: 'ok', html: t.resOk(num(good)) }; }
+        rerender(renderP2, 'res' + i);
+    }
+
+    function renderP3() {
+        const t = s(), st = state.p3;
+        $('p3').innerHTML = `<p class="intro">${t.p3Intro}</p><div class="card${st.resOk ? ' done' : ''}"><h3>${t.p3Q}</h3>` +
+            `<div class="row"><label for="p3sub">${t.sub}</label><input class="text-input" id="p3sub" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(st.sub)}"></div>` +
+            `<div class="row"><label for="p3res">${t.res}</label><input class="num-input${st.resOk ? ' ok-field' : ''}" id="p3res" type="text" inputmode="decimal" autocomplete="off" value="${esc(st.res)}">` +
+            `<button type="button" class="btn" id="p3Check">${t.check}</button><button type="button" class="btn light" id="p3Count">${t.count}</button></div>` +
+            fbHtml(st.fb) + `<div id="p3Draw">${poolSvg(7, st.counted ? 32 : 0)}</div><div class="counter" id="p3Counter">${st.counted ? t.counted(32) : ''}</div>` +
+            (st.counted && st.resOk ? `<div class="feedback ok">${t.confirm}</div>` : '') + `</div>`;
+        $('p3').innerHTML = $('p3').innerHTML.replace(/§/g, 'n');
+    }
+    function poolSvg(n, k) {
+        const N = n + 2, S = 10;
+        const ring = [];
+        for (let c = 0; c <= n + 1; c++) ring.push([0, c]);
+        for (let r = 1; r <= n + 1; r++) ring.push([r, n + 1]);
+        for (let c = n; c >= 0; c--) ring.push([n + 1, c]);
+        for (let r = n; r >= 1; r--) ring.push([r, 0]);
+        let h = `<svg class="pool" viewBox="-1 -1 ${N * S + 2} ${N * S + 2}" aria-hidden="true"><rect x="${S}" y="${S}" width="${n * S}" height="${n * S}" fill="#d7e8f7"/>`;
+        ring.forEach(([r, c], i) => { h += `<rect x="${c * S + 0.5}" y="${r * S + 0.5}" width="9" height="9" rx="1" fill="${i < k ? '#1f5fa8' : 'white'}" stroke="${i < k ? 'none' : '#9fb0c8'}" stroke-width="0.6"/>`; });
+        return h + '</svg>';
+    }
+    function count() {
+        const t0 = performance.now(), total = 32;
+        (function step(now) {
+            const k = Math.min(total, Math.round(total * (now - t0) / 1200));
+            $('p3Draw').innerHTML = poolSvg(7, k);
+            $('p3Counter').textContent = s().counting(k);
+            if (k < total) requestAnimationFrame(step);
+            else { state.p3.counted = true; renderP3(); }
+        })(t0);
+    }
+
+    function rerender(fn, focusId) {
+        const a = document.activeElement;
+        const keep = focusId && a && a.tagName === 'BUTTON' ? null : (a && a.id);
+        fn();
+        const el = keep && $(keep);
+        if (el) { el.focus(); if (el.setSelectionRange && el.type === 'text') el.setSelectionRange(el.value.length, el.value.length); }
+    }
+
+    document.addEventListener('input', e => {
+        const el = e.target;
+        if (el.id === 'mx' || el.id === 'mexpr') { state[el.id] = el.value; rerender(renderP1); }
+        else if (el.dataset.sub) state.items[el.dataset.sub].sub = el.value;
+        else if (el.dataset.res) state.items[el.dataset.res].res = el.value;
+        else if (el.id === 'cmpA') state.cmp.a = el.value;
+        else if (el.id === 'cmpB') state.cmp.b = el.value;
+        else if (el.id === 'p3sub') state.p3.sub = el.value;
+        else if (el.id === 'p3res') state.p3.res = el.value;
+    });
+    document.addEventListener('click', e => {
+        const el = e.target, t = s();
+        const m = el.closest('[data-m]');
+        if (m) { state.mexpr = MACHINE[m.dataset.m]; renderP1(); $('p1').querySelector(`[data-m="${m.dataset.m}"]`).focus(); return; }
+        const c = el.closest('[data-check]');
+        if (c) return checkItem(Number(c.dataset.check));
+        const r = el.closest('[data-reveal]');
+        if (r) { const it = ITEMS[r.dataset.reveal]; state.items[r.dataset.reveal].fb = { cls: 'info', html: t.answer(stepsText(it.terms, it.x)) }; return rerender(renderP2); }
+        if (el.closest('#cmpCheck')) {
+            const a = readNum(state.cmp.a), b = readNum(state.cmp.b);
+            state.cmp.fb = a !== 4 ? { cls: 'hint', html: t.cmpWrongA } : b !== -4 ? { cls: 'hint', html: t.cmpWrongB } : { cls: 'ok', html: t.cmpOk };
+            return rerender(renderP2);
+        }
+        if (el.closest('#p3Check')) {
+            const st = state.p3;
+            const f = checkSub(st.sub, [[4, 1], [4, 0]], 7, t, 'n');
+            const v = readNum(st.res);
+            st.resOk = false;
+            if (f) st.fb = f;
+            else if (isNaN(v)) st.fb = { cls: 'hint', html: st.res.trim() ? t.badNum : t.resEmpty };
+            else if (v !== 32) st.fb = { cls: 'hint', html: t.resWrong };
+            else { st.resOk = true; st.fb = { cls: 'ok', html: t.resOk('32') }; }
+            return rerender(renderP3);
+        }
+        if (el.closest('#p3Count')) return count();
+    });
+    document.addEventListener('keydown', e => {
+        if (e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
+        const el = e.target;
+        if (el.dataset.sub || el.dataset.res) checkItem(Number(el.dataset.sub || el.dataset.res));
+        else if (el.id === 'cmpA' || el.id === 'cmpB') $('cmpCheck').click();
+        else if (el.id === 'p3sub' || el.id === 'p3res') $('p3Check').click();
+    });
+
+    function applyLang() {
+        const t = s();
+        document.querySelectorAll('[data-i18n]').forEach(el => { const v = t[el.dataset.i18n]; if (typeof v === 'string') el.innerHTML = v; });
+        document.title = t.title.replace(/^\S+\s/, '') + ' – LaboMath';
+        $('concept').innerHTML = t.concept;
+        state.items.forEach(x => { x.fb = null; });
+        state.cmp.fb = null; state.p3.fb = null;
+        renderP1(); renderP2(); renderP3();
+    }
+    Langue.onChange(lang => { state.lang = lang; applyLang(); });
+    applyLang();
+</script>
+
+</body>
+</html>
